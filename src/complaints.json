@@ -1,0 +1,26 @@
+[
+    {
+      "id": 1,
+      "subject": "Slow Internet",
+      "details": "The internet speed in Building A is very slow",
+      "department": "IT",
+      "building": "Building A",
+      "status": "in_progress",
+      "priority": "high",
+      "raisedBy": 3,
+      "raisedOn": "2023-09-15T10:30:00Z",
+      "fileAttachment": "slow_internet.pdf"
+    },
+    {
+      "id": 2,
+      "subject": "Broken Chair",
+      "details": "There's a broken chair in Room 101 of Building B",
+      "department": "Maintenance",
+      "building": "Building B",
+      "status": "raised",
+      "priority": "medium",
+      "raisedBy": 3,
+      "raisedOn": "2023-09-16T14:45:00Z",
+      "fileAttachment": "broken_chair.jpg"
+    }
+  ]
