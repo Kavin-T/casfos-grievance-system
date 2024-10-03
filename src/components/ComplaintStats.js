@@ -1,56 +1,84 @@
 import React from 'react';
-import complaints from '../complaints.json';
+import { ChartBarIcon, ClockIcon, CheckCircleIcon, ExclamationCircleIcon, BuildingOfficeIcon} from '@heroicons/react/24/outline';
 
-export default function ComplaintStats() {
+export default function ComplaintStats({ complaints }) {
   const totalComplaints = complaints.length;
-  const raisedComplaints = complaints.filter(c => c.status === 'raised').length;
-  const inProgressComplaints = complaints.filter(c => c.status === 'in_progress').length;
-  const resolvedComplaints = complaints.filter(c => c.status === 'resolved').length;
+  const resolvedComplaints = complaints.filter(c => c.status === 'Work completed').length;
+  const pendingComplaints = totalComplaints - resolvedComplaints;
+  const resolutionRate = totalComplaints > 0 ? (resolvedComplaints / totalComplaints * 100).toFixed(2) : 0;
 
-  const departments = [...new Set(complaints.map(c => c.department))];
-  const departmentStats = departments.map(dept => ({
-    name: dept,
-    count: complaints.filter(c => c.department === dept).length
-  }));
+  const departmentStats = complaints.reduce((acc, complaint) => {
+    if (!acc[complaint.department]) {
+      acc[complaint.department] = { total: 0, resolved: 0 };
+    }
+    acc[complaint.department].total += 1;
+    if (complaint.status === 'Work completed') {
+      acc[complaint.department].resolved += 1;
+    }
+    return acc;
+  }, {});
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-900">Complaint Statistics</h2>
-      <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-4">
-        <div className="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-          <dt className="text-sm font-medium text-gray-500 truncate">Total Complaints</dt>
-          <dd className="mt-1 text-3xl font-semibold text-gray-900">{totalComplaints}</dd>
+    <div className="bg-white shadow rounded-lg p-6 mb-8">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Complaint Statistics</h2>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="bg-green-100 rounded-lg p-4 flex items-center">
+          <ChartBarIcon className="h-10 w-10 text-green-600 mr-4" />
+          <div>
+            <p className="text-sm font-medium text-gray-500">Total Complaints</p>
+            <p className="text-2xl font-semibold text-gray-900">{totalComplaints}</p>
+          </div>
         </div>
-        <div className="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-          <dt className="text-sm font-medium text-gray-500 truncate">Raised</dt>
-          <dd className="mt-1 text-3xl font-semibold text-gray-900">{raisedComplaints}</dd>
+        <div className="bg-yellow-100 rounded-lg p-4 flex items-center">
+          <ClockIcon className="h-10 w-10 text-yellow-600 mr-4" />
+          <div>
+            <p className="text-sm font-medium text-gray-500">Pending Complaints</p>
+            <p className="text-2xl font-semibold text-gray-900">{pendingComplaints}</p>
+          </div>
         </div>
-        <div className="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-          <dt className="text-sm font-medium text-gray-500 truncate">In Progress</dt>
-          <dd className="mt-1 text-3xl font-semibold text-gray-900">{inProgressComplaints}</dd>
+        <div className="bg-green-100 rounded-lg p-4 flex items-center">
+          <CheckCircleIcon className="h-10 w-10 text-green-600 mr-4" />
+          <div>
+            <p className="text-sm font-medium text-gray-500">Resolved Complaints</p>
+            <p className="text-2xl font-semibold text-gray-900">{resolvedComplaints}</p>
+          </div>
         </div>
-        <div className="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-          <dt className="text-sm font-medium text-gray-500 truncate">Resolved</dt>
-          <dd className="mt-1 text-3xl font-semibold text-gray-900">{resolvedComplaints}</dd>
+        <div className="bg-blue-100 rounded-lg p-4 flex items-center">
+          <ExclamationCircleIcon className="h-10 w-10 text-blue-600 mr-4" />
+          <div>
+            <p className="text-sm font-medium text-gray-500">Resolution Rate</p>
+            <p className="text-2xl font-semibold text-gray-900">{resolutionRate}%</p>
+          </div>
         </div>
-      </dl>
-      <h3 className="mt-8 text-xl font-semibold text-gray-900">Complaints by Department</h3>
-      <ul className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {departmentStats.map((dept) => (
-          <li key={dept.name} className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200">
-            <div className="w-full flex items-center justify-between p-6 space-x-6">
-              <div className="flex-1 truncate">
-                <div className="flex items-center space-x-3">
-                  <h3 className="text-gray-900 text-sm font-medium truncate">{dept.name}</h3>
-                </div>
+      </div>
+
+      <h3 className="text-xl font-semibold text-gray-900 mb-4">Department-wise Statistics</h3>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {Object.entries(departmentStats).map(([department, stats]) => (
+          <div key={department} className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center mb-4">
+              <BuildingOfficeIcon className="h-8 w-8 text-green-600 mr-3" />
+              <h4 className="text-lg font-semibold text-gray-900">{department}</h4>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total</p>
+                <p className="text-xl font-semibold text-gray-900">{stats.total}</p>
               </div>
-              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-gray-500 text-sm font-medium">
-                {dept.count}
+              <div>
+                <p className="text-sm font-medium text-gray-500">Resolved</p>
+                <p className="text-xl font-semibold text-gray-900">{stats.resolved}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-gray-500">Resolution Rate</p>
+                <p className="text-xl font-semibold text-gray-900">
+                  {stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(2) : 0}%
+                </p>
               </div>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

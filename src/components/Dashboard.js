@@ -3,80 +3,67 @@ import ComplaintForm from './ComplaintForm';
 import ComplaintList from './ComplaintList';
 import ComplaintStats from './ComplaintStats';
 
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user, complaints, onNewComplaint, onStatusChange, onFeedbackSubmit }) {
   const [activeTab, setActiveTab] = useState('list');
 
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <span className="text-lg font-semibold">CASFOS Grievance System</span>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 mr-4">Welcome, {user.username}</span>
-              <button
-                onClick={onLogout}
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+  const tabs = [
+    { id: 'new', label: 'New Complaint', show: user.role === 'complaint_raiser' },
+    { id: 'list', label: 'Complaint List', show: true },
+    { id: 'stats', label: 'Complaint Stats', show: true }, // Changed to always show
+  ];
 
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-4">
+        <div className="sm:hidden">
+          <select
+            className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+          >
+            {tabs.filter(tab => tab.show).map((tab) => (
+              <option key={tab.id} value={tab.id}>{tab.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="hidden sm:block">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              {user.role === 'complaint_raiser' && (
+              {tabs.filter(tab => tab.show).map((tab) => (
                 <button
-                  onClick={() => setActiveTab('new')}
-                  className={`${
-                    activeTab === 'new'
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                    ${activeTab === tab.id
+                      ? 'border-green-500 text-green-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
+                  `}
                 >
-                  New Complaint
+                  {tab.label}
                 </button>
-              )}
-              <button
-                onClick={() => setActiveTab('list')}
-                className={`${
-                  activeTab === 'list'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-              >
-                Complaints
-              </button>
-              {user.role === 'admin' && (
-                <button
-                  onClick={() => setActiveTab('stats')}
-                  className={`${
-                    activeTab === 'stats'
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-                >
-                  Statistics
-                </button>
-              )}
+              ))}
             </nav>
-          </div>
-
-          <div className="mt-6">
-            {activeTab === 'new' && user.role === 'complaint_raiser' && <ComplaintForm user={user} />}
-            {activeTab === 'list' && <ComplaintList user={user} />}
-            {activeTab === 'stats' && user.role === 'admin' && <ComplaintStats />}
           </div>
         </div>
       </div>
+
+      {activeTab === 'new' && user.role === 'complaint_raiser' && (
+        <ComplaintForm user={user} onSubmit={onNewComplaint} />
+      )}
+      
+      {activeTab === 'list' && (
+        <ComplaintList
+          user={user}
+          complaints={complaints}
+          onStatusChange={onStatusChange}
+          onFeedbackSubmit={onFeedbackSubmit}
+        />
+      )}
+      
+      {activeTab === 'stats' && (
+        <ComplaintStats complaints={complaints} />
+      )}
     </div>
   );
 }
