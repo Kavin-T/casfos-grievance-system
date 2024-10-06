@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Signup from './components/Signup';
@@ -6,15 +6,24 @@ import Dashboard from './components/Dashboard';
 import Footer from './components/Footer';
 import complaintsData from './complaints.json';
 import casfos_logo from './assets/images/casfos_logo.jpg';
+import users from './users.json';
 
 function App() {
   const [user, setUser] = useState(null);
   const [complaints, setComplaints] = useState(complaintsData);
 
   const handleLogin = (username, password) => {
-    // Implement your login logic here
-    setUser({ id: 1, username, role: 'complaint_raiser' });
-    return true;
+    // Find the user in the users array based on the provided username and password
+    const user = users.find(u => u.username === username && u.password === password);
+  
+    if (user) {
+      // If user is found, set the user state with the matched user details
+      setUser({ id: user.id, username: user.username, role: user.role, department: user.department || null });
+      return true;
+    } else {
+      // If no match is found, return false
+      return false;
+    }
   };
 
   const handleSignup = (newUser) => {

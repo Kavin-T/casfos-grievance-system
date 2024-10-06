@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ClipboardIcon, BuildingOfficeIcon, MapPinIcon, PaperClipIcon } from '@heroicons/react/24/outline';
+import { ClipboardIcon, BuildingOfficeIcon, MapPinIcon, PaperClipIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
 export default function ComplaintForm({ user, onSubmit }) {
+  const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [details, setDetails] = useState('');
   const [department, setDepartment] = useState('');
@@ -10,18 +11,20 @@ export default function ComplaintForm({ user, onSubmit }) {
   const [otherLocation, setOtherLocation] = useState('');
   const [file, setFile] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [date, setDate] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newComplaint = {
+      name,
       subject,
       details,
       department,
       premises,
       location: location === 'Other' ? otherLocation : location,
+      raisedOn: date,
       status: 'Not started',
       raisedBy: user.id,
-      raisedOn: new Date().toISOString(),
       fileAttachment: file ? file.name : null,
     };
     
@@ -30,6 +33,7 @@ export default function ComplaintForm({ user, onSubmit }) {
     setTimeout(() => setSuccess(false), 3000);
 
     // Reset form
+    setName('');
     setSubject('');
     setDetails('');
     setDepartment('');
@@ -37,14 +41,36 @@ export default function ComplaintForm({ user, onSubmit }) {
     setLocation('');
     setOtherLocation('');
     setFile(null);
+    setDate('');
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
+      {/* Name input */}
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          Complaint Raiser Name <span className="text-red-500">*</span>
+        </label>
+        <div className="mt-1 relative rounded-md shadow-sm">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <UserIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </div>
+          <input
+            type="text"
+            id="name"
+            required
+            className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+      </div>
+
       {/* Subject input */}
       <div>
         <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-          Subject
+          Subject <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -61,10 +87,30 @@ export default function ComplaintForm({ user, onSubmit }) {
         </div>
       </div>
 
+      {/* Date picker */}
+      <div>
+        <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+          Date of Incident <span className="text-red-500">*</span>
+        </label>
+        <div className="mt-1 relative rounded-md shadow-sm">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </div>
+          <input
+            type="date"
+            id="date"
+            required
+            className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+      </div>
+
       {/* Details textarea */}
       <div>
         <label htmlFor="details" className="block text-sm font-medium text-gray-700">
-          Details
+          Details <span className="text-red-500">*</span>
         </label>
         <div className="mt-1">
           <textarea
@@ -81,7 +127,7 @@ export default function ComplaintForm({ user, onSubmit }) {
       {/* Department select */}
       <div>
         <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-          Department
+          Department <span className="text-red-500">*</span>
         </label>
         <select
           id="department"
@@ -99,7 +145,7 @@ export default function ComplaintForm({ user, onSubmit }) {
       {/* Premises select */}
       <div>
         <label htmlFor="premises" className="block text-sm font-medium text-gray-700">
-          Premises
+          Premises <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -125,7 +171,7 @@ export default function ComplaintForm({ user, onSubmit }) {
       {/* Location select */}
       <div>
         <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-          Location
+          Location <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -174,7 +220,7 @@ export default function ComplaintForm({ user, onSubmit }) {
       {location === 'Other' && (
         <div>
           <label htmlFor="otherLocation" className="block text-sm font-medium text-gray-700">
-            Specify Other Location
+            Specify Other Location <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -190,7 +236,7 @@ export default function ComplaintForm({ user, onSubmit }) {
       {/* File upload */}
       <div>
         <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-          Attachment
+          Attachment (Optional)
         </label>
         <div className="mt-1 flex items-center">
           <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">

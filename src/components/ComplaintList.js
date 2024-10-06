@@ -29,17 +29,29 @@ export default function ComplaintList({ user, complaints, onStatusChange, onFeed
     <div className="space-y-4">
       {complaints.map((complaint) => (
         <div key={complaint.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
+          {/* Complaint Header: Subject and Status */}
           <div className="px-4 py-5 sm:px-6 flex justify-between items-center cursor-pointer" onClick={() => setExpandedComplaint(expandedComplaint === complaint.id ? null : complaint.id)}>
-            <h3 className="text-lg leading-6 font-medium text-gray-900 flex items-center">
+            <div className="flex items-center">
               <ClipboardIcon className="h-5 w-5 text-green-500 mr-2" />
-              {complaint.subject}
-            </h3>
-            {expandedComplaint === complaint.id ? (
-              <ChevronUpIcon className="h-5 w-5 text-gray-500" />
-            ) : (
-              <ChevronDownIcon className="h-5 w-5 text-gray-500" />
-            )}
+              <h3 className="text-lg leading-6 font-medium text-gray-900">{complaint.subject}</h3>
+            </div>
+            <div className="flex items-center space-x-4">
+              {/* Show status next to the subject */}
+              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                complaint.status === 'Work completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {complaint.status}
+              </span>
+              {/* Expand/Collapse Icon */}
+              {expandedComplaint === complaint.id ? (
+                <ChevronUpIcon className="h-5 w-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="h-5 w-5 text-gray-500" />
+              )}
+            </div>
           </div>
+
+          {/* Complaint Details (shown when expanded) */}
           {expandedComplaint === complaint.id && (
             <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
               <dl className="sm:divide-y sm:divide-gray-200">
@@ -67,7 +79,7 @@ export default function ComplaintList({ user, complaints, onStatusChange, onFeed
                     Status
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {user.role === 'admin' || user.role === 'department_admin' ? (
+                    {user.role === 'casfos_admin' || user.role === 'cpwd_admin' ? (
                       <button
                         onClick={() => {
                           setStatusChangeComplaint(complaint);
@@ -143,34 +155,32 @@ export default function ComplaintList({ user, complaints, onStatusChange, onFeed
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                      Provide Feedback
-                    </h3>
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">Provide Feedback</h3>
                     <div className="mt-2">
                       <textarea
-                        rows="4"
-                        className="shadow-sm focus:ring-green-500 focus:border-green-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                        placeholder="Enter your feedback here"
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
-                      ></textarea>
+                        rows={5}
+                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
+                        placeholder="Enter your feedback here"
+                      />
                     </div>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
+                  onClick={handleFeedbackSubmit}
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={handleFeedbackSubmit}
                 >
                   Submit Feedback
                 </button>
                 <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={() => setFeedbackComplaint(null)}
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>
@@ -189,19 +199,14 @@ export default function ComplaintList({ user, complaints, onStatusChange, onFeed
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                      Change Complaint Status
-                    </h3>
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">Change Status</h3>
                     <div className="mt-2">
                       <select
-                        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                         value={newStatus}
                         onChange={(e) => setNewStatus(e.target.value)}
+                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                       >
-                        <option value="Not started">Not started</option>
-                        <option value="Technical Person expected">Technical Person expected</option>
-                        <option value="Material not Available">Material not Available</option>
                         <option value="Work in progress">Work in progress</option>
                         <option value="Work completed">Work completed</option>
                       </select>
@@ -211,16 +216,16 @@ export default function ComplaintList({ user, complaints, onStatusChange, onFeed
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
+                  onClick={handleStatusChangeSubmit}
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={handleStatusChangeSubmit}
                 >
-                  Confirm Status Change
+                  Submit
                 </button>
                 <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={() => setStatusChangeComplaint(null)}
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>

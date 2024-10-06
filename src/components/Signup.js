@@ -95,8 +95,8 @@ export default function Signup({ onSignup }) {
                   onChange={(e) => setRole(e.target.value)}
                 >
                   <option value="complaint_raiser">Complaint Raiser</option>
-                  <option value="department_admin">Department Admin</option>
-                  <option value="admin">Admin</option>
+                  <option value="casfos_admin">CASFOS Admin</option>
+                  <option value="cpwd_admin">CPWD Admin</option>
                 </select>
               </div>
             </div>

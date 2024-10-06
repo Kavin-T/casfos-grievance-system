@@ -9,23 +9,33 @@ export default function Dashboard({ user, complaints, onNewComplaint, onStatusCh
   const tabs = [
     { id: 'new', label: 'New Complaint', show: user.role === 'complaint_raiser' },
     { id: 'list', label: 'Complaint List', show: true },
-    { id: 'stats', label: 'Complaint Stats', show: true }, // Changed to always show
+    { id: 'stats', label: 'Complaint Stats', show: user.role === 'casfos_admin' },
   ];
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-4">
+        {/* Mobile view: scrollable tab bar */}
         <div className="sm:hidden">
-          <select
-            className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value)}
-          >
+          <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
             {tabs.filter(tab => tab.show).map((tab) => (
-              <option key={tab.id} value={tab.id}>{tab.label}</option>
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  whitespace-nowrap py-2 px-4 rounded-md font-medium text-sm
+                  ${activeTab === tab.id
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700'}
+                `}
+              >
+                {tab.label}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
+
+        {/* Desktop view: regular tab navigation */}
         <div className="hidden sm:block">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
@@ -48,6 +58,7 @@ export default function Dashboard({ user, complaints, onNewComplaint, onStatusCh
         </div>
       </div>
 
+      {/* Tab content */}
       {activeTab === 'new' && user.role === 'complaint_raiser' && (
         <ComplaintForm user={user} onSubmit={onNewComplaint} />
       )}
@@ -61,7 +72,7 @@ export default function Dashboard({ user, complaints, onNewComplaint, onStatusCh
         />
       )}
       
-      {activeTab === 'stats' && (
+      {activeTab === 'stats' && user.role === 'casfos_admin' && (
         <ComplaintStats complaints={complaints} />
       )}
     </div>
