@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "subject": "Faulty Air Conditioning",
+    "details": "The AC in Room 101 is not cooling properly",
+    "department": "Electrical",
+    "premises": "VanVigyan",
+    "location": "Faculty Chamber",
+    "status": "Work completed",
+    "raisedBy": 3,
+    "raisedOn": "2023-09-15T10:30:00Z",
+    "fileAttachment": "ac_issue.pdf"
+  },
+  {
+    "id": 2,
+    "subject": "Leaking Roof",
+    "details": "There's a water leak in the Corbett Hall roof",
+    "department": "Civil",
+    "premises": "VanVatika",
+    "location": "Corbett Hall",
+    "status": "Work in progress",
+    "raisedBy": 3,
+    "raisedOn": "2023-09-16T14:45:00Z",
+    "fileAttachment": "roof_leak.jpg"
+  },
+  {
+    "id": 3,
+    "subject": "Broken Projector",
+    "details": "The projector in Lecture Hall 2 is not working",
+    "department": "IT",
+    "premises": "CASFOS Sports Ground",
+    "location": "Lecture Hall",
+    "status": "Not started",
+    "raisedBy": 4,
+    "raisedOn": "2023-09-17T09:15:00Z",
+    "fileAttachment": "projector_issue.png"
+  }
+]

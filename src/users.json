@@ -1,0 +1,21 @@
+[
+    {
+      "id": 1,
+      "username": "cpwd_admin",
+      "password": "1234",
+      "role": "cpwd_admin"
+    },
+    {
+      "id": 2,
+      "username": "casfos_admin",
+      "password": "1234",
+      "role": "casfos_admin",
+      "department": "IT"
+    },
+    {
+      "id": 3,
+      "username": "user",
+      "password": "1234",
+      "role": "complaint_raiser"
+    }
+  ]
