@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ComplaintForm from './ComplaintForm';
 import ComplaintList from './ComplaintList';
 import ComplaintStats from './ComplaintStats';
+import ComplaintFilter from './ComplaintsFilter';
 
 export default function Dashboard({ user, complaints, onNewComplaint, onStatusChange, onFeedbackSubmit }) {
   const [activeTab, setActiveTab] = useState('list');
@@ -10,6 +11,7 @@ export default function Dashboard({ user, complaints, onNewComplaint, onStatusCh
     { id: 'new', label: 'New Complaint', show: user.role === 'complaint_raiser' },
     { id: 'list', label: 'Complaint List', show: true },
     { id: 'stats', label: 'Complaint Stats', show: user.role === 'casfos_admin' },
+    { id: 'filter', label: 'Complaint Filter', show: true }
   ];
 
   return (
@@ -70,6 +72,10 @@ export default function Dashboard({ user, complaints, onNewComplaint, onStatusCh
           onStatusChange={onStatusChange}
           onFeedbackSubmit={onFeedbackSubmit}
         />
+      )}
+
+      {activeTab === 'filter' && (
+        <ComplaintFilter />
       )}
       
       {activeTab === 'stats' && user.role === 'casfos_admin' && (
