@@ -1,47 +1,113 @@
 import React, { useState } from 'react';
-import { ClipboardIcon, BuildingOfficeIcon, MapPinIcon, PaperClipIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { ClipboardIcon, BuildingOfficeIcon, MapPinIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
 
-export default function ComplaintForm({ user, onSubmit }) {
-  const [name, setName] = useState('');
-  const [subject, setSubject] = useState('');
-  const [details, setDetails] = useState('');
-  const [department, setDepartment] = useState('');
-  const [premises, setPremises] = useState('');
-  const [location, setLocation] = useState('');
+export default function NewComplaint() {
+  const [formData, setFormData] = useState({
+    raiserName: '',
+    subject: '',
+    date: '',
+    details: '',
+    department: '',
+    premises: '',
+    location: '',
+  });
+
   const [otherLocation, setOtherLocation] = useState('');
-  const [file, setFile] = useState(null);
-  const [success, setSuccess] = useState(false);
-  const [date, setDate] = useState('');
+  const [isEmergency, setIsEmergency] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [files, setFiles] = useState({
+    imgBefore: null,
+    vidBefore: null,
+  });
+
+  // Handle input field changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    // Image size limit (5MB)
+    if (file.type.startsWith("image") && file.size > 5 * 1024 * 1024) {
+      alert("Image file size should not exceed 5MB.");
+      return;
+    }
+  
+    // Video size limit (100MB)
+    if (file.type.startsWith("video") && file.size > 100 * 1024 * 1024) {
+      alert("Video file size should not exceed 100MB.");
+      return;
+    }
+  
+    // Update the file state (assuming you are using setState to store the files)
+    setFiles(prevFiles => ({
+      ...prevFiles,
+      [event.target.name]: file
+    }));
+  };
+  
+
+  // Submit the form
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newComplaint = {
-      name,
-      subject,
-      details,
-      department,
-      premises,
-      location: location === 'Other' ? otherLocation : location,
-      raisedOn: date,
-      status: 'Not started',
-      raisedBy: user.id,
-      fileAttachment: file ? file.name : null,
-    };
-    
-    onSubmit(newComplaint);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
 
-    // Reset form
-    setName('');
-    setSubject('');
-    setDetails('');
-    setDepartment('');
-    setPremises('');
-    setLocation('');
-    setOtherLocation('');
-    setFile(null);
-    setDate('');
+    if (!files.imgBefore && !files.vidBefore) {
+      alert('At least one file must be uploaded.');
+      return;
+    }
+
+    setIsSubmitting(true); // Disable form submission
+
+    const data = new FormData();
+
+    // Append form fields
+    for (const key in formData) {
+      data.append(key, formData[key]);
+    }
+
+    if(formData['location'] === 'Other'){
+      data.set('location', otherLocation);
+    }
+
+    data.append('emergency', isEmergency);
+
+    // Append files
+    if (files.imgBefore) data.append('imgBefore', files.imgBefore);
+    if (files.vidBefore) data.append('vidBefore', files.vidBefore);
+
+    try {
+      const response = await axios.post('http://localhost:4000/api/v1/complaint/add', data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      alert(response.data.message);
+
+      // Reset the form after successful submission
+      setFormData({
+        raiserName: '',
+        subject: '',
+        date: '',
+        details: '',
+        department: '',
+        premises: '',
+        location: '',
+      });
+      setOtherLocation('');
+      setIsEmergency(false);
+      setFiles({
+        imgBefore: null,
+        vidBefore: null,
+      });
+    } catch (error) {
+      alert(error.response?.data?.message || 'An error occurred.');
+    } finally {
+      setIsSubmitting(false); // Re-enable form submission
+    }
   };
 
   return (
@@ -58,11 +124,11 @@ export default function ComplaintForm({ user, onSubmit }) {
           </div>
           <input
             type="text"
-            id="name"
+            name="raiserName"
             required
             className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.raiserName}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -78,11 +144,11 @@ export default function ComplaintForm({ user, onSubmit }) {
           </div>
           <input
             type="text"
-            id="subject"
+            name="subject"
             required
             className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
+            value={formData.subject}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -98,11 +164,11 @@ export default function ComplaintForm({ user, onSubmit }) {
           </div>
           <input
             type="date"
-            id="date"
+            name="date"
             required
-            className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            className="focus:ring-green-500 focus:border-green-500 block w-50 pl-10 sm:text-sm border-gray-300 rounded-md"
+            value={formData.date}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -114,12 +180,12 @@ export default function ComplaintForm({ user, onSubmit }) {
         </label>
         <div className="mt-1">
           <textarea
-            id="details"
+            name="details"
             required
             rows={3}
             className="shadow-sm focus:ring-green-500 focus:border-green-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
+            value={formData.details}
+            onChange={handleInputChange}
           />
         </div>
       </div>
@@ -130,15 +196,15 @@ export default function ComplaintForm({ user, onSubmit }) {
           Department <span className="text-red-500">*</span>
         </label>
         <select
-          id="department"
+          name="department"
           required
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-          value={department}
-          onChange={(e) => setDepartment(e.target.value)}
+          value={formData.department}
+          onChange={handleInputChange}
         >
           <option value="">Select a department</option>
-          <option value="Civil">Civil</option>
-          <option value="Electrical">Electrical</option>
+          <option value="CIVIL">Civil</option>
+          <option value="ELECTRICAL">Electrical</option>
         </select>
       </div>
 
@@ -152,11 +218,11 @@ export default function ComplaintForm({ user, onSubmit }) {
             <BuildingOfficeIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
           </div>
           <select
-            id="premises"
+            name="premises"
             required
             className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-            value={premises}
-            onChange={(e) => setPremises(e.target.value)}
+            value={formData.premises}
+            onChange={handleInputChange}
           >
             <option value="">Select premises</option>
             <option value="VanVigyan">VanVigyan</option>
@@ -178,11 +244,11 @@ export default function ComplaintForm({ user, onSubmit }) {
             <MapPinIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
           </div>
           <select
-            id="location"
+            name="location"
             required
             className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={formData.location}
+            onChange={handleInputChange}
           >
             <option value="">Select location</option>
             <option value="Principal Chamber">Principal Chamber</option>
@@ -217,14 +283,14 @@ export default function ComplaintForm({ user, onSubmit }) {
       </div>
 
       {/* Other Location input */}
-      {location === 'Other' && (
+      {formData.location === 'Other' && (
         <div>
           <label htmlFor="otherLocation" className="block text-sm font-medium text-gray-700">
             Specify Other Location <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            id="otherLocation"
+            name="otherLocation"
             required
             className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
             value={otherLocation}
@@ -233,32 +299,70 @@ export default function ComplaintForm({ user, onSubmit }) {
         </div>
       )}
 
-      {/* File upload */}
+      {/* Emergency checkbox */}
+      <div className="flex items-center">
+        <input
+          id="isEmergency"
+          type="checkbox"
+          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+          checked={isEmergency}
+          onChange={() => setIsEmergency(!isEmergency)}
+        />
+        <label htmlFor="isEmergency" className="ml-2 block text-sm text-gray-700">
+          Mark as Emergency
+        </label>
+      </div>
+
+      {/* Image upload */}
       <div>
-        <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-          Attachment (Optional)
+        <label htmlFor="imgBefore" className="block text-sm font-medium text-gray-700">
+          Image
         </label>
         <div className="mt-1 flex items-center">
-          <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
-            {file ? (
-              <img src={URL.createObjectURL(file)} alt="Preview" className="h-full w-full object-cover" />
-            ) : (
-              <PaperClipIcon className="h-full w-full text-gray-300" aria-hidden="true" />
-            )}
-          </span>
           <label
-            htmlFor="file-upload"
+            htmlFor="imgBefore"
             className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
           >
-            {file ? 'Change file' : 'Upload a file'}
+            {files?.imgBefore ? 'Change file' : 'Upload a file'}
           </label>
           <input
-            id="file-upload"
-            name="file-upload"
+            id="imgBefore"
+            name="imgBefore"
             type="file"
+            accept="image/*"
             className="sr-only"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleFileChange}
           />
+          {files?.imgBefore && (
+            <span className="ml-3 text-sm text-gray-600">{files.imgBefore.name}</span>
+          )}
+        </div>
+      </div>
+
+
+      {/* Video upload */}
+      <div>
+        <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+          Video
+        </label>
+        <div className="mt-1 flex items-center">
+          <label
+            htmlFor="vidBefore"
+            className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
+          >
+            {files.vidBefore ? 'Change file' : 'Upload a file'}
+          </label>
+          <input
+            id='vidBefore'
+            name="vidBefore"
+            type="file"
+            accept='video/*'
+            className="sr-only"
+            onChange={handleFileChange}
+          />
+          {files?.vidBefore && (
+            <span className="ml-3 text-sm text-gray-600">{files.vidBefore.name}</span>
+          )}
         </div>
       </div>
 
@@ -266,17 +370,15 @@ export default function ComplaintForm({ user, onSubmit }) {
       <div>
         <button
           type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          disabled={isSubmitting}
+          className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
-          Submit Complaint
+          {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
         </button>
       </div>
 
-      {success && (
-        <div className="mt-3 text-sm text-green-600">
-          Complaint submitted successfully!
-        </div>
-      )}
     </form>
   );
 }

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LockClosedIcon, UserIcon } from '@heroicons/react/24/solid';
 import casfos_logo from '../assets/images/casfos_logo.jpg';
 
-export default function Login({ onLogin }) {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -11,7 +11,7 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onLogin(username, password)) {
+    if (true) {
       navigate('/dashboard');
     } else {
       setError('Invalid username or password');
@@ -87,11 +87,6 @@ export default function Login({ onLogin }) {
             </button>
           </div>
         </form>
-        <div className="text-center">
-          <Link to="/signup" className="font-medium text-green-600 hover:text-green-500">
-            Don't have an account? Sign up
-          </Link>
-        </div>
       </div>
     </div>
   );

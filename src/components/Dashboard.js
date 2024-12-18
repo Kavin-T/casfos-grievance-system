@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import ComplaintForm from './ComplaintForm';
-import ComplaintList from './ComplaintList';
-import ComplaintStats from './ComplaintStats';
-import ComplaintFilter from './ComplaintsFilter';
+import NewComplaint from './NewComplaint';
+import ComplaintStatistics from './ComplaintStatistics';
+import ComplaintsHistory from './ComplaintsHistory';
+import YourActivity from './YourActivity';
+import OngoingComplaints from './OngoingComplaints';
+import Users from './Users';
 
-export default function Dashboard({ user, complaints, onNewComplaint, onStatusChange, onFeedbackSubmit }) {
+export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('list');
 
   const tabs = [
-    { id: 'new', label: 'New Complaint', show: user.role === 'complaint_raiser' },
-    { id: 'list', label: 'Complaint List', show: true },
-    { id: 'stats', label: 'Complaint Stats', show: user.role === 'casfos_admin' },
-    { id: 'filter', label: 'Complaint Filter', show: true }
+    { id: 'complaint_statistics', label: 'Complaint Statistics', show: true },
+    { id: 'new_complaint', label: 'New Complaint', show: true },
+    { id: 'your_activity', label: 'Your Activity', show: true },
+    { id: 'ongoing_complaints', label: 'Ongoing Complaints', show: true },
+    { id: 'complaints_history', label: 'Complaints History', show: true },
+    { id: 'users', label: 'Users', show: true },
   ];
 
   return (
@@ -61,25 +65,28 @@ export default function Dashboard({ user, complaints, onNewComplaint, onStatusCh
       </div>
 
       {/* Tab content */}
-      {activeTab === 'new' && user.role === 'complaint_raiser' && (
-        <ComplaintForm user={user} onSubmit={onNewComplaint} />
-      )}
-      
-      {activeTab === 'list' && (
-        <ComplaintList
-          user={user}
-          complaints={complaints}
-          onStatusChange={onStatusChange}
-          onFeedbackSubmit={onFeedbackSubmit}
-        />
+      {activeTab === 'complaint_statistics' && (
+        <ComplaintStatistics/>
       )}
 
-      {activeTab === 'filter' && (
-        <ComplaintFilter />
+      {activeTab === 'new_complaint' && (
+        <NewComplaint/>
       )}
       
-      {activeTab === 'stats' && user.role === 'casfos_admin' && (
-        <ComplaintStats complaints={complaints} />
+      {activeTab === 'your_activity' && (
+        <YourActivity/>
+      )}
+
+      {activeTab === 'ongoing_complaints' && (
+        <OngoingComplaints/>
+      )}
+
+      {activeTab === 'complaints_history' && (
+        <ComplaintsHistory/>
+      )}
+
+      {activeTab === 'users' && (
+        <Users/>
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ComplaintsFilter = () => {
+const ComplaintsHistory = () => {
   const [complaints, setComplaints] = useState([]);
   const [filters, setFilters] = useState({
     raiserName: '',
@@ -24,10 +24,11 @@ const ComplaintsFilter = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [toggle,setToggle] = useState(false);
 
   useEffect(() => {
     fetchComplaints();
-  }, [page]);
+  }, [toggle,page]);
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -58,9 +59,64 @@ const ComplaintsFilter = () => {
   };
 
   const handleApplyFilters = () => {
-    setPage(1); // Reset to the first page whenever filters are applied
+    setPage(1);
     fetchComplaints();
   };
+
+  const handleClearFilters = () => {
+    setFilters({
+      raiserName: '',
+      subject: '',
+      department: '',
+      premises: '',
+      location: '',
+      details: '',
+      emergency: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+      createdStartDate: '',
+      createdEndDate: '',
+      acknowledgedStartDate: '',
+      acknowledgedEndDate: '',
+      resolvedStartDate: '',
+      resolvedEndDate: '',
+    });
+    setPage(1); // Reset to the first page
+    setToggle(!toggle);
+  };
+
+  const handleGenerateReport = async () => {
+    try {
+      // Make a request to generate the report and receive it as a Blob
+      const response = await axios.get('http://localhost:4000/api/v1/report', {
+        params: filters, // Pass filters as query parameters
+        responseType: 'blob', // Important: Receive the response as a binary Blob
+      });
+  
+      // Create a blob URL for the downloaded file
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      });
+  
+      // Create a link element to trigger download
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'complaint_report.docx'; // Set the desired file name
+      document.body.appendChild(link);
+  
+      // Programmatically click the link to trigger download
+      link.click();
+  
+      // Clean up and remove the link
+      document.body.removeChild(link);
+  
+      alert('Report downloaded successfully');
+    } catch (error) {
+      alert('Error generating and downloading report:', error);
+    }
+  };
+  
 
   return (
     <div className="p-4 bg-green-50 min-h-screen">
@@ -245,6 +301,22 @@ const ComplaintsFilter = () => {
             Apply Filters
           </button>
         </div>
+        <div className="col-span-1">
+          <button
+            onClick={handleClearFilters}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-green-600"
+          >
+            Clear Filters
+          </button>
+        </div>
+        <div className="col-span-1">
+          <button
+            onClick={handleGenerateReport}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
+          >
+            Generate Report
+          </button>
+        </div>
       </div>
       <h2 className="text-2xl font-bold text-green-700 mb-4">Complaints</h2>
       {loading ? (
@@ -302,5 +374,5 @@ const ComplaintsFilter = () => {
   );
 };
 
-export default ComplaintsFilter;
+export default ComplaintsHistory;
 
