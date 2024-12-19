@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const PrivateRoute = ({ element: Element, ...rest }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,6 +22,14 @@ const PrivateRoute = ({ element: Element, ...rest }) => {
             navigate('/');
           } else {
             setIsAuthenticated(true);
+            // Schedule a timeout to log out the user when the token expires
+            const timeUntilExpiry = (exp - currentTime) * 1000;
+            setTimeout(() => {
+              localStorage.removeItem('authToken');
+              setIsAuthenticated(false);
+              alert('Your session has expired. Please log in again.');
+              navigate('/');
+            }, timeUntilExpiry);
           }
         } catch (error) {
           localStorage.removeItem('authToken');
@@ -31,6 +39,7 @@ const PrivateRoute = ({ element: Element, ...rest }) => {
         }
       } else {
         setIsAuthenticated(false);
+        alert('Token not found. Please log in again.');
         navigate('/');
       }
       setLoading(false);
@@ -38,17 +47,11 @@ const PrivateRoute = ({ element: Element, ...rest }) => {
 
     // Initial token check
     checkTokenExpiration();
-
-    // Periodic token check every minute
-    const interval = setInterval(checkTokenExpiration, 30000);
-
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(interval);
   }, [navigate]);
 
   // Show loading state while checking authentication
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   return isAuthenticated ? <Element {...rest} /> : <Navigate to="/" />;

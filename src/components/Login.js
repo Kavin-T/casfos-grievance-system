@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LockClosedIcon, UserIcon } from '@heroicons/react/24/solid';
 import casfos_logo from '../assets/images/casfos_logo.jpg';
+import { loginUser } from '../services/loginApi';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -9,16 +10,34 @@ export default function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (true) {
-      navigate('/dashboard');
-    } else {
-      setError('Invalid username or password');
+    setError(''); // Clear any previous errors
+
+    try {
+      const data = await loginUser(username, password); // Call the login API
+      localStorage.setItem('authToken', data.token); // Store the token securely
+      navigate('/dashboard'); // Navigate to the dashboard
+      alert(`Welcome, ${data.username}!`);
+    } catch (error) {
+      setError(error || 'An unexpected error occurred.'); // Display the error message
     }
   };
 
   return (
+    <>
+    <header className="bg-green-800 text-white p-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <div className="flex items-center">
+              <img
+                src={casfos_logo}
+                alt="CASFOS Logo"
+                className="h-12 w-auto mr-4"
+              />
+              <h1 className="text-2xl font-bold">CASFOS Grievance System</h1>
+            </div>
+          </div>
+        </header>
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
@@ -89,5 +108,6 @@ export default function Login() {
         </form>
       </div>
     </div>
+    </>
   );
 }
