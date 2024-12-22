@@ -3,24 +3,31 @@ import NewComplaint from "./NewComplaint";
 import ComplaintStatistics from "./ComplaintStatistics";
 import ComplaintsHistory from "./ComplaintsHistory";
 import YourActivity from "./YourActivity";
-import OngoingComplaints from "./OngoingComplaints";
 import Users from "./Users";
 import casfos_logo from "../assets/images/casfos_logo.jpg";
 import { getUser } from "../utils/useToken";
+import { useNavigate } from "react-router-dom";
+import { designationFormat } from "../utils/formatting";
 
-export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("list");
+export default function Home() {
+  const [activeTab, setActiveTab] = useState("complaint_statistics");
+
+  const navigate = useNavigate();
 
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
     { id: "new_complaint", label: "New Complaint", show: true },
     { id: "your_activity", label: "Your Activity", show: true },
-    { id: "ongoing_complaints", label: "Ongoing Complaints", show: true },
     { id: "complaints_history", label: "Complaints History", show: true },
     { id: "users", label: "Users", show: true },
   ];
 
   const user = getUser();
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // Remove the JWT token from storage
+    navigate("/"); 
+  };
 
   return (
     <>
@@ -39,9 +46,12 @@ export default function Dashboard() {
               <>
                 <div className="text-right">
                   <p className="font-semibold">{user.username}</p>
-                  <p className="text-sm text-green-300">{user.designation}</p>
+                  <p className="text-sm text-green-300">{designationFormat(user.designation)}</p>
                 </div>
-                <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                <button
+                  onClick={handleLogout} // Attach handleLogout to the button
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                >
                   Logout
                 </button>
               </>
@@ -108,8 +118,6 @@ export default function Dashboard() {
         {activeTab === "new_complaint" && <NewComplaint />}
 
         {activeTab === "your_activity" && <YourActivity />}
-
-        {activeTab === "ongoing_complaints" && <OngoingComplaints />}
 
         {activeTab === "complaints_history" && <ComplaintsHistory />}
 

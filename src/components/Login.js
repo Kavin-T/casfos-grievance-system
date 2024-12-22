@@ -17,10 +17,11 @@ export default function Login() {
     try {
       const data = await loginUser(username, password); // Call the login API
       localStorage.setItem('authToken', data.token); // Store the token securely
-      navigate('/dashboard'); // Navigate to the dashboard
+      navigate('/home'); // Navigate to the dashboard
       alert(`Welcome, ${data.username}!`);
     } catch (error) {
-      setError(error || 'An unexpected error occurred.'); // Display the error message
+      setError(error || 'An unexpected error occurred.');
+      alert(error);
     }
   };
 

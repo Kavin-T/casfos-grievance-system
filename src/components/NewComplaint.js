@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
-import { ClipboardIcon, BuildingOfficeIcon, MapPinIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  ClipboardIcon,
+  BuildingOfficeIcon,
+  MapPinIcon,
+  UserIcon,
+  CalendarIcon,
+} from "@heroicons/react/24/outline";
+import { addComplaint } from "../services/complaintApi";
+import { getUser } from "../utils/useToken";
 
 export default function NewComplaint() {
   const [formData, setFormData] = useState({
-    raiserName: '',
-    subject: '',
-    date: '',
-    details: '',
-    department: '',
-    premises: '',
-    location: '',
+    raiserName: getUser().username,
+    subject: "",
+    date: "",
+    details: "",
+    department: "",
+    premises: "",
+    location: "",
   });
 
-  const [otherLocation, setOtherLocation] = useState('');
+  const [otherLocation, setOtherLocation] = useState("");
   const [isEmergency, setIsEmergency] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,33 +38,40 @@ export default function NewComplaint() {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-  
+
     // Image size limit (5MB)
     if (file.type.startsWith("image") && file.size > 5 * 1024 * 1024) {
       alert("Image file size should not exceed 5MB.");
       return;
     }
-  
+
     // Video size limit (100MB)
     if (file.type.startsWith("video") && file.size > 100 * 1024 * 1024) {
       alert("Video file size should not exceed 100MB.");
       return;
     }
-  
+
     // Update the file state (assuming you are using setState to store the files)
-    setFiles(prevFiles => ({
+    setFiles((prevFiles) => ({
       ...prevFiles,
-      [event.target.name]: file
+      [event.target.name]: file,
     }));
   };
-  
 
   // Submit the form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prompt for confirmation before submitting
+    const isConfirmed = window.confirm(
+      `Are you sure you want to submit the form?`
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
     if (!files.imgBefore && !files.vidBefore) {
-      alert('At least one file must be uploaded.');
+      alert("At least one file must be uploaded.");
       return;
     }
 
@@ -70,52 +84,52 @@ export default function NewComplaint() {
       data.append(key, formData[key]);
     }
 
-    if(formData['location'] === 'Other'){
-      data.set('location', otherLocation);
+    if (formData["location"] === "Other") {
+      data.set("location", otherLocation);
     }
 
-    data.append('emergency', isEmergency);
+    data.append("emergency", isEmergency);
 
     // Append files
-    if (files.imgBefore) data.append('imgBefore', files.imgBefore);
-    if (files.vidBefore) data.append('vidBefore', files.vidBefore);
+    if (files.imgBefore) data.append("imgBefore", files.imgBefore);
+    if (files.vidBefore) data.append("vidBefore", files.vidBefore);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/v1/complaint/add', data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await addComplaint(data);
 
-      alert(response.data.message);
+      alert(response.message);
 
       // Reset the form after successful submission
       setFormData({
-        raiserName: '',
-        subject: '',
-        date: '',
-        details: '',
-        department: '',
-        premises: '',
-        location: '',
+        raiserName: "",
+        subject: "",
+        date: "",
+        details: "",
+        department: "",
+        premises: "",
+        location: "",
       });
-      setOtherLocation('');
+      setOtherLocation("");
       setIsEmergency(false);
       setFiles({
         imgBefore: null,
         vidBefore: null,
       });
     } catch (error) {
-      alert(error.response?.data?.message || 'An error occurred.');
+      alert(error);
     } finally {
-      setIsSubmitting(false); // Re-enable form submission
+      setIsSubmitting(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-
       {/* Name input */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700"
+        >
           Complaint Raiser Name <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
@@ -135,12 +149,18 @@ export default function NewComplaint() {
 
       {/* Subject input */}
       <div>
-        <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="subject"
+          className="block text-sm font-medium text-gray-700"
+        >
           Subject <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <ClipboardIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <ClipboardIcon
+              className="h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
           </div>
           <input
             type="text"
@@ -155,12 +175,18 @@ export default function NewComplaint() {
 
       {/* Date picker */}
       <div>
-        <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="date"
+          className="block text-sm font-medium text-gray-700"
+        >
           Date of Incident <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <CalendarIcon
+              className="h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
           </div>
           <input
             type="date"
@@ -175,7 +201,10 @@ export default function NewComplaint() {
 
       {/* Details textarea */}
       <div>
-        <label htmlFor="details" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="details"
+          className="block text-sm font-medium text-gray-700"
+        >
           Details <span className="text-red-500">*</span>
         </label>
         <div className="mt-1">
@@ -192,7 +221,10 @@ export default function NewComplaint() {
 
       {/* Department select */}
       <div>
-        <label htmlFor="department" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="department"
+          className="block text-sm font-medium text-gray-700"
+        >
           Department <span className="text-red-500">*</span>
         </label>
         <select
@@ -210,12 +242,18 @@ export default function NewComplaint() {
 
       {/* Premises select */}
       <div>
-        <label htmlFor="premises" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="premises"
+          className="block text-sm font-medium text-gray-700"
+        >
           Premises <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <BuildingOfficeIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <BuildingOfficeIcon
+              className="h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
           </div>
           <select
             name="premises"
@@ -236,7 +274,10 @@ export default function NewComplaint() {
 
       {/* Location select */}
       <div>
-        <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="location"
+          className="block text-sm font-medium text-gray-700"
+        >
           Location <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
@@ -283,9 +324,12 @@ export default function NewComplaint() {
       </div>
 
       {/* Other Location input */}
-      {formData.location === 'Other' && (
+      {formData.location === "Other" && (
         <div>
-          <label htmlFor="otherLocation" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="otherLocation"
+            className="block text-sm font-medium text-gray-700"
+          >
             Specify Other Location <span className="text-red-500">*</span>
           </label>
           <input
@@ -308,14 +352,20 @@ export default function NewComplaint() {
           checked={isEmergency}
           onChange={() => setIsEmergency(!isEmergency)}
         />
-        <label htmlFor="isEmergency" className="ml-2 block text-sm text-gray-700">
+        <label
+          htmlFor="isEmergency"
+          className="ml-2 block text-sm text-gray-700"
+        >
           Mark as Emergency
         </label>
       </div>
 
       {/* Image upload */}
       <div>
-        <label htmlFor="imgBefore" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="imgBefore"
+          className="block text-sm font-medium text-gray-700"
+        >
           Image
         </label>
         <div className="mt-1 flex items-center">
@@ -323,7 +373,7 @@ export default function NewComplaint() {
             htmlFor="imgBefore"
             className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
           >
-            {files?.imgBefore ? 'Change file' : 'Upload a file'}
+            {files?.imgBefore ? "Change file" : "Upload a file"}
           </label>
           <input
             id="imgBefore"
@@ -334,15 +384,19 @@ export default function NewComplaint() {
             onChange={handleFileChange}
           />
           {files?.imgBefore && (
-            <span className="ml-3 text-sm text-gray-600">{files.imgBefore.name}</span>
+            <span className="ml-3 text-sm text-gray-600">
+              {files.imgBefore.name}
+            </span>
           )}
         </div>
       </div>
 
-
       {/* Video upload */}
       <div>
-        <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="file"
+          className="block text-sm font-medium text-gray-700"
+        >
           Video
         </label>
         <div className="mt-1 flex items-center">
@@ -350,18 +404,20 @@ export default function NewComplaint() {
             htmlFor="vidBefore"
             className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
           >
-            {files.vidBefore ? 'Change file' : 'Upload a file'}
+            {files.vidBefore ? "Change file" : "Upload a file"}
           </label>
           <input
-            id='vidBefore'
+            id="vidBefore"
             name="vidBefore"
             type="file"
-            accept='video/*'
+            accept="video/*"
             className="sr-only"
             onChange={handleFileChange}
           />
           {files?.vidBefore && (
-            <span className="ml-3 text-sm text-gray-600">{files.vidBefore.name}</span>
+            <span className="ml-3 text-sm text-gray-600">
+              {files.vidBefore.name}
+            </span>
           )}
         </div>
       </div>
@@ -372,13 +428,12 @@ export default function NewComplaint() {
           type="submit"
           disabled={isSubmitting}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
+          {isSubmitting ? "Submitting..." : "Submit Complaint"}
         </button>
       </div>
-
     </form>
   );
 }

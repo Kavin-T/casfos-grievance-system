@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
+import Home from "./components/Home";
 import PrivateRoute from "./routes/PrivateRoute";
 
 function App() {
@@ -26,8 +26,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route
-          path="/dashboard"
-          element={<PrivateRoute element={Dashboard} />}
+          path="/home"
+          element={<PrivateRoute element={Home} />}
         />
       </Routes>
 
