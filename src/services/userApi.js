@@ -61,13 +61,13 @@ export const updateUser = async (formData) => {
 
 
 export const deleteUser = async (id) => {
-  const token = getToken(); // Retrieve the token using your utility function
+  const token = getToken(); 
   try {
     const response = await axios.delete(
       `${BASE_URL}/user/delete/${id}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Add the token here
+          Authorization: `Bearer ${token}`,
         },
       }
     );

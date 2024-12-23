@@ -1,12 +1,12 @@
 import axios from "axios";
-import { getToken,getUser } from "../utils/useToken";
+import { getToken } from "../utils/useToken";
 
 const BASE_URL = process.env.REACT_APP_BACKEND_API_URL;
 
 export const fetchComplaintsByDesignation = async () => {
   const token = getToken();
   try {
-    const response = await axios.get(`${BASE_URL}/your-activity`, {
+    const response = await axios.get(`${BASE_URL}/complaint/your-activity`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

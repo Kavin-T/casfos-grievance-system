@@ -100,17 +100,20 @@ const YourActivityPopup = ({
             </div>
           </div>
 
-          {[
+          {(
+            [
             "RESOURCE_REQUIRED",
             "AE_NOT_SATISFIED",
             "EE_NOT_SATISFIED",
-          ].includes(statusChange) && (
+            ].includes(statusChange) || 
+            (selectedComplaint.status === "RESOURCE_REQUIRED" && statusChange === "RAISED")
+          ) && (
             <div className="mt-4">
-              <label htmlFor="statusChange">Enter Remark:</label>
+              <label htmlFor="remark">Enter Remark:</label>
               <div className="mt-2">
                 <textarea
                   className="block mt-2 p-2 border rounded w-full"
-                  placeholder="Enter reason"
+                  placeholder="Enter remark"
                   value={remark}
                   onChange={(e) => setRemark(e.target.value)}
                 />
@@ -120,7 +123,7 @@ const YourActivityPopup = ({
 
           {statusChange === "EE_ACKNOWLEDGED" && (
             <div className="mt-4">
-              <label htmlFor="statusChange">Enter Price:</label>
+              <label htmlFor="price">Enter Price:</label>
               <div className="mt-2">
                 <input
                   type="number"
@@ -133,25 +136,9 @@ const YourActivityPopup = ({
             </div>
           )}
 
-          {selectedComplaint.status === "RESOURCE_REQUIRED" &&
-            statusChange === "RAISED" && (
-              <div className="mt-4">
-                <label htmlFor="statusChange">Enter Remark:</label>
-                <div className="mt-2">
-                  <textarea
-                    className="block mt-2 p-2 border rounded w-full"
-                    placeholder={`Enter remark for ${statusChange}`}
-                    value={remark}
-                    onChange={(e) => setRemark(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-            )}
-
           {statusChange === "JE_WORKDONE" && (
-            <div>
-              <div className="mt-1 flex items-center">
+            <div className="mt-2">
+              <div className="mt-4 flex items-center">
                 <label
                   htmlFor="imgAfter"
                   className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
@@ -172,7 +159,7 @@ const YourActivityPopup = ({
                   </span>
                 )}
               </div>
-              <div className="mt-1 flex items-center">
+              <div className="mt-4 flex items-center">
                 <label
                   htmlFor="vidAfter"
                   className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"

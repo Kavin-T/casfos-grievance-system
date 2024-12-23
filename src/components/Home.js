@@ -11,6 +11,7 @@ import { designationFormat } from "../utils/formatting";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("complaint_statistics");
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const navigate = useNavigate();
 
@@ -25,7 +26,7 @@ export default function Home() {
   const user = getUser();
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Remove the JWT token from storage
+    localStorage.removeItem("authToken"); 
     navigate("/"); 
   };
 
@@ -63,26 +64,54 @@ export default function Home() {
         <div className="mb-4">
           {/* Mobile view: scrollable tab bar */}
           <div className="sm:hidden">
-            <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
-              {tabs
-                .filter((tab) => tab.show)
-                .map((tab) => (
+            <div className="flex items-center justify-between bg-gray-200 p-2 rounded-md">
+              <button
+                className="p-2 text-gray-700 bg-white rounded-md shadow"
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16m-7 6h7"
+                  />
+                </svg>
+              </button>
+
+              {/* Display Selected Tab */}
+              <span className="ml-4 text-lg font-medium text-gray-700 pr-2">
+                {tabs.find((tab) => tab.id === activeTab)?.label || "Select a Tab"}
+              </span>
+            </div>
+
+            {/* Dropdown Menu */}
+            {isMenuOpen && (
+              <div className="mt-2 bg-white border rounded-md shadow-lg">
+                {tabs.filter((tab) => tab.show).map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`
-                  whitespace-nowrap py-2 px-4 rounded-md font-medium text-sm
-                  ${
-                    activeTab === tab.id
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }
-                `}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setIsMenuOpen(false); // Close menu on selection
+                    }}
+                    className={`block w-full text-left px-4 py-2 ${
+                      activeTab === tab.id
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
                   >
                     {tab.label}
                   </button>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Desktop view: regular tab navigation */}
@@ -96,7 +125,7 @@ export default function Home() {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={`
-                    whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                    whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg
                     ${
                       activeTab === tab.id
                         ? "border-green-500 text-green-600"

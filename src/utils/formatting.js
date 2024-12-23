@@ -45,7 +45,7 @@ export const dateFormat = (input) => {
 }
 
 export const priceFormat = (input) => {
-  return parseFloat(input.$numberDecimal).toLocaleString(
+  return parseFloat(input).toLocaleString(
     "en-IN",
     {
       minimumFractionDigits: 2,

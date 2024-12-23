@@ -38,9 +38,9 @@ const ComplaintDetailsPopup = ({selectedComplaint}) =>{
                 <strong>Resolved by:</strong> {selectedComplaint.resolvedName}
             </p>
             )}
-            {parseFloat(selectedComplaint.price) > 0 && (
+            {parseFloat(selectedComplaint.price.$numberDecimal) > 0 && (
                 <div className="text-green-600 font-bold border border-green-600 p-2 my-5">
-                Price: ₹ {priceFormat(selectedComplaint.price)}
+                Price: ₹ {priceFormat(selectedComplaint.price.$numberDecimal)}
                 </div>
             )}
             <div className="grid grid-cols-2 gap-4 mt-4">
