@@ -22,19 +22,33 @@ const YourActivity = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Image size limit (5MB)
-    if (file.type.startsWith("image") && file.size > 5 * 1024 * 1024) {
-      alert("Image file size should not exceed 5MB.");
-      return;
+    const minImageSize = 1 * 1024 * 1024;
+    const maxImageSize = 5 * 1024 * 1024;
+    const minVideoSize = 5 * 1024 * 1024;
+    const maxVideoSize = 100 * 1024 * 1024;
+
+    if (file.type.startsWith("image")) {
+      if (file.size < minImageSize) {
+        alert("Image file size should be at least 1MB.");
+        return;
+      }
+      if (file.size > maxImageSize) {
+        alert("Image file size should not exceed 5MB.");
+        return;
+      }
     }
 
-    // Video size limit (100MB)
-    if (file.type.startsWith("video") && file.size > 100 * 1024 * 1024) {
-      alert("Video file size should not exceed 100MB.");
-      return;
+    if (file.type.startsWith("video")) {
+      if (file.size < minVideoSize) {
+        alert("Video file size should be at least 5MB.");
+        return;
+      }
+      if (file.size > maxVideoSize) {
+        alert("Video file size should not exceed 100MB.");
+        return;
+      }
     }
 
-    // Update the file state (assuming you are using setState to store the files)
     setFiles((prevFiles) => ({
       ...prevFiles,
       [event.target.name]: file,
@@ -153,6 +167,7 @@ const YourActivity = () => {
       await fetchComplaints();
     } catch (error) {
       alert(error);
+      await fetchComplaints();
     }
   };
 
@@ -168,14 +183,17 @@ const YourActivity = () => {
                 : "bg-white border-green-200" // Default for non-emergency complaints
             }`}
           >
-            <div>
+            <div className="mb-10">
               <h3
-                className={`text-lg font-semibold ${
+                className={`text-xl font-bold ${
                   complaint.emergency ? "text-red-800" : "text-green-800"
                 }`}
               >
                 {complaint.subject}
               </h3>
+              <p className="text-lg font-medium mt-2">
+                <strong>Complaint ID:</strong> {complaint._id}
+              </p>
               <p>
                 <strong>Raiser:</strong> {complaint.raiserName}
               </p>
@@ -189,9 +207,9 @@ const YourActivity = () => {
                 <strong>Location:</strong> {complaint.location}
               </p>
               <p>
-                <strong>CreatedAt:</strong> {dateFormat(complaint.createdAt)}
+                <strong>Created On:</strong> {dateFormat(complaint.createdAt)}
               </p>
-              <p style={{ color: "red", fontWeight: "bold" }}>
+              <p className="text-red-600 font-bold text-lg">
                 <strong>Status:</strong> {statusFormat(complaint.status)}
               </p>
             </div>
@@ -203,24 +221,26 @@ const YourActivity = () => {
                 Update
               </button>
             </div>
-          </div>
+          </div>        
         ))}
       </div>
 
       {/*POP UP WINDOW*/}
-      {selectedComplaint && <YourActivityPopup
-        selectedComplaint={selectedComplaint}
-        statusChange={statusChange}
-        setStatusChange={setStatusChange}
-        remark={remark}
-        setRemark={setRemark}
-        price={price}
-        setPrice={setPrice}
-        files={files}
-        handleFileChange={handleFileChange}
-        closeModal={closeModal}
-        handleStatusChange={handleStatusChange}
-      />}
+      {selectedComplaint && (
+        <YourActivityPopup
+          selectedComplaint={selectedComplaint}
+          statusChange={statusChange}
+          setStatusChange={setStatusChange}
+          remark={remark}
+          setRemark={setRemark}
+          price={price}
+          setPrice={setPrice}
+          files={files}
+          handleFileChange={handleFileChange}
+          closeModal={closeModal}
+          handleStatusChange={handleStatusChange}
+        />
+      )}
     </div>
   );
 };

@@ -15,15 +15,16 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+  const user = getUser();
+
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
-    { id: "new_complaint", label: "New Complaint", show: true },
+    { id: "new_complaint", label: "New Complaint", 
+      show: user.designation ==='COMPLAINT_RAISER' || user.designation ==='ESTATE_OFFICER'},
     { id: "your_activity", label: "Your Activity", show: true },
     { id: "complaints_history", label: "Complaints History", show: true },
-    { id: "users", label: "Users", show: true },
+    { id: "users", label: "Users", show: user.designation ==='ESTATE_OFFICER' },
   ];
-
-  const user = getUser();
 
   const handleLogout = () => {
     localStorage.removeItem("authToken"); 

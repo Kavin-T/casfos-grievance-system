@@ -376,6 +376,9 @@ const ComplaintsHistory = () => {
                   >
                     {complaint.subject}
                   </h3>
+                  <p className="text-lg font-medium mt-2">
+                    <strong>Complaint ID:</strong> {complaint._id}
+                  </p>
                   <p>
                     <strong>Raiser:</strong> {complaint.raiserName}
                   </p>

@@ -172,7 +172,7 @@ const Users = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-green-700 mb-4">
               {isEditing ? "Update User" : "Create New User"}
             </h2>

@@ -29,7 +29,6 @@ export default function NewComplaint() {
     vidBefore: null,
   });
 
-  // Handle input field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -39,19 +38,33 @@ export default function NewComplaint() {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Image size limit (5MB)
-    if (file.type.startsWith("image") && file.size > 5 * 1024 * 1024) {
-      alert("Image file size should not exceed 5MB.");
-      return;
+    const minImageSize = 1 * 1024 * 1024;
+    const maxImageSize = 5 * 1024 * 1024;
+    const minVideoSize = 5 * 1024 * 1024;
+    const maxVideoSize = 100 * 1024 * 1024;
+
+    if (file.type.startsWith("image")) {
+      if (file.size < minImageSize) {
+        alert("Image file size should be at least 1MB.");
+        return;
+      }
+      if (file.size > maxImageSize) {
+        alert("Image file size should not exceed 5MB.");
+        return;
+      }
     }
 
-    // Video size limit (100MB)
-    if (file.type.startsWith("video") && file.size > 100 * 1024 * 1024) {
-      alert("Video file size should not exceed 100MB.");
-      return;
+    if (file.type.startsWith("video")) {
+      if (file.size < minVideoSize) {
+        alert("Video file size should be at least 5MB.");
+        return;
+      }
+      if (file.size > maxVideoSize) {
+        alert("Video file size should not exceed 100MB.");
+        return;
+      }
     }
 
-    // Update the file state (assuming you are using setState to store the files)
     setFiles((prevFiles) => ({
       ...prevFiles,
       [event.target.name]: file,
@@ -360,66 +373,59 @@ export default function NewComplaint() {
         </label>
       </div>
 
+      <div className="text-red-500 mt-2 text-wrap">
+        <strong>Warning:</strong> The file must meet the following size
+        restrictions:
+        <ul className="list-disc pl-4">
+          <li>Images: Minimum size 1MB, Maximum size 5MB</li>
+          <li>Videos: Minimum size 5MB, Maximum size 100MB</li>
+        </ul>
+      </div>
+
       {/* Image upload */}
-      <div>
+      <div className="mt-1 flex items-center">
         <label
           htmlFor="imgBefore"
-          className="block text-sm font-medium text-gray-700"
+          className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
         >
-          Image
+          {files?.imgBefore ? "Change image" : "Upload image"}
         </label>
-        <div className="mt-1 flex items-center">
-          <label
-            htmlFor="imgBefore"
-            className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
-          >
-            {files?.imgBefore ? "Change file" : "Upload a file"}
-          </label>
-          <input
-            id="imgBefore"
-            name="imgBefore"
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={handleFileChange}
-          />
-          {files?.imgBefore && (
-            <span className="ml-3 text-sm text-gray-600">
-              {files.imgBefore.name}
-            </span>
-          )}
-        </div>
+        <input
+          id="imgBefore"
+          name="imgBefore"
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleFileChange}
+        />
+        {files?.imgBefore && (
+          <span className="ml-3 text-sm text-gray-600">
+            {files.imgBefore.name}
+          </span>
+        )}
       </div>
 
       {/* Video upload */}
-      <div>
+      <div className="mt-1 flex items-center">
         <label
-          htmlFor="file"
-          className="block text-sm font-medium text-gray-700"
+          htmlFor="vidBefore"
+          className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
         >
-          Video
+          {files.vidBefore ? "Change video" : "Upload video"}
         </label>
-        <div className="mt-1 flex items-center">
-          <label
-            htmlFor="vidBefore"
-            className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
-          >
-            {files.vidBefore ? "Change file" : "Upload a file"}
-          </label>
-          <input
-            id="vidBefore"
-            name="vidBefore"
-            type="file"
-            accept="video/*"
-            className="sr-only"
-            onChange={handleFileChange}
-          />
-          {files?.vidBefore && (
-            <span className="ml-3 text-sm text-gray-600">
-              {files.vidBefore.name}
-            </span>
-          )}
-        </div>
+        <input
+          id="vidBefore"
+          name="vidBefore"
+          type="file"
+          accept="video/*"
+          className="sr-only"
+          onChange={handleFileChange}
+        />
+        {files?.vidBefore && (
+          <span className="ml-3 text-sm text-gray-600">
+            {files.vidBefore.name}
+          </span>
+        )}
       </div>
 
       {/* Submit button */}
