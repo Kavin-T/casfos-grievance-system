@@ -29,6 +29,8 @@ const ComplaintsHistory = () => {
   const [loading, setLoading] = useState(false);
   const [toggle, setToggle] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [showFilters, setShowFilters] = useState(false); // State to toggle filter visibility
+
   const handleCloseModal = () => {
     setSelectedComplaint(null);
   };
@@ -101,10 +103,20 @@ const ComplaintsHistory = () => {
 
   return (
     <div className="p-4 bg-green-50 min-h-screen">
-      <h2 className="text-2xl font-bold text-green-700 mb-4">
-        Filter Complaints
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <h2 className="text-2xl font-bold text-green-700 mb-4">Filter Complaints</h2>
+      
+      {/* Mobile view: Button to toggle filter visibility */}
+      <div className="sm:hidden mb-4">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
+        >
+          {showFilters ? "Hide Filters" : "View Filters"}
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 ${showFilters ? "" : "hidden sm:grid"}`}>
         <input
           type="text"
           name="raiserName"
@@ -189,10 +201,7 @@ const ComplaintsHistory = () => {
         </select>
 
         <div>
-          <label
-            htmlFor="startDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="startDate" className="block text-green-700 font-medium mb-1">
             Start Date
           </label>
           <input
@@ -206,10 +215,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="endDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="endDate" className="block text-green-700 font-medium mb-1">
             End Date
           </label>
           <input
@@ -223,10 +229,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="createdStartDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="createdStartDate" className="block text-green-700 font-medium mb-1">
             Created Start Date
           </label>
           <input
@@ -240,10 +243,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="createdEndDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="createdEndDate" className="block text-green-700 font-medium mb-1">
             Created End Date
           </label>
           <input
@@ -257,10 +257,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="acknowledgedStartDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="acknowledgedStartDate" className="block text-green-700 font-medium mb-1">
             Acknowledged Start Date
           </label>
           <input
@@ -274,10 +271,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="acknowledgedEndDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="acknowledgedEndDate" className="block text-green-700 font-medium mb-1">
             Acknowledged End Date
           </label>
           <input
@@ -291,10 +285,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="resolvedStartDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="resolvedStartDate" className="block text-green-700 font-medium mb-1">
             Resolved Start Date
           </label>
           <input
@@ -308,10 +299,7 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="resolvedEndDate"
-            className="block text-green-700 font-medium mb-1"
-          >
+          <label htmlFor="resolvedEndDate" className="block text-green-700 font-medium mb-1">
             Resolved End Date
           </label>
           <input
@@ -351,6 +339,7 @@ const ComplaintsHistory = () => {
           </button>
         </div>
       </div>
+
       <h2 className="text-2xl font-bold text-green-700 mb-4">Complaints</h2>
       {loading ? (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
