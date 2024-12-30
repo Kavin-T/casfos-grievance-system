@@ -29,7 +29,7 @@ const ComplaintsHistory = () => {
   const [loading, setLoading] = useState(false);
   const [toggle, setToggle] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [showFilters, setShowFilters] = useState(false); // State to toggle filter visibility
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleCloseModal = () => {
     setSelectedComplaint(null);
