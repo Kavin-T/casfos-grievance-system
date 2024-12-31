@@ -2,10 +2,8 @@ const { defineConfig } = require("@playwright/test");
 
 module.exports = defineConfig({
   testDir: "./tests/e2e", // Directory containing your test files
-  timeout: 30000, // Maximum time for a test to run (in milliseconds)
   retries: 1, // Number of retries for failed tests
   workers: 2, // Number of parallel test workers
-  reporter: "html", // Generate an HTML report for test results
   use: {
     browserName: "chromium", // Default browser for testing ('chromium', 'firefox', 'webkit')
     headless: false, // Run tests in a visible browser (useful for debugging)
