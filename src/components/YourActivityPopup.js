@@ -112,6 +112,7 @@ const YourActivityPopup = ({
               <label htmlFor="remark">Enter Remark:</label>
               <div className="mt-2">
                 <textarea
+                  id="remark-text"
                   className="block mt-2 p-2 border rounded w-full"
                   placeholder="Enter remark"
                   value={remark}
@@ -126,6 +127,7 @@ const YourActivityPopup = ({
               <label htmlFor="price">Enter Price:</label>
               <div className="mt-2">
                 <input
+                  id="price-input"
                   type="number"
                   className="block mt-2 p-2 border rounded w-full"
                   placeholder="Enter price"
@@ -201,6 +203,7 @@ const YourActivityPopup = ({
               Cancel
             </button>
             <button
+              id="popup-submit"
               onClick={handleStatusChange}
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               disabled={
