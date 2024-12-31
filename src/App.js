@@ -8,8 +8,8 @@ function App() {
   useEffect(() => {
     // Add event listener to delete token on tab close
     const removeTokenOnTabClose = () => {
-      window.addEventListener('beforeunload', () => {
-        localStorage.removeItem('authToken'); // Remove the token
+      window.addEventListener("beforeunload", () => {
+        localStorage.removeItem("authToken"); // Remove the token
       });
     };
 
@@ -17,7 +17,7 @@ function App() {
 
     // Cleanup the event listener when the component unmounts
     return () => {
-      window.removeEventListener('beforeunload', removeTokenOnTabClose);
+      window.removeEventListener("beforeunload", removeTokenOnTabClose);
     };
   }, []);
 
@@ -25,10 +25,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route
-          path="/home"
-          element={<PrivateRoute element={Home} />}
-        />
+        <Route path="/home" element={<PrivateRoute element={Home} />} />
       </Routes>
 
       <footer className="bg-green-800 text-white text-center py-6 sm:py-8 lg:py-12">

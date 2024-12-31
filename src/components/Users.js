@@ -6,6 +6,7 @@ import {
   updateUser,
 } from "../services/userApi";
 import { designationFormat } from "../utils/formatting";
+import { toast } from "react-toastify";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -34,26 +35,23 @@ const Users = () => {
     getUsers();
   }, []);
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prompt for confirmation before submitting
     const isConfirmed = window.confirm(
-      `Are you sure you want to ${isEditing?"update":"add"} the user?`
+      `Are you sure you want to ${isEditing ? "update" : "add"} the user?`
     );
     if (!isConfirmed) {
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.success("Passwords do not match!");
       return;
     }
 
@@ -72,12 +70,9 @@ const Users = () => {
     }
   };
 
-  // Handle delete
   const handleDelete = async (id) => {
-
-    // Prompt for confirmation before submitting
     const isConfirmed = window.confirm(
-      `Are you sure you want to delete the user?`
+      "Are you sure you want to delete the user?"
     );
     if (!isConfirmed) {
       return;
@@ -92,7 +87,6 @@ const Users = () => {
     }
   };
 
-  // Open modal for creating or editing
   const openModal = (user = null) => {
     if (user) {
       setFormData({
@@ -125,29 +119,40 @@ const Users = () => {
   };
 
   return (
-    <div className="p-4 bg-green-50 min-h-screen">
+    <div className="p-4 bg-green-50 min-h-screen" data-testid="user-management">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-green-700">User Management</h1>
+        <h1
+          className="text-2xl font-bold text-green-700"
+          data-testid="user-management-title"
+        >
+          User Management
+        </h1>
         <button
           onClick={() => openModal()}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          data-testid="create-user-button"
         >
           Create New User
         </button>
       </div>
 
-      {/* User Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        data-testid="user-list"
+      >
         {users.map((user) => (
           <div
             key={user._id}
             className="bg-white shadow-md rounded p-4 flex flex-col justify-between"
+            data-testid={`user-name-${user.username}`}
           >
             <div>
               <h2 className="text-xl font-semibold text-green-700">
                 {user.username}
               </h2>
-              <p className="text-sm text-green-600">{designationFormat(user.designation)}</p>
+              <p className="text-sm text-green-600">
+                {designationFormat(user.designation)}
+              </p>
               <p>{user.email}</p>
               <p>{user.phoneNumber}</p>
             </div>
@@ -155,12 +160,14 @@ const Users = () => {
               <button
                 onClick={() => openModal(user)}
                 className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                data-testid={`update-user-button`}
               >
                 Update
               </button>
               <button
                 onClick={() => handleDelete(user._id)}
                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                data-testid={`delete-user-button`}
               >
                 Delete
               </button>
@@ -169,11 +176,16 @@ const Users = () => {
         ))}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+          data-testid="user-modal"
+        >
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-green-700 mb-4">
+            <h2
+              className="text-xl font-bold text-green-700 mb-4"
+              data-testid="modal-title"
+            >
               {isEditing ? "Update User" : "Create New User"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -188,6 +200,7 @@ const Users = () => {
                   onChange={handleChange}
                   required
                   className="w-full border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-green-500"
+                  data-testid="user-input-username"
                 />
               </div>
               <div>
@@ -200,6 +213,7 @@ const Users = () => {
                   onChange={handleChange}
                   required
                   className="w-full border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-green-500"
+                  data-testid="user-input-designation"
                 >
                   <option value="">Select Designation</option>
                   <option value="ESTATE_OFFICER">Estate Officer</option>
@@ -220,6 +234,7 @@ const Users = () => {
                   onChange={handleChange}
                   required
                   className="w-full border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-green-500"
+                  data-testid="user-input-email"
                 />
               </div>
               <div>
@@ -234,6 +249,7 @@ const Users = () => {
                   pattern="\d{10}"
                   required
                   className="w-full border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-green-500"
+                  data-testid="user-input-phone-number"
                 />
               </div>
               <div>
@@ -245,8 +261,9 @@ const Users = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  required={!isEditing} // Password is only required for new users
+                  required={!isEditing}
                   className="w-full border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-green-500"
+                  data-testid="user-input-password"
                 />
               </div>
               <div>
@@ -258,8 +275,9 @@ const Users = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  required={!isEditing} // Re-enter Password only for new users
+                  required={!isEditing}
                   className="w-full border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-green-500"
+                  data-testid="user-input-confirm-password"
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -267,12 +285,14 @@ const Users = () => {
                   type="button"
                   onClick={closeModal}
                   className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  data-testid="user-cancel-button"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                  data-testid="user-submit-button"
                 >
                   {isEditing ? "Update" : "Create"}
                 </button>

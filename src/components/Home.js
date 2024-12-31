@@ -8,6 +8,7 @@ import casfos_logo from "../assets/images/casfos_logo.jpg";
 import { getUser } from "../utils/useToken";
 import { useNavigate } from "react-router-dom";
 import { designationFormat } from "../utils/formatting";
+import { ToastContainer } from "react-toastify";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("complaint_statistics");
@@ -19,20 +20,30 @@ export default function Home() {
 
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
-    { id: "new_complaint", label: "New Complaint", 
-      show: user.designation ==='COMPLAINT_RAISER' || user.designation ==='ESTATE_OFFICER'},
+    {
+      id: "new_complaint",
+      label: "New Complaint",
+      show:
+        user.designation === "COMPLAINT_RAISER" ||
+        user.designation === "ESTATE_OFFICER",
+    },
     { id: "your_activity", label: "Your Activity", show: true },
     { id: "complaints_history", label: "Complaints History", show: true },
-    { id: "users", label: "Users", show: user.designation ==='ESTATE_OFFICER' },
+    {
+      id: "users",
+      label: "Users",
+      show: user.designation === "ESTATE_OFFICER",
+    },
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); 
-    navigate("/"); 
+    localStorage.removeItem("authToken");
+    navigate("/");
   };
 
   return (
     <>
+      <ToastContainer position="top-center" autoClose={3000} theme="colored" />
       <header className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
@@ -48,7 +59,9 @@ export default function Home() {
               <>
                 <div className="text-right">
                   <p className="font-semibold">{user.username}</p>
-                  <p className="text-sm text-green-300">{designationFormat(user.designation)}</p>
+                  <p className="text-sm text-green-300">
+                    {designationFormat(user.designation)}
+                  </p>
                 </div>
                 <button
                   onClick={handleLogout} // Attach handleLogout to the button
@@ -88,29 +101,32 @@ export default function Home() {
 
               {/* Display Selected Tab */}
               <span className="ml-4 text-lg font-medium text-gray-700 pr-2">
-                {tabs.find((tab) => tab.id === activeTab)?.label || "Select a Tab"}
+                {tabs.find((tab) => tab.id === activeTab)?.label ||
+                  "Select a Tab"}
               </span>
             </div>
 
             {/* Dropdown Menu */}
             {isMenuOpen && (
               <div className="mt-2 bg-white border rounded-md shadow-lg">
-                {tabs.filter((tab) => tab.show).map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      setIsMenuOpen(false); // Close menu on selection
-                    }}
-                    className={`block w-full text-left px-4 py-2 ${
-                      activeTab === tab.id
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+                {tabs
+                  .filter((tab) => tab.show)
+                  .map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMenuOpen(false); // Close menu on selection
+                      }}
+                      className={`block w-full text-left px-4 py-2 ${
+                        activeTab === tab.id
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
               </div>
             )}
           </div>
