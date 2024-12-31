@@ -1,7 +1,7 @@
 const { test, expect } = require("@playwright/test");
-const complaintID = "6773a544123e50423da628f7";
-const imagePath = "C:UserskavinDownloadsIMG_4399.jpg";
-test.setTimeout(60000); // 60 seconds timeout for each test
+const complaintID = "6773b9a9a2fcc0a9f8293f7b";
+const imagePath = "C:/Users/kavin/Downloads/IMG_4399.jpg";
+test.setTimeout(60000);
 test.describe("CASE 01 - Complaint Handling Workflow", () => {
   // Helper function for logging in
   async function login(page, username, password) {
@@ -42,7 +42,6 @@ test.describe("CASE 01 - Complaint Handling Workflow", () => {
       await page.click(selector);
     } catch (error) {
       console.error(`Error clicking button ${selector}:`, error);
-      await page.screenshot({ path: `debug-${selector.replace("#", "")}.png` });
       throw error;
     }
   }

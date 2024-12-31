@@ -47,7 +47,7 @@ const YourActivityPopup = ({
     <>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
         <div className="bg-white p-6 shadow-lg rounded-lg max-w-lg w-full max-h-[80vh] overflow-y-auto">
-          <ComplaintDetailsPopup selectedComplaint={selectedComplaint}/>
+          <ComplaintDetailsPopup selectedComplaint={selectedComplaint} />
 
           {selectedComplaint.status === "RESOURCE_REQUIRED" &&
             selectedComplaint.remark_JE && (
@@ -100,14 +100,13 @@ const YourActivityPopup = ({
             </div>
           </div>
 
-          {(
-            [
+          {([
             "RESOURCE_REQUIRED",
             "AE_NOT_SATISFIED",
             "EE_NOT_SATISFIED",
-            ].includes(statusChange) || 
-            (selectedComplaint.status === "RESOURCE_REQUIRED" && statusChange === "RAISED")
-          ) && (
+          ].includes(statusChange) ||
+            (selectedComplaint.status === "RESOURCE_REQUIRED" &&
+              statusChange === "RAISED")) && (
             <div className="mt-4">
               <label htmlFor="remark">Enter Remark:</label>
               <div className="mt-2">
