@@ -1,19 +1,15 @@
 const { test, expect } = require("@playwright/test");
-
-const complaintID = "6773bbdea2fcc0a9f8293ff4"; // Replace with your complaint ID
-const imagePath = "C:/Users/kavin/Downloads/IMG_4399.jpg"; // Ensure this file path exists
-
-// Set a global timeout for all tests
+const complaintID = "677678b96e0ad8b6397944a5";
 test.setTimeout(60000); // 60 seconds timeout for each test
 
-test.describe("CASE 03 - Resource Required", () => {
+test.describe("CASE 03 - Workflow for JE and Murugavel", () => {
   // Helper function for logging in
   async function login(page, username, password) {
     await page.fill("#username", username);
     await page.fill("#password", password);
     await page.click('button:has-text("Sign in")');
     page.once("dialog", async (dialog) => {
-      await dialog.accept(); // Accept dialog after login
+      await dialog.accept();
     });
     const yourActivityButton = await page.getByRole("button", {
       name: "Your Activity",
@@ -22,7 +18,7 @@ test.describe("CASE 03 - Resource Required", () => {
     await yourActivityButton.click();
   }
 
-  // Helper function to handle consecutive dialogs
+  // Helper function to handle multiple dialogs
   async function handleConsecutiveDialogs(page, numDialogs) {
     let dialogCount = 0;
     const dialogListener = async (dialog) => {
@@ -30,94 +26,71 @@ test.describe("CASE 03 - Resource Required", () => {
         await dialog.accept();
         dialogCount++;
         if (dialogCount === numDialogs) {
-          page.off("dialog", dialogListener); // Stop listening after required dialogs
+          page.off("dialog", dialogListener);
         }
       }
     };
     page.on("dialog", dialogListener);
   }
 
-  async function waitAndClick(page, selector) {
+  // Helper function to interact with elements
+  async function waitAndClick(page, selector, fillText = null) {
     try {
-      await page.waitForSelector(selector, {
-        state: "visible",
-        timeout: 10000,
-      });
-      await page.locator(selector).waitFor({ state: "visible" });
-
-      // Check if the selector is 'remark-text' and set the value if it is
-      if (selector === "#remark-text") {
-        await page.locator(selector).fill("I am Not Satisfied");
+      await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
+      if (fillText) {
+        await page.locator(selector).fill(fillText);
       } else {
         await page.click(selector);
       }
     } catch (error) {
-      console.error(`Error clicking or interacting with ${selector}:`, error);
+      console.error(`Error interacting with ${selector}:`, error);
       throw error;
     }
   }
 
-  // JE Workflow
-  test("JE Login and Resource Required", async ({ page }) => {
+  // JE Workflow - Status Change to RESOURCE_REQUIRED
+  test("JE Login and Change Status to RESOURCE_REQUIRED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    const logo = page.locator('header img[alt="CASFOS Logo"]');
-    await expect(logo).toBeVisible();
-
-    await login(page, "je", "je");
-
-    // JE steps
+    await login(page, "Test_JE", "password");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RESOURCE_REQUIRED");
-    await waitAndClick(page, "#remark-text");
-    await handleConsecutiveDialogs(page, 2); // Handle two consecutive dialogs
+    await waitAndClick(page, "#remark-text", "Resource required due to shortage.");
+    await handleConsecutiveDialogs(page, 2);
     await waitAndClick(page, "#popup-submit");
-
     await waitAndClick(page, "#logout-button");
   });
 
-  // Admin Workflow (Murugavel)
-  test("Admin Login and Raised", async ({ page }) => {
+  // Murugavel Workflow - Status Change to RAISED
+  test("Murugavel Login and Change Status to RAISED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    const logo = page.locator('header img[alt="CASFOS Logo"]');
-    await expect(logo).toBeVisible();
-    await login(page, "eo", "eo");
-    // Admin steps
+    await login(page, "murugavel", "123456789secure");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RAISED");
-    await waitAndClick(page, "#remark-text");
-    await handleConsecutiveDialogs(page, 2); // Handle two consecutive dialogs
+    await waitAndClick(page, "#remark-text", "Issue raised for further escalation.");
+    await handleConsecutiveDialogs(page, 2);
     await waitAndClick(page, "#popup-submit");
     await waitAndClick(page, "#logout-button");
   });
 
-  // JE Workflow
-  test("JE Login and Again Resource Required", async ({ page }) => {
+  // JE Workflow - Repeat Status Change to RESOURCE_REQUIRED
+  test("JE Login Again and Change Status to RESOURCE_REQUIRED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    const logo = page.locator('header img[alt="CASFOS Logo"]');
-    await expect(logo).toBeVisible();
-
-    await login(page, "je", "je");
-
-    // JE steps
+    await login(page, "Test_JE", "password");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RESOURCE_REQUIRED");
-    await waitAndClick(page, "#remark-text");
-    await handleConsecutiveDialogs(page, 2); // Handle two consecutive dialogs
+    await waitAndClick(page, "#remark-text", "Additional resources required.");
+    await handleConsecutiveDialogs(page, 2);
     await waitAndClick(page, "#popup-submit");
-
     await waitAndClick(page, "#logout-button");
   });
 
-  // Admin Workflow (Murugavel)
-  test("Admin Login and Closed", async ({ page }) => {
+  // Murugavel Workflow - Status Change to CLOSED
+  test("Murugavel Login and Change Status to CLOSED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    const logo = page.locator('header img[alt="CASFOS Logo"]');
-    await expect(logo).toBeVisible();
-    await login(page, "eo", "eo");
-    // Admin steps
+    await login(page, "murugavel", "123456789secure");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "CLOSED");
-    await handleConsecutiveDialogs(page, 2); // Handle two consecutive dialogs
+    await handleConsecutiveDialogs(page, 2);
     await waitAndClick(page, "#popup-submit");
     await waitAndClick(page, "#logout-button");
   });
