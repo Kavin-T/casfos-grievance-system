@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const complaintID = "6773ba60a2fcc0a9f8293fa2";
+const complaintID = "677c02d06b0e7bb19a0c03da";
 const imagePath = "C:/Users/kavin/Downloads/IMG_4399.jpg";
 test.setTimeout(60000); // 60 seconds timeout for each test
 test.describe("CASE 02 - All Not Satisfied Handling Workflow", () => {

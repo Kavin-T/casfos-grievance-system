@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const complaintID = "6773b9a9a2fcc0a9f8293f7b";
+const complaintID = "677c02ac6b0e7bb19a0c03d7";
 const imagePath = "C:/Users/kavin/Downloads/IMG_4399.jpg";
 test.setTimeout(60000);
 test.describe("CASE 01 - Complaint Handling Workflow", () => {

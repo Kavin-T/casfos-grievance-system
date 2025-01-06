@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const complaintID = "6773bbdea2fcc0a9f8293ff4";
+const complaintID = "677c03196b0e7bb19a0c03de";
 test.setTimeout(60000); // 60 seconds timeout for each test
 
 test.describe("CASE 03 - Workflow for JE and EO", () => {
@@ -36,7 +36,10 @@ test.describe("CASE 03 - Workflow for JE and EO", () => {
   // Helper function to interact with elements
   async function waitAndClick(page, selector, fillText = null) {
     try {
-      await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
+      await page.waitForSelector(selector, {
+        state: "visible",
+        timeout: 10000,
+      });
       if (fillText) {
         await page.locator(selector).fill(fillText);
       } else {
@@ -54,7 +57,11 @@ test.describe("CASE 03 - Workflow for JE and EO", () => {
     await login(page, "je", "je");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RESOURCE_REQUIRED");
-    await waitAndClick(page, "#remark-text", "Resource required due to shortage.");
+    await waitAndClick(
+      page,
+      "#remark-text",
+      "Resource required due to shortage."
+    );
     await handleConsecutiveDialogs(page, 2);
     await waitAndClick(page, "#popup-submit");
     await waitAndClick(page, "#logout-button");
@@ -66,14 +73,20 @@ test.describe("CASE 03 - Workflow for JE and EO", () => {
     await login(page, "eo", "eo");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RAISED");
-    await waitAndClick(page, "#remark-text", "Issue raised for further escalation.");
+    await waitAndClick(
+      page,
+      "#remark-text",
+      "Issue raised for further escalation."
+    );
     await handleConsecutiveDialogs(page, 2);
     await waitAndClick(page, "#popup-submit");
     await waitAndClick(page, "#logout-button");
   });
 
   // JE Workflow - Repeat Status Change to RESOURCE_REQUIRED
-  test("JE Login Again and Change Status to RESOURCE_REQUIRED", async ({ page }) => {
+  test("JE Login Again and Change Status to RESOURCE_REQUIRED", async ({
+    page,
+  }) => {
     await page.goto("http://localhost:3000");
     await login(page, "je", "je");
     await waitAndClick(page, `#update-button-${complaintID}`);
