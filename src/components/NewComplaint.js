@@ -7,7 +7,11 @@ import {
   CalendarIcon,
 } from "@heroicons/react/24/outline";
 import { addComplaint } from "../services/complaintApi";
-import { getUser } from "../utils/useToken";
+
+const getUser = () => {
+  const user = localStorage.getItem("username");
+  return { username: user };
+};
 
 export default function NewComplaint() {
   const [formData, setFormData] = useState({

@@ -1,18 +1,11 @@
-import axios from "axios";
-import { getToken } from "../utils/useToken";
+import axios from "./axios";
 import { dateFormat } from "../utils/formatting";
 
-const BASE_URL = process.env.REACT_APP_BACKEND_API_URL;
-
 export const getReport = async (filters) => {
-  const token = getToken();
   try {
-    const response = await axios.get(`${BASE_URL}/report`, {
+    const response = await axios.get('/report', {
       params: filters,
       responseType: "blob",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
     const url = window.URL.createObjectURL(

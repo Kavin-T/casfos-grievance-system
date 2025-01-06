@@ -1,18 +1,14 @@
-import axios from "axios";
-import { getToken } from "../utils/useToken";
+import axios from './axios';
 
-const BASE_URL = process.env.REACT_APP_BACKEND_API_URL;
-
+// Add complaint
 export const addComplaint = async (formData) => {
-  const token = getToken();
   try {
     const response = await axios.post(
-      `${BASE_URL}/complaint/add`,
+      '/complaint/add',
       formData,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       }
     );
@@ -20,17 +16,14 @@ export const addComplaint = async (formData) => {
   } catch (error) {
     throw error.response && error.response.data.message
       ? error.response.data.message
-      : "Unable to submit complaint.";
+      : 'Unable to submit complaint.';
   }
 };
 
-export const fetchComplaint = async (filters,page) => {
-  const token = getToken();
+// Fetch complaints
+export const fetchComplaint = async (filters, page) => {
   try {
-    const response = await axios.get(`${BASE_URL}/complaint`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await axios.get('/complaint', {
       params: {
         ...filters,
         page,
@@ -41,25 +34,20 @@ export const fetchComplaint = async (filters,page) => {
   } catch (error) {
     throw error.response && error.response.data.message
       ? error.response.data.message
-      : "Unable to fetch complaints.";
+      : 'Unable to fetch complaints.';
   }
 };
 
+// Fetch complaint statistics
 export const fetchComplaintStatistics = async (year, month) => {
-  const token = getToken(); 
   try {
-    const response = await axios.get(`${BASE_URL}/complaint/statistics`, {
+    const response = await axios.get('/complaint/statistics', {
       params: { year, month },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
-    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message
       ? error.response.data.message
-      : "Unable to fetch complaints statistics.";
+      : 'Unable to fetch complaints statistics.';
   }
 };
-

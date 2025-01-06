@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import casfos_logo from "../assets/images/casfos_logo.jpg";
-import { loginUser } from "../services/loginApi";
+import { loginUser } from "../services/authApi";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -11,16 +11,18 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear any previous errors
+    setError("");
 
     try {
-      const data = await loginUser(username, password); // Call the login API
-      localStorage.setItem("authToken", data.token); // Store the token securely
-      navigate("/home"); // Navigate to the dashboard
+      const data = await loginUser(username, password);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("designation", data.designation);
+      navigate("/home");
       alert(`Welcome, ${data.username}!`);
     } catch (error) {
-      setError(error || "An unexpected error occurred.");
-      alert(error);
+      const errorMessage = error.message || "An unexpected error occurred.";
+      setError(errorMessage);
+      alert(errorMessage);
     }
   };
 

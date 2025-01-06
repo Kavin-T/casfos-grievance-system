@@ -1,8 +1,8 @@
 const { test, expect } = require("@playwright/test");
-const complaintID = "677678b96e0ad8b6397944a5";
+const complaintID = "6773bbdea2fcc0a9f8293ff4";
 test.setTimeout(60000); // 60 seconds timeout for each test
 
-test.describe("CASE 03 - Workflow for JE and Murugavel", () => {
+test.describe("CASE 03 - Workflow for JE and EO", () => {
   // Helper function for logging in
   async function login(page, username, password) {
     await page.fill("#username", username);
@@ -51,7 +51,7 @@ test.describe("CASE 03 - Workflow for JE and Murugavel", () => {
   // JE Workflow - Status Change to RESOURCE_REQUIRED
   test("JE Login and Change Status to RESOURCE_REQUIRED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    await login(page, "Test_JE", "password");
+    await login(page, "je", "je");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RESOURCE_REQUIRED");
     await waitAndClick(page, "#remark-text", "Resource required due to shortage.");
@@ -60,10 +60,10 @@ test.describe("CASE 03 - Workflow for JE and Murugavel", () => {
     await waitAndClick(page, "#logout-button");
   });
 
-  // Murugavel Workflow - Status Change to RAISED
-  test("Murugavel Login and Change Status to RAISED", async ({ page }) => {
+  // EO Workflow - Status Change to RAISED
+  test("EO Login and Change Status to RAISED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    await login(page, "murugavel", "123456789secure");
+    await login(page, "eo", "eo");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RAISED");
     await waitAndClick(page, "#remark-text", "Issue raised for further escalation.");
@@ -75,7 +75,7 @@ test.describe("CASE 03 - Workflow for JE and Murugavel", () => {
   // JE Workflow - Repeat Status Change to RESOURCE_REQUIRED
   test("JE Login Again and Change Status to RESOURCE_REQUIRED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    await login(page, "Test_JE", "password");
+    await login(page, "je", "je");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "RESOURCE_REQUIRED");
     await waitAndClick(page, "#remark-text", "Additional resources required.");
@@ -84,10 +84,10 @@ test.describe("CASE 03 - Workflow for JE and Murugavel", () => {
     await waitAndClick(page, "#logout-button");
   });
 
-  // Murugavel Workflow - Status Change to CLOSED
-  test("Murugavel Login and Change Status to CLOSED", async ({ page }) => {
+  // EO Workflow - Status Change to CLOSED
+  test("EO Login and Change Status to CLOSED", async ({ page }) => {
     await page.goto("http://localhost:3000");
-    await login(page, "murugavel", "123456789secure");
+    await login(page, "eo", "eo");
     await waitAndClick(page, `#update-button-${complaintID}`);
     await page.selectOption("#statusChange", "CLOSED");
     await handleConsecutiveDialogs(page, 2);

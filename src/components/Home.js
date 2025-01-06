@@ -1,22 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NewComplaint from "./NewComplaint";
 import ComplaintStatistics from "./ComplaintStatistics";
 import ComplaintsHistory from "./ComplaintsHistory";
 import YourActivity from "./YourActivity";
 import Users from "./Users";
 import casfos_logo from "../assets/images/casfos_logo.jpg";
-import { getUser } from "../utils/useToken";
 import { useNavigate } from "react-router-dom";
 import { designationFormat } from "../utils/formatting";
 import { ToastContainer } from "react-toastify";
+import { checkAuthentication } from "../services/authApi";
+import { useCookies } from "react-cookie";
+
+const getUser = () => {
+  const username = localStorage.getItem("username");
+  const designation = localStorage.getItem("designation");
+  return { username, designation };
+};
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("complaint_statistics");
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [cookies, removeCookie] = useCookies([]);
 
   const navigate = useNavigate();
 
-  const user = getUser();
+  const userInfo = getUser();
+
+  useEffect(() => {
+    const verifyUser = async () => {
+      const response = await checkAuthentication();
+      if (!response) {
+        removeCookie("token");
+        alert("Session expired. Please login again.");
+        navigate("/");
+      }
+    };
+    verifyUser();
+  }, [cookies, navigate, removeCookie]);
 
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
@@ -24,20 +44,20 @@ export default function Home() {
       id: "new_complaint",
       label: "New Complaint",
       show:
-        user.designation === "COMPLAINT_RAISER" ||
-        user.designation === "ESTATE_OFFICER",
+        userInfo.designation === "COMPLAINT_RAISER" ||
+        userInfo.designation === "ESTATE_OFFICER",
     },
     { id: "your_activity", label: "Your Activity", show: true },
     { id: "complaints_history", label: "Complaints History", show: true },
     {
       id: "users",
       label: "Users",
-      show: user.designation === "ESTATE_OFFICER",
+      show: userInfo.designation === "ESTATE_OFFICER",
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
+  const handleLogout = async () => {
+    removeCookie("token");
     navigate("/");
   };
 
@@ -55,12 +75,12 @@ export default function Home() {
             <h1 className="text-2xl font-bold">CASFOS Grievance System</h1>
           </div>
           <div className="flex items-center space-x-4">
-            {user && (
+            {userInfo && (
               <>
                 <div className="text-right">
-                  <p className="font-semibold">{user.username}</p>
+                  <p className="font-semibold">{userInfo.username}</p>
                   <p className="text-sm text-green-300">
-                    {designationFormat(user.designation)}
+                    {designationFormat(userInfo.designation)}
                   </p>
                 </div>
                 <button

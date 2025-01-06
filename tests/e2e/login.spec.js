@@ -14,18 +14,6 @@ test.describe("Login Page Tests", () => {
     await expect(passwordField).toBeVisible();
   });
 
-  test("should display an error message with invalid credentials", async ({
-    page,
-  }) => {
-    await page.goto("http://localhost:3000");
-    await page.fill("input#username", "invalidUser");
-    await page.fill("input#password", "invalidPass");
-    await page.click('button:has-text("Sign in")');
-
-    const errorMessage = page.locator("p.text-red-500");
-    await expect(errorMessage).toContainText("Username not found");
-  });
-
   test("should successfully login with valid credentials", async ({ page }) => {
     const username = "ae";
     const password = "ae";

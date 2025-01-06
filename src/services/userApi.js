@@ -1,16 +1,9 @@
-import axios from "axios";
-import { getToken } from "../utils/useToken";
+import axios from "./axios";
 
-const BASE_URL = process.env.REACT_APP_BACKEND_API_URL;
-
+// Fetch all users
 export const fetchUsers = async () => {
-  const token = getToken(); // Retrieve the token using your utility function
   try {
-    const response = await axios.get(`${BASE_URL}/user/all`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Add the token here
-      },
-    });
+    const response = await axios.get(`/user/all`);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message
@@ -19,18 +12,10 @@ export const fetchUsers = async () => {
   }
 };
 
+// Add a new user
 export const addUser = async (formData) => {
-  const token = getToken(); // Retrieve the token using your utility function
   try {
-    const response = await axios.post(
-      `${BASE_URL}/user/add`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Add the token here
-        },
-      }
-    );
+    const response = await axios.post(`/user/add`, formData);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message
@@ -39,18 +24,10 @@ export const addUser = async (formData) => {
   }
 };
 
+// Update an existing user
 export const updateUser = async (formData) => {
-  const token = getToken(); // Retrieve the token using your utility function
   try {
-    const response = await axios.put(
-      `${BASE_URL}/user/update`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Add the token here
-        },
-      }
-    );
+    const response = await axios.put(`/user/update`, formData);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message
@@ -59,18 +36,10 @@ export const updateUser = async (formData) => {
   }
 };
 
-
+// Delete a user
 export const deleteUser = async (id) => {
-  const token = getToken(); 
   try {
-    const response = await axios.delete(
-      `${BASE_URL}/user/delete/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.delete(`/user/delete/${id}`);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message

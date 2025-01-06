@@ -51,7 +51,7 @@ const Users = () => {
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.success("Passwords do not match!");
+      toast.info("Passwords do not match!");
       return;
     }
 

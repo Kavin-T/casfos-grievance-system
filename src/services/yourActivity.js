@@ -1,16 +1,9 @@
-import axios from "axios";
-import { getToken } from "../utils/useToken";
+import axios from "./axios";
 
-const BASE_URL = process.env.REACT_APP_BACKEND_API_URL;
-
+// Fetch complaints by designation
 export const fetchComplaintsByDesignation = async () => {
-  const token = getToken();
   try {
-    const response = await axios.get(`${BASE_URL}/complaint/your-activity`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-    });
+    const response = await axios.get(`/complaint/your-activity`);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message
@@ -19,40 +12,29 @@ export const fetchComplaintsByDesignation = async () => {
   }
 };
 
-export const updateStatus = async (formData,endpoint) => {
-    const token = getToken();
-    try {
-        const response = await axios.put(`${BASE_URL}/status/${endpoint}`,
-            formData,
-            {
-                headers: {
-                Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        throw error.response && error.response.data.message
-        ? error.response.data.message
-        : "Unable to update complaints.";
-    }
+// Update complaint status
+export const updateStatus = async (formData, endpoint) => {
+  try {
+    const response = await axios.put(`/status/${endpoint}`, formData);
+    return response.data;
+  } catch (error) {
+    throw error.response && error.response.data.message
+      ? error.response.data.message
+      : "Unable to update complaints.";
+  }
 };
 
+// Update work done status
 export const updateWorkDone = async (formData) => {
-    const token = getToken();
-    try {
-        const response = await axios.post(`${BASE_URL}/status/je-acknowledged/je-workdone`, 
-            formData,
-            {
-                headers: {
-                Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        throw error.response && error.response.data.message
-        ? error.response.data.message
-        : "Unable to update complaints.";
-    }
+  try {
+    const response = await axios.post(
+      `/status/je-acknowledged/je-workdone`,
+      formData
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response && error.response.data.message
+      ? error.response.data.message
+      : "Unable to update complaints.";
+  }
 };
