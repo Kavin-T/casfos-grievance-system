@@ -11,7 +11,6 @@ import { fetchComplaintStatistics } from "../services/complaintApi";
 
 export default function ComplaintStatistics() {
   const [statistics, setStatistics] = useState({});
-  const [year, setYear] = useState("2024");
   const [month, setMonth] = useState("All");
   const [loading, setLoading] = useState(false);
 
@@ -180,9 +179,9 @@ export default function ComplaintStatistics() {
                       let IconComponent = WrenchIcon;
 
                       // Update icons for specific departments
-                      if (department.toLowerCase() === "civil") {
+                      if (department.toLowerCase() === "0") {
                         IconComponent = WrenchIcon;
-                      } else if (department.toLowerCase() === "electrical") {
+                      } else if (department.toLowerCase() === "1") {
                         IconComponent = BoltIcon;
                       }
 
@@ -194,7 +193,7 @@ export default function ComplaintStatistics() {
                           <div className="flex items-center mb-4">
                             <IconComponent className="h-8 w-8 text-green-600 mr-3" />
                             <h4 className="text-lg font-semibold text-gray-900">
-                              {department}
+                              {department === "0" ? "Civil" : "Electrical"}
                             </h4>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
