@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ComplaintDetailsPopup from "./ComplaintDetailsPopup";
 import { fetchComplaint } from "../services/complaintApi";
 import { getReport } from "../services/reportApi";
-import { dateFormat, statusFormat } from "../utils/formatting";
+import { calculateDuration, dateFormat, statusFormat } from "../utils/formatting";
 
 const ComplaintsHistory = () => {
   const [complaints, setComplaints] = useState([]);
@@ -392,16 +392,28 @@ const ComplaintsHistory = () => {
                     {dateFormat(complaint.createdAt)}
                   </p>
                   {complaint.acknowledgeAt && (
-                    <p>
-                      <strong>Acknowledged At:</strong>{" "}
-                      {dateFormat(complaint.acknowledgeAt)}
-                    </p>
+                    <>
+                      <p>
+                        <strong>Acknowledged At:</strong>{" "}
+                        {dateFormat(complaint.acknowledgeAt)}
+                      </p>
+                      <p>
+                        <strong>Acknowledged Duration:</strong>{" "}
+                        {calculateDuration(complaint.createdAt,complaint.acknowledgeAt)}
+                      </p>
+                    </>
                   )}
                   {complaint.resolvedAt && (
-                    <p>
-                      <strong>Resolved At:</strong>{" "}
-                      {dateFormat(complaint.resolvedAt)}
-                    </p>
+                    <>
+                      <p>
+                        <strong>Resolved At:</strong>{" "}
+                        {dateFormat(complaint.resolvedAt)}
+                      </p>
+                      <p>
+                        <strong>Resolved Duration:</strong>{" "}
+                        {calculateDuration(complaint.createdAt,complaint.resolvedAt)}
+                      </p>
+                    </>
                   )}
                   <button
                     className="mt-4 px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600"
@@ -437,29 +449,25 @@ const ComplaintsHistory = () => {
       )}
 
       <div className="flex justify-center items-center mt-6 space-x-4">
-        <button
-          disabled={page === 1}
-          onClick={() => handlePageChange(page - 1)}
-          className={`px-4 py-2 bg-green-500 text-white rounded-lg shadow-md ${
-            page === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
-          }`}
-        >
-          Previous
-        </button>
+        {page !== 1 && (
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
+          >
+            Previous
+          </button>
+        )}
         <span className="text-green-700 font-medium">
           Page {page} of {totalPages}
         </span>
-        <button
-          disabled={page === totalPages}
-          onClick={() => handlePageChange(page + 1)}
-          className={`px-4 py-2 bg-green-500 text-white rounded-lg shadow-md ${
-            page === totalPages
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-green-600"
-          }`}
-        >
-          Next
-        </button>
+        {page !== totalPages && (
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
+          >
+            Next
+          </button>
+        )}
       </div>
     </div>
   );

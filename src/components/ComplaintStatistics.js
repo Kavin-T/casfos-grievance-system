@@ -11,7 +11,7 @@ import { fetchComplaintStatistics } from "../services/complaintApi";
 
 export default function ComplaintStatistics() {
   const [statistics, setStatistics] = useState({});
-  const [year, setYear] = useState("2024");
+  const [year, setYear] = useState("2025");
   const [month, setMonth] = useState("All");
   const [loading, setLoading] = useState(false);
 
@@ -60,7 +60,7 @@ export default function ComplaintStatistics() {
             className="ml-2 pl-2 pr-8 py-1 border rounded"
           >
             <option value="All">All</option>
-            {[2021, 2022, 2023, 2024].map((yr) => (
+            {[2021, 2022, 2023, 2024, 2025].map((yr) => (
               <option key={yr} value={yr}>
                 {yr}
               </option>
@@ -177,14 +177,9 @@ export default function ComplaintStatistics() {
                     ([department, stats]) => {
                       const totalComplaints =
                         (stats.pending || 0) + (stats.resolved || 0);
-                      let IconComponent = WrenchIcon;
 
-                      // Update icons for specific departments
-                      if (department.toLowerCase() === "civil") {
-                        IconComponent = WrenchIcon;
-                      } else if (department.toLowerCase() === "electrical") {
-                        IconComponent = BoltIcon;
-                      }
+                      let IconComponent =
+                        department === "0" ? WrenchIcon : BoltIcon;
 
                       return (
                         <div
@@ -194,7 +189,7 @@ export default function ComplaintStatistics() {
                           <div className="flex items-center mb-4">
                             <IconComponent className="h-8 w-8 text-green-600 mr-3" />
                             <h4 className="text-lg font-semibold text-gray-900">
-                              {department}
+                              {department === "0" ? "Civil" : "Electrical"}
                             </h4>
                           </div>
                           <div className="grid grid-cols-2 gap-4">

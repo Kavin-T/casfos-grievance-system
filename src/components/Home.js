@@ -10,6 +10,7 @@ import { designationFormat } from "../utils/formatting";
 import { ToastContainer } from "react-toastify";
 import { checkAuthentication } from "../services/authApi";
 import { useCookies } from "react-cookie";
+import { fetchComplaintsByDesignation } from "../services/yourActivity";
 
 const getUser = () => {
   const username = localStorage.getItem("username");
@@ -18,6 +19,7 @@ const getUser = () => {
 };
 
 export default function Home() {
+  const [complaintCount, setComplaintCount] = useState(0);
   const [activeTab, setActiveTab] = useState("complaint_statistics");
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [cookies, removeCookie] = useCookies([]);
@@ -38,6 +40,18 @@ export default function Home() {
     verifyUser();
   }, [cookies, navigate, removeCookie]);
 
+  useEffect(() => {
+    const fetchComplaintCount = async () => {
+      try {
+        const data = await fetchComplaintsByDesignation();
+        setComplaintCount(data.length);
+      } catch (error) {
+        console.error("Error fetching complaint data:", error);
+      }
+    };
+    fetchComplaintCount();
+  }, []);
+  
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
     {
@@ -139,13 +153,18 @@ export default function Home() {
                         setActiveTab(tab.id);
                         setIsMenuOpen(false); // Close menu on selection
                       }}
-                      className={`block w-full text-left px-4 py-2 ${
+                      className={`relative block w-full text-left px-4 py-2 ${
                         activeTab === tab.id
                           ? "bg-green-500 text-white"
                           : "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {tab.label}
+                      {tab.label === "Your Activity" && complaintCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2">
+                          {complaintCount}
+                        </span>
+                      )}
                     </button>
                   ))}
               </div>
@@ -162,16 +181,19 @@ export default function Home() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`
-                    whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg
-                    ${
-                      activeTab === tab.id
-                        ? "border-green-500 text-green-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }
-                  `}
+                      className={`relative whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg
+                        ${
+                          activeTab === tab.id
+                            ? "border-green-500 text-green-600"
+                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
                     >
                       {tab.label}
+                      {tab.label === "Your Activity" && complaintCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2">
+                          {complaintCount}
+                        </span>
+                      )}
                     </button>
                   ))}
               </nav>
