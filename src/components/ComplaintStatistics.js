@@ -190,6 +190,7 @@ export default function ComplaintStatistics() {
                             <IconComponent className="h-8 w-8 text-green-600 mr-3" />
                             <h4 className="text-lg font-semibold text-gray-900">
                               {department === "0" ? "Civil" : "Electrical"}
+                              {department === "0" ? "Civil" : "Electrical"}
                             </h4>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
