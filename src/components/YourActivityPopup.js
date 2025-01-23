@@ -1,32 +1,7 @@
 import React from "react";
-import ComplaintDetailsPopup from "./ComplaintDetailsPopup";
-
-// Mapping for status transitions
-const statusOptions = {
-  RAISED: [
-    { value: "JE_ACKNOWLEDGED", label: "JE_ACKNOWLEDGED" },
-    { value: "RESOURCE_REQUIRED", label: "RESOURCE_REQUIRED" },
-  ],
-  JE_WORKDONE: [
-    { value: "AE_ACKNOWLEDGED", label: "AE_ACKNOWLEDGED" },
-    { value: "AE_NOT_SATISFIED", label: "AE_NOT_SATISFIED" },
-  ],
-  AE_ACKNOWLEDGED: [
-    { value: "EE_ACKNOWLEDGED", label: "EE_ACKNOWLEDGED" },
-    { value: "EE_NOT_SATISFIED", label: "EE_NOT_SATISFIED" },
-  ],
-  EE_ACKNOWLEDGED: [{ value: "RESOLVED", label: "RESOLVED" }],
-  RESOURCE_REQUIRED: [
-    { value: "CLOSED", label: "CLOSED" },
-    { value: "RAISED", label: "RAISED" },
-  ],
-  EE_NOT_SATISFIED: [
-    { value: "AE_NOT_SATISFIED", label: "AE_NOT_SATISFIED" },
-    { value: "AE_ACKNOWLEDGED", label: "AE_ACKNOWLEDGED" },
-  ],
-  JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "JE_WORKDONE" }],
-  AE_NOT_SATISFIED: [{ value: "JE_WORKDONE", label: "JE_WORKDONE" }],
-};
+import ComplaintBasicDetails from "./ComplaintBasicDetails";
+import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
+import { statusOptions } from "../constants/options";
 
 const YourActivityPopup = ({
   selectedComplaint,
@@ -47,7 +22,10 @@ const YourActivityPopup = ({
     <>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
         <div className="bg-white p-6 shadow-lg rounded-lg max-w-lg w-full max-h-[80vh] overflow-y-auto">
-          <ComplaintDetailsPopup selectedComplaint={selectedComplaint} />
+          
+          <ComplaintBasicDetails complaint={selectedComplaint} />
+          
+          <ComplaintAdditionalDetails complaint={selectedComplaint} />
 
           {selectedComplaint.status === "RESOURCE_REQUIRED" &&
             selectedComplaint.remark_JE && (

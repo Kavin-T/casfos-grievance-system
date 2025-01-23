@@ -8,6 +8,7 @@ import {
   CurrencyRupeeIcon, // Assuming a rupee icon is available
 } from "@heroicons/react/24/outline";
 import { fetchComplaintStatistics } from "../services/complaintApi";
+import { toast } from "react-toastify";
 
 export default function ComplaintStatistics() {
   const [statistics, setStatistics] = useState({});
@@ -26,7 +27,7 @@ export default function ComplaintStatistics() {
       setStatistics(response);
       setLoading(false);
     } catch (error) {
-      alert(error);
+      toast.error(error);
       setLoading(false);
     }
   };
@@ -189,7 +190,6 @@ export default function ComplaintStatistics() {
                           <div className="flex items-center mb-4">
                             <IconComponent className="h-8 w-8 text-green-600 mr-3" />
                             <h4 className="text-lg font-semibold text-gray-900">
-                              {department === "0" ? "Civil" : "Electrical"}
                               {department === "0" ? "Civil" : "Electrical"}
                             </h4>
                           </div>

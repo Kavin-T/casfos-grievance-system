@@ -7,6 +7,8 @@ import {
 } from "../services/userApi";
 import { designationFormat } from "../utils/formatting";
 import { toast } from "react-toastify";
+import { designations } from "../constants/options";
+import confirmAction from "../utils/confirmAction ";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -27,7 +29,7 @@ const Users = () => {
       const response = await fetchUsers();
       setUsers(response.users);
     } catch (error) {
-      alert(error);
+      toast.error(error);
     }
   };
 
@@ -43,7 +45,7 @@ const Users = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const isConfirmed = window.confirm(
+    const isConfirmed = await confirmAction(
       `Are you sure you want to ${isEditing ? "update" : "add"} the user?`
     );
     if (!isConfirmed) {
@@ -51,27 +53,27 @@ const Users = () => {
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.info("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
     try {
       if (isEditing) {
         const response = await updateUser(formData);
-        alert(response.message);
+        toast.success(response.message);
       } else {
         const response = await addUser(formData);
-        alert(response.message);
+        toast.success(response.message);
       }
       await getUsers();
       closeModal();
     } catch (error) {
-      alert(error);
+      toast.error(error);
     }
   };
 
   const handleDelete = async (id) => {
-    const isConfirmed = window.confirm(
+    const isConfirmed = await confirmAction(
       "Are you sure you want to delete the user?"
     );
     if (!isConfirmed) {
@@ -80,10 +82,10 @@ const Users = () => {
 
     try {
       const response = await deleteUser(id);
-      alert(response.message);
+      toast.success(response.message);
       await getUsers();
     } catch (error) {
-      alert(error);
+      toast.error(error);
     }
   };
 
@@ -216,11 +218,11 @@ const Users = () => {
                   data-testid="user-input-designation"
                 >
                   <option value="">Select Designation</option>
-                  <option value="ESTATE_OFFICER">Estate Officer</option>
-                  <option value="COMPLAINT_RAISER">Complaint Raiser</option>
-                  <option value="EXECUTIVE_ENGINEER">Executive Engineer</option>
-                  <option value="ASSISTANT_ENGINEER">Assistant Engineer</option>
-                  <option value="JUNIOR_ENGINEER">Junior Engineer</option>
+                  {designations.map((designation) => (
+                    <option key={designation.value} value={designation.value}>
+                      {designation.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>

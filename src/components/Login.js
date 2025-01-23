@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import casfos_logo from "../assets/images/casfos_logo.jpg";
 import { loginUser } from "../services/authApi";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -18,11 +19,9 @@ export default function Login() {
       localStorage.setItem("username", data.username);
       localStorage.setItem("designation", data.designation);
       navigate("/home");
-      alert(`Welcome, ${data.username}!`);
+      toast.success(`Welcome, ${data.username}!`);
     } catch (error) {
-      const errorMessage = error.message || "An unexpected error occurred.";
-      setError(errorMessage);
-      alert(errorMessage);
+      setError(error);
     }
   };
 

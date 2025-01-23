@@ -7,6 +7,8 @@ import {
   CalendarIcon,
 } from "@heroicons/react/24/outline";
 import { addComplaint } from "../services/complaintApi";
+import { toast } from "react-toastify";
+import confirmAction from "../utils/confirmAction ";
 
 const getUser = () => {
   const user = localStorage.getItem("username");
@@ -15,7 +17,7 @@ const getUser = () => {
 
 export default function NewComplaint() {
   const [formData, setFormData] = useState({
-    raiserName: getUser().username,
+    complainantName: getUser().username,
     subject: "",
     date: "",
     details: "",
@@ -42,29 +44,19 @@ export default function NewComplaint() {
     const file = event.target.files[0];
     if (!file) return;
 
-    const minImageSize = 1 * 1024 * 1024;
     const maxImageSize = 5 * 1024 * 1024;
-    const minVideoSize = 5 * 1024 * 1024;
     const maxVideoSize = 100 * 1024 * 1024;
 
     if (file.type.startsWith("image")) {
-      if (file.size < minImageSize) {
-        alert("Image file size should be at least 1MB.");
-        return;
-      }
       if (file.size > maxImageSize) {
-        alert("Image file size should not exceed 5MB.");
+        toast.error("Image file size should not exceed 5MB.");
         return;
       }
     }
 
     if (file.type.startsWith("video")) {
-      if (file.size < minVideoSize) {
-        alert("Video file size should be at least 5MB.");
-        return;
-      }
       if (file.size > maxVideoSize) {
-        alert("Video file size should not exceed 100MB.");
+        toast.error("Video file size should not exceed 100MB.");
         return;
       }
     }
@@ -80,7 +72,7 @@ export default function NewComplaint() {
     e.preventDefault();
 
     // Prompt for confirmation before submitting
-    const isConfirmed = window.confirm(
+    const isConfirmed = await confirmAction(
       `Are you sure you want to submit the form?`
     );
     if (!isConfirmed) {
@@ -88,7 +80,7 @@ export default function NewComplaint() {
     }
 
     if (!files.imgBefore && !files.vidBefore) {
-      alert("At least one file must be uploaded.");
+      toast.error("At least one file must be uploaded.");
       return;
     }
 
@@ -114,11 +106,11 @@ export default function NewComplaint() {
     try {
       const response = await addComplaint(data);
 
-      alert(response.message);
+      toast.success(response.message);
 
       // Reset the form after successful submission
       setFormData({
-        raiserName: "",
+        complainantName: getUser().username,
         subject: "",
         date: "",
         details: "",
@@ -133,7 +125,7 @@ export default function NewComplaint() {
         vidBefore: null,
       });
     } catch (error) {
-      alert(error);
+      toast.error(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -144,10 +136,10 @@ export default function NewComplaint() {
       {/* Name input */}
       <div>
         <label
-          htmlFor="name"
+          htmlFor="complainantName"
           className="block text-sm font-medium text-gray-700"
         >
-          Complaint Raiser Name <span className="text-red-500">*</span>
+          Complainant Name <span className="text-red-500">*</span>
         </label>
         <div className="mt-1 relative rounded-md shadow-sm">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -155,10 +147,10 @@ export default function NewComplaint() {
           </div>
           <input
             type="text"
-            name="raiserName"
+            name="complainantName"
             required
             className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-            value={formData.raiserName}
+            value={formData.complainantName}
             onChange={handleInputChange}
           />
         </div>

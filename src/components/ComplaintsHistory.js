@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
-import ComplaintDetailsPopup from "./ComplaintDetailsPopup";
+import ComplaintBasicDetails from "./ComplaintBasicDetails";
+import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
 import { fetchComplaint } from "../services/complaintApi";
 import { getReport } from "../services/reportApi";
-import { calculateDuration, dateFormat, statusFormat } from "../utils/formatting";
+import Spinner from "./Spinner";
+import { toast } from "react-toastify";
 
 const ComplaintsHistory = () => {
   const [complaints, setComplaints] = useState([]);
   const [filters, setFilters] = useState({
-    raiserName: "",
+    complainantID: "",
+    complainantName: "",
     subject: "",
     department: "",
     premises: "",
     location: "",
+    specificLocation: "",
     details: "",
     emergency: "",
     status: "",
@@ -46,7 +50,7 @@ const ComplaintsHistory = () => {
       setComplaints(response.complaints);
       setTotalPages(response.totalPages);
     } catch (error) {
-      alert(error);
+      toast.error(error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +72,7 @@ const ComplaintsHistory = () => {
 
   const handleClearFilters = () => {
     setFilters({
-      raiserName: "",
+      complainantName: "",
       subject: "",
       department: "",
       premises: "",
@@ -93,9 +97,9 @@ const ComplaintsHistory = () => {
     setLoading(true);
     try {
       await getReport(filters);
-      alert("Report downloaded successfully!");
+      toast.success("Report downloaded successfully!");
     } catch (error) {
-      alert(error);
+      toast.error(error);
     } finally {
       setLoading(false);
     }
@@ -117,11 +121,21 @@ const ComplaintsHistory = () => {
 
       {/* Filters */}
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 ${showFilters ? "" : "hidden sm:grid"}`}>
+
         <input
           type="text"
-          name="raiserName"
-          placeholder="Raiser Name"
-          value={filters.raiserName}
+          name="complainantID"
+          placeholder="Complainant ID"
+          value={filters.complainantID}
+          onChange={handleFilterChange}
+          className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          type="text"
+          name="complainantName"
+          placeholder="Complainant Name"
+          value={filters.complainantName}
           onChange={handleFilterChange}
           className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         />
@@ -160,6 +174,15 @@ const ComplaintsHistory = () => {
           name="location"
           placeholder="Location"
           value={filters.location}
+          onChange={handleFilterChange}
+          className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          type="text"
+          name="specificLocation"
+          placeholder="Specific Location"
+          value={filters.specificLocation}
           onChange={handleFilterChange}
           className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         />
@@ -342,9 +365,7 @@ const ComplaintsHistory = () => {
 
       <h2 className="text-2xl font-bold text-green-700 mb-4">Complaints</h2>
       {loading ? (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-green-500"></div>
-        </div>
+        <Spinner/>
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -358,63 +379,7 @@ const ComplaintsHistory = () => {
                       : "bg-white border-green-200"
                   }`}
                 >
-                  <h3
-                    className={`text-lg font-semibold ${
-                      complaint.emergency ? "text-red-800" : "text-green-800"
-                    }`}
-                  >
-                    {complaint.subject}
-                  </h3>
-                  <p className="text-lg font-medium mt-2">
-                    <strong>Complaint ID:</strong> {complaint._id}
-                  </p>
-                  <p>
-                    <strong>Raiser:</strong> {complaint.raiserName}
-                  </p>
-                  <p>
-                    <strong>Department:</strong> {complaint.department}
-                  </p>
-                  <p>
-                    <strong>Premises:</strong> {complaint.premises}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {complaint.location}
-                  </p>
-                  <p>
-                    <strong>Emergency:</strong>{" "}
-                    {complaint.emergency ? "Yes" : "No"}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {statusFormat(complaint.status)}
-                  </p>
-                  <p>
-                    <strong>Created At:</strong>{" "}
-                    {dateFormat(complaint.createdAt)}
-                  </p>
-                  {complaint.acknowledgeAt && (
-                    <>
-                      <p>
-                        <strong>Acknowledged At:</strong>{" "}
-                        {dateFormat(complaint.acknowledgeAt)}
-                      </p>
-                      <p>
-                        <strong>Acknowledged Duration:</strong>{" "}
-                        {calculateDuration(complaint.createdAt,complaint.acknowledgeAt)}
-                      </p>
-                    </>
-                  )}
-                  {complaint.resolvedAt && (
-                    <>
-                      <p>
-                        <strong>Resolved At:</strong>{" "}
-                        {dateFormat(complaint.resolvedAt)}
-                      </p>
-                      <p>
-                        <strong>Resolved Duration:</strong>{" "}
-                        {calculateDuration(complaint.createdAt,complaint.resolvedAt)}
-                      </p>
-                    </>
-                  )}
+                  <ComplaintBasicDetails complaint={complaint}/>
                   <button
                     className="mt-4 px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600"
                     onClick={() => setSelectedComplaint(complaint)}
@@ -435,7 +400,11 @@ const ComplaintsHistory = () => {
                 <h2 className="text-xl font-bold text-green-800 mb-4">
                   Complaint Details
                 </h2>
-                <ComplaintDetailsPopup selectedComplaint={selectedComplaint} />
+
+                <ComplaintBasicDetails complaint={selectedComplaint}/>
+
+                <ComplaintAdditionalDetails complaint={selectedComplaint}/>
+
                 <button
                   className="mt-6 px-4 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600"
                   onClick={handleCloseModal}

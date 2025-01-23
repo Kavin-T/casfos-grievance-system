@@ -7,7 +7,7 @@ import Users from "./Users";
 import casfos_logo from "../assets/images/casfos_logo.jpg";
 import { useNavigate } from "react-router-dom";
 import { designationFormat } from "../utils/formatting";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { checkAuthentication } from "../services/authApi";
 import { useCookies } from "react-cookie";
 import { fetchComplaintsByDesignation } from "../services/yourActivity";
@@ -21,7 +21,7 @@ const getUser = () => {
 export default function Home() {
   const [complaintCount, setComplaintCount] = useState(0);
   const [activeTab, setActiveTab] = useState("complaint_statistics");
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cookies, removeCookie] = useCookies([]);
 
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ export default function Home() {
       const response = await checkAuthentication();
       if (!response) {
         removeCookie("token");
-        alert("Session expired. Please login again.");
+        toast.error("Session expired. Please login again.");
         navigate("/");
       }
     };
@@ -51,27 +51,33 @@ export default function Home() {
     };
     fetchComplaintCount();
   }, []);
-  
+
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
     {
       id: "new_complaint",
       label: "New Complaint",
       show:
-        userInfo.designation === "COMPLAINT_RAISER" ||
-        userInfo.designation === "ESTATE_OFFICER",
+        userInfo.designation === "COMPLAINANT" ||
+        userInfo.designation === "ESTATE_OFFICER" ||
+        userInfo.designation === "ASSISTANT_TO_ESTATE_OFFICER" ||
+        userInfo.designation === "PRINCIPAL",
     },
     { id: "your_activity", label: "Your Activity", show: true },
     { id: "complaints_history", label: "Complaints History", show: true },
     {
       id: "users",
       label: "Users",
-      show: userInfo.designation === "ESTATE_OFFICER",
+      show:
+        userInfo.designation === "ESTATE_OFFICER" ||
+        userInfo.designation === "PRINCIPAL",
     },
   ];
 
   const handleLogout = async () => {
     removeCookie("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("designation");
     navigate("/");
   };
 

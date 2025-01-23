@@ -1,16 +1,27 @@
 export const designationFormat = (input) => {
-  if (input === "ESTATE_OFFICER") {
-    return "Estate Officer";
-  } else if (input === "COMPLAINT_RAISER") {
-    return "Complaint Raiser";
-  } else if (input === "EXECUTIVE_ENGINEER") {
-    return "Executive Engineer";
-  } else if (input === "ASSISTANT_ENGINEER") {
-    return "Assistant Engineer";
-  } else if (input === "JUNIOR_ENGINEER") {
-    return "Junior Engineer";
-  } else {
-    return "Unknown Role";
+  switch (input) {
+    case "PRINCIPAL":
+      return "Principal";
+    case "ESTATE_OFFICER":
+      return "Estate Officer";
+    case "ASSISTANT_TO_ESTATE_OFFICER":
+      return "Assistant to Estate Officer";
+    case "COMPLAINANT":
+      return "Complainant";
+    case "EXECUTIVE_ENGINEER_CIVIL":
+      return "Executive Engineer (Civil)";
+    case "EXECUTIVE_ENGINEER_ELECTRICAL":
+      return "Executive Engineer (Electrical)";
+    case "ASSISTANT_ENGINEER_CIVIL":
+      return "Assistant Engineer (Civil)";
+    case "ASSISTANT_ENGINEER_ELECTRICAL":
+      return "Assistant Engineer (Electrical)";
+    case "JUNIOR_ENGINEER_CIVIL":
+      return "Junior Engineer (Civil)";
+    case "JUNIOR_ENGINEER_ELECTRICAL":
+      return "Junior Engineer (Electrical)";
+    default:
+      return "Unknown Role";
   }
 };
 
@@ -22,9 +33,9 @@ export const statusFormat = (input) => {
   } else if (input === "JE_WORKDONE") {
     return "JE Work Done";
   } else if (input === "AE_ACKNOWLEDGED") {
-    return "AE Acknowledged";
+    return "AE Approved";
   } else if (input === "EE_ACKNOWLEDGED") {
-    return "EE Acknowledged";
+    return "EE Approved";
   } else if (input === "RESOLVED") {
     return "Resolved";
   } else if (input === "CLOSED") {
@@ -37,6 +48,17 @@ export const statusFormat = (input) => {
     return "EE Not Satisfied";
   } else {
     return "Unknown Status";
+  }
+};
+
+export const departmentFormat = (input) => {
+  switch (input) {
+    case "CIVIL":
+      return "Civil";
+    case "ELECTRICAL":
+      return "Electrical";
+    default:
+      return "Unknown Department";
   }
 };
 

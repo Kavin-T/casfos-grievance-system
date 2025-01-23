@@ -2,12 +2,11 @@ import axios from "./axios";
 
 // Login user
 export const loginUser = async (username, password) => {
-  console.log(username, password);
   try {
     const response = await axios.post("/auth/login", { username, password });
     return response.data;
   } catch (error) {
-    return error.response && error.response.data.message
+    throw error.response && error.response.data.message
       ? error.response.data.message
       : "Login failed.";
   }

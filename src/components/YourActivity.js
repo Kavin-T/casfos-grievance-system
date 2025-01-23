@@ -4,8 +4,10 @@ import {
   updateStatus,
   updateWorkDone,
 } from "../services/yourActivity";
-import { dateFormat, statusFormat } from "../utils/formatting";
 import YourActivityPopup from "./YourActivityPopup";
+import ComplaintBasicDetails from "./ComplaintBasicDetails";
+import { toast } from "react-toastify";
+import confirmAction from "../utils/confirmAction ";
 
 const YourActivity = () => {
   const [complaints, setComplaints] = useState([]);
@@ -22,29 +24,19 @@ const YourActivity = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const minImageSize = 1 * 1024 * 1024;
     const maxImageSize = 5 * 1024 * 1024;
-    const minVideoSize = 5 * 1024 * 1024;
     const maxVideoSize = 100 * 1024 * 1024;
 
     if (file.type.startsWith("image")) {
-      if (file.size < minImageSize) {
-        alert("Image file size should be at least 1MB.");
-        return;
-      }
       if (file.size > maxImageSize) {
-        alert("Image file size should not exceed 5MB.");
+        toast.error("Image file size should not exceed 5MB.");
         return;
       }
     }
 
     if (file.type.startsWith("video")) {
-      if (file.size < minVideoSize) {
-        alert("Video file size should be at least 5MB.");
-        return;
-      }
       if (file.size > maxVideoSize) {
-        alert("Video file size should not exceed 100MB.");
+        toast.error("Video file size should not exceed 100MB.");
         return;
       }
     }
@@ -60,7 +52,7 @@ const YourActivity = () => {
       const data = await fetchComplaintsByDesignation();
       setComplaints(data);
     } catch (err) {
-      alert(err);
+      toast.error(err);
       setComplaints([]);
     }
   };
@@ -89,17 +81,17 @@ const YourActivity = () => {
 
   const handleStatusChange = async () => {
     if (!statusChange) {
-      alert("Choose the status to change");
+      toast.error("Choose the status to change");
       return;
     }
 
     if (statusChange === "JE_WORKDONE" && !files.imgAfter && !files.vidAfter) {
-      alert("At least one file must be uploaded.");
+      toast.error("At least one file must be uploaded.");
       return;
     }
 
     // Prompt for confirmation before submitting
-    const isConfirmed = window.confirm(
+    const isConfirmed = await confirmAction(
       "Are you sure you want to update the complaint?"
     );
     if (!isConfirmed) {
@@ -162,13 +154,12 @@ const YourActivity = () => {
         response = await updateStatus(body, endpoint);
       }
 
-      alert(response.message);
+      toast.success(response.message);
       closeModal();
-      await fetchComplaints();
     } catch (error) {
-      alert(error);
-      await fetchComplaints();
+      toast.error(error);
     }
+    await fetchComplaints();
   };
 
   return (
@@ -184,34 +175,7 @@ const YourActivity = () => {
             }`}
           >
             <div className="mb-10">
-              <h3
-                className={`text-xl font-bold ${
-                  complaint.emergency ? "text-red-800" : "text-green-800"
-                }`}
-              >
-                {complaint.subject}
-              </h3>
-              <p className="text-lg font-medium mt-2">
-                <strong>Complaint ID:</strong> {complaint._id}
-              </p>
-              <p>
-                <strong>Raiser:</strong> {complaint.raiserName}
-              </p>
-              <p>
-                <strong>Department:</strong> {complaint.department}
-              </p>
-              <p>
-                <strong>Premises:</strong> {complaint.premises}
-              </p>
-              <p>
-                <strong>Location:</strong> {complaint.location}
-              </p>
-              <p>
-                <strong>Created On:</strong> {dateFormat(complaint.createdAt)}
-              </p>
-              <p className="text-red-600 font-bold text-lg">
-                <strong>Status:</strong> {statusFormat(complaint.status)}
-              </p>
+              <ComplaintBasicDetails complaint={complaint}/>
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button
