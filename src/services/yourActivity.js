@@ -18,6 +18,7 @@ export const updateStatus = async (formData, endpoint) => {
     const response = await axios.put(`/status/${endpoint}`, formData);
     return response.data;
   } catch (error) {
+    console.log(error);
     throw error.response && error.response.data.message
       ? error.response.data.message
       : "Unable to update complaints.";
@@ -36,5 +37,19 @@ export const updateWorkDone = async (formData) => {
     throw error.response && error.response.data.message
       ? error.response.data.message
       : "Unable to update complaints.";
+  }
+};
+
+export const changeDepartment = async ({ id, newDepartment }) => {
+  try {
+    const response = await axios.put(`/status/change-department`, {
+      id,
+      newDepartment,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response && error.response.data.message
+      ? error.response.data.message
+      : "Unable to change department.";
   }
 };

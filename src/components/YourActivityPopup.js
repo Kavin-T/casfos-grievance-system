@@ -2,6 +2,7 @@ import React from "react";
 import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
 import { statusOptions } from "../constants/options";
+import { FileUpload } from "./FileUpload";
 
 const YourActivityPopup = ({
   selectedComplaint,
@@ -12,9 +13,12 @@ const YourActivityPopup = ({
   price,
   setPrice,
   files,
-  handleFileChange,
+  setFiles,
   closeModal,
   handleStatusChange,
+  newDepartment,
+  setNewDepartment,
+  handleDepartmentChange,
 }) => {
   const statusChangeOptions = statusOptions[selectedComplaint.status] || [];
 
@@ -22,9 +26,8 @@ const YourActivityPopup = ({
     <>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
         <div className="bg-white p-6 shadow-lg rounded-lg max-w-lg w-full max-h-[80vh] overflow-y-auto">
-          
           <ComplaintBasicDetails complaint={selectedComplaint} />
-          
+
           <ComplaintAdditionalDetails complaint={selectedComplaint} />
 
           {selectedComplaint.status === "RESOURCE_REQUIRED" &&
@@ -59,8 +62,33 @@ const YourActivityPopup = ({
               />
             )}
 
+          {selectedComplaint.status === "RAISED" && (
+            <div className="mt-3">
+              <h2 className="font-bold text-lg mb-2">Change Department</h2>
+              <select
+                value={newDepartment}
+                onChange={(e) => setNewDepartment(e.target.value)}
+                className="mb-4 p-2 border rounded w-full"
+              >
+                <option value="">Select Department</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="ELECTRICAL">ELECTRICAL</option>
+              </select>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={handleDepartmentChange}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                >
+                  Change Department
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="mt-4">
-            <label htmlFor="statusChange">Change Status:</label>
+            <label className="text-lg font-bold" htmlFor="statusChange">
+              Change Status:
+            </label>
             <div className="mt-2">
               <select
                 id="statusChange"
@@ -110,64 +138,79 @@ const YourActivityPopup = ({
                   placeholder="Enter price"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
+                  min={1}
                 />
               </div>
             </div>
           )}
 
           {statusChange === "JE_WORKDONE" && (
-            <div className="mt-2">
-              <div className="mt-4 flex items-center">
-                <label
-                  htmlFor="imgAfter"
-                  className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
-                >
-                  {files.imgAfter ? "Change image" : "Upload image"}
-                </label>
-                <input
-                  id="imgAfter"
-                  name="imgAfter"
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleFileChange}
-                />
-                {files?.imgAfter && (
-                  <span className="ml-3 text-sm text-gray-600">
-                    {files.imgAfter.name}
-                  </span>
-                )}
+            <>
+              <div className="text-red-500 mt-2 text-wrap">
+                <strong>Warning:</strong> The file must meet the following size
+                restrictions:
+                <ul className="list-disc pl-4">
+                  <li>Videos: Maximum size 100MB</li>
+                  <li>Images: Maximum size 5MB</li>
+                </ul>
               </div>
-              <div className="mt-4 flex items-center">
-                <label
-                  htmlFor="vidAfter"
-                  className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
-                >
-                  {files.vidAfter ? "Change video" : "Upload video"}
-                </label>
-                <input
+              <div className="mt-2 grid grid-cols-1 gap-6 p-6 bg-gray-100 rounded-md shadow-lg">
+                {/* Image After 1 */}
+                <FileUpload
+                  id="imgAfter_1"
+                  name="imgAfter_1"
+                  label="Image After 1"
+                  fileType="image"
+                  files={files}
+                  setFiles={setFiles}
+                />
+
+                {/* Image After 2 */}
+                <FileUpload
+                  id="imgAfter_2"
+                  name="imgAfter_2"
+                  label="Image After 2"
+                  fileType="image"
+                  files={files}
+                  setFiles={setFiles}
+                  dependentFileKey="imgAfter_1"
+                />
+
+                {/* Image After 3 */}
+                <FileUpload
+                  id="imgAfter_3"
+                  name="imgAfter_3"
+                  label="Image After 3"
+                  fileType="image"
+                  files={files}
+                  setFiles={setFiles}
+                  dependentFileKey="imgAfter_2"
+                />
+
+                {/* Video After */}
+                <FileUpload
                   id="vidAfter"
                   name="vidAfter"
-                  type="file"
-                  accept="video/*"
-                  className="sr-only"
-                  onChange={handleFileChange}
+                  label="Video After"
+                  fileType="video"
+                  files={files}
+                  setFiles={setFiles}
                 />
-                {files?.vidAfter && (
-                  <span className="ml-3 text-sm text-gray-600">
-                    {files.vidAfter.name}
-                  </span>
-                )}
               </div>
-            </div>
+            </>
           )}
 
           {statusChange === "JE_WORKDONE" &&
-            !(files.imgAfter || files.vidAfter) && (
+            !(
+              files.imgAfter_1 ||
+              files.imgAfter_2 ||
+              files.imgAfter_3 ||
+              files.vidAfter
+            ) && (
               <div className="text-red-500 mt-2">
                 <p>
-                  <strong>Warning:</strong> You must upload either an image or a
-                  video.
+                  <strong>Warning:</strong> You must upload at least one image
+                  or a video.
                 </p>
               </div>
             )}
@@ -183,10 +226,6 @@ const YourActivityPopup = ({
               id="popup-submit"
               onClick={handleStatusChange}
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              disabled={
-                statusChange === "JE_WORKDONE" &&
-                !(files.imgAfter || files.vidAfter)
-              }
             >
               Submit
             </button>

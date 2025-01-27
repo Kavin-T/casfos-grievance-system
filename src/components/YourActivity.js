@@ -3,11 +3,14 @@ import {
   fetchComplaintsByDesignation,
   updateStatus,
   updateWorkDone,
+  changeDepartment,
 } from "../services/yourActivity";
 import YourActivityPopup from "./YourActivityPopup";
 import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import { toast } from "react-toastify";
 import confirmAction from "../utils/confirmAction ";
+import Spinner from "./Spinner";
+import { Timer } from "./Timer";
 
 const YourActivity = () => {
   const [complaints, setComplaints] = useState([]);
@@ -15,45 +18,25 @@ const YourActivity = () => {
   const [statusChange, setStatusChange] = useState("");
   const [remark, setRemark] = useState("");
   const [price, setPrice] = useState("");
+  const [newDepartment, setNewDepartment] = useState("");
   const [files, setFiles] = useState({
-    imgAfter: null,
+    imgAfter_1: null,
+    imgAfter_2: null,
+    imgAfter_3: null,
     vidAfter: null,
   });
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const maxImageSize = 5 * 1024 * 1024;
-    const maxVideoSize = 100 * 1024 * 1024;
-
-    if (file.type.startsWith("image")) {
-      if (file.size > maxImageSize) {
-        toast.error("Image file size should not exceed 5MB.");
-        return;
-      }
-    }
-
-    if (file.type.startsWith("video")) {
-      if (file.size > maxVideoSize) {
-        toast.error("Video file size should not exceed 100MB.");
-        return;
-      }
-    }
-
-    setFiles((prevFiles) => ({
-      ...prevFiles,
-      [event.target.name]: file,
-    }));
-  };
+  const [loading, setLoading] = useState(true);
 
   const fetchComplaints = async () => {
+    setLoading(true);
     try {
       const data = await fetchComplaintsByDesignation();
       setComplaints(data);
     } catch (err) {
       toast.error(err);
       setComplaints([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,22 +62,53 @@ const YourActivity = () => {
     setStatusChange("");
   };
 
+  const handleDepartmentChange = async () => {
+    if (!newDepartment) {
+      toast.error("Please select a new department.");
+      return;
+    }
+
+    const isConfirmed = await confirmAction(
+      "Are you sure you want to change the department?"
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      const response = await changeDepartment({
+        id: selectedComplaint._id,
+        newDepartment,
+      });
+      toast.success(response.message);
+      closeModal();
+    } catch (error) {
+      toast.error(error);
+    }
+    await fetchComplaints();
+  };
+
   const handleStatusChange = async () => {
+    const isConfirmed = await confirmAction(
+      `Are you sure you want to update the complaint?`
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
     if (!statusChange) {
       toast.error("Choose the status to change");
       return;
     }
 
-    if (statusChange === "JE_WORKDONE" && !files.imgAfter && !files.vidAfter) {
+    if (
+      statusChange === "JE_WORKDONE" &&
+      !files.imgAfter_1 &&
+      !files.imgAfter_2 &&
+      !files.imgAfter_3 &&
+      !files.vidAfter
+    ) {
       toast.error("At least one file must be uploaded.");
-      return;
-    }
-
-    // Prompt for confirmation before submitting
-    const isConfirmed = await confirmAction(
-      "Are you sure you want to update the complaint?"
-    );
-    if (!isConfirmed) {
       return;
     }
 
@@ -139,7 +153,9 @@ const YourActivity = () => {
         endpoint = "je-acknowledged/je-workdone";
         body = new FormData();
         body.append("id", selectedComplaint._id);
-        if (files.imgAfter) body.append("imgAfter", files.imgAfter);
+        if (files.imgAfter_1) body.append("imgAfter_1", files.imgAfter_1);
+        if (files.imgAfter_2) body.append("imgAfter_2", files.imgAfter_2);
+        if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
         if (files.vidAfter) body.append("vidAfter", files.vidAfter);
         break;
       default:
@@ -164,31 +180,55 @@ const YourActivity = () => {
 
   return (
     <div className="p-4 bg-green-50 min-h-screen">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {complaints.map((complaint) => (
-          <div
-            key={complaint._id}
-            className={`p-4 shadow-md rounded-lg border relative ${
-              complaint.emergency
-                ? "bg-red-100 border-red-200" // Light red background for emergencies
-                : "bg-white border-green-200" // Default for non-emergency complaints
-            }`}
-          >
-            <div className="mb-10">
-              <ComplaintBasicDetails complaint={complaint}/>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => openModal(complaint)}
-                className="absolute bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded"
-                id={`update-button-${complaint._id}`}
-              >
-                Update
-              </button>
-            </div>
-          </div>        
-        ))}
-      </div>
+      <h1 className="text-xl font-bold text-green-700 mb-4">Your Activity</h1>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {complaints.length > 0 ? (
+            complaints.map((complaint) => {
+              let bgColor = "p-4 shadow-md rounded-lg border";
+              if (complaint.status === "RESOLVED") {
+                bgColor += " bg-green-100 border-green-300";
+              } else if (complaint.emergency) {
+                bgColor += " bg-red-100 border-red-300";
+              } else {
+                bgColor += " bg-yellow-100 border-yellow-300";
+              }
+
+              return (
+                <div key={complaint._id} className={bgColor}>
+                  <div className="mb-4">
+                    <ComplaintBasicDetails complaint={complaint} />
+                    {complaint.reRaised && (
+                      <p className="mt-2">
+                        <span className="bg-green-100 text-green-800 text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                          Re-raised
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex justify-between gap-2 mt-4">
+                    <Timer
+                      createdAt={complaint.createdAt}
+                      isEmergency={complaint.emergency}
+                    />
+                    <button
+                      onClick={() => openModal(complaint)}
+                      className="mt-8 px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 min-w-20 max-h-11"
+                      id={`update-button-${complaint._id}`}
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-center text-green-700">No complaints.</p>
+          )}
+        </div>
+      )}
 
       {/*POP UP WINDOW*/}
       {selectedComplaint && (
@@ -201,9 +241,12 @@ const YourActivity = () => {
           price={price}
           setPrice={setPrice}
           files={files}
-          handleFileChange={handleFileChange}
+          setFiles={setFiles}
           closeModal={closeModal}
           handleStatusChange={handleStatusChange}
+          newDepartment={newDepartment}
+          setNewDepartment={setNewDepartment}
+          handleDepartmentChange={handleDepartmentChange}
         />
       )}
     </div>

@@ -5,6 +5,7 @@ import { fetchComplaint } from "../services/complaintApi";
 import { getReport } from "../services/reportApi";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
+import { Timer } from "./Timer";
 
 const ComplaintsHistory = () => {
   const [complaints, setComplaints] = useState([]);
@@ -107,8 +108,10 @@ const ComplaintsHistory = () => {
 
   return (
     <div className="p-4 bg-green-50 min-h-screen">
-      <h2 className="text-2xl font-bold text-green-700 mb-4">Filter Complaints</h2>
-      
+      <h2 className="text-2xl font-bold text-green-700 mb-4">
+        Filter Complaints
+      </h2>
+
       {/* Mobile view: Button to toggle filter visibility */}
       <div className="sm:hidden mb-4">
         <button
@@ -120,8 +123,11 @@ const ComplaintsHistory = () => {
       </div>
 
       {/* Filters */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 ${showFilters ? "" : "hidden sm:grid"}`}>
-
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 ${
+          showFilters ? "" : "hidden sm:grid"
+        }`}
+      >
         <input
           type="text"
           name="complainantID"
@@ -224,7 +230,10 @@ const ComplaintsHistory = () => {
         </select>
 
         <div>
-          <label htmlFor="startDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="startDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Start Date
           </label>
           <input
@@ -238,7 +247,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="endDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="endDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             End Date
           </label>
           <input
@@ -252,7 +264,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="createdStartDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="createdStartDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Created Start Date
           </label>
           <input
@@ -266,7 +281,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="createdEndDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="createdEndDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Created End Date
           </label>
           <input
@@ -280,7 +298,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="acknowledgedStartDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="acknowledgedStartDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Acknowledged Start Date
           </label>
           <input
@@ -294,7 +315,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="acknowledgedEndDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="acknowledgedEndDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Acknowledged End Date
           </label>
           <input
@@ -308,7 +332,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="resolvedStartDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="resolvedStartDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Resolved Start Date
           </label>
           <input
@@ -322,7 +349,10 @@ const ComplaintsHistory = () => {
         </div>
 
         <div>
-          <label htmlFor="resolvedEndDate" className="block text-green-700 font-medium mb-1">
+          <label
+            htmlFor="resolvedEndDate"
+            className="block text-green-700 font-medium mb-1"
+          >
             Resolved End Date
           </label>
           <input
@@ -365,29 +395,46 @@ const ComplaintsHistory = () => {
 
       <h2 className="text-2xl font-bold text-green-700 mb-4">Complaints</h2>
       {loading ? (
-        <Spinner/>
+        <Spinner />
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {complaints.length > 0 ? (
-              complaints.map((complaint) => (
-                <div
-                  key={complaint._id}
-                  className={`p-4 shadow-md rounded-lg border ${
-                    complaint.emergency
-                      ? "bg-red-100 border-red-300"
-                      : "bg-white border-green-200"
-                  }`}
-                >
-                  <ComplaintBasicDetails complaint={complaint}/>
-                  <button
-                    className="mt-4 px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600"
-                    onClick={() => setSelectedComplaint(complaint)}
-                  >
-                    View
-                  </button>
-                </div>
-              ))
+              complaints.map((complaint) => {
+                let bgColor = "p-4 shadow-md rounded-lg border";
+                if (complaint.status === "RESOLVED") {
+                  bgColor += " bg-green-100 border-green-300";
+                } else if (complaint.emergency) {
+                  bgColor += " bg-red-100 border-red-300";
+                } else {
+                  bgColor += " bg-yellow-100 border-yellow-300";
+                }
+
+                return (
+                  <div key={complaint._id} className={bgColor}>
+                    <ComplaintBasicDetails complaint={complaint} />
+                    {complaint.reRaised && (
+                      <p className="mt-2">
+                        <span className="bg-green-100 text-green-800 text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                          Re-raised
+                        </span>
+                      </p>
+                    )}
+                    <div className="flex justify-between gap-2 mt-4">
+                      <Timer
+                        createdAt={complaint.createdAt}
+                        isEmergency={complaint.emergency}
+                      />
+                      <button
+                        className="mt-8 px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 min-w-20 max-h-11"
+                        onClick={() => setSelectedComplaint(complaint)}
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
             ) : (
               <p className="text-center text-green-700">No complaints found.</p>
             )}
@@ -401,9 +448,9 @@ const ComplaintsHistory = () => {
                   Complaint Details
                 </h2>
 
-                <ComplaintBasicDetails complaint={selectedComplaint}/>
+                <ComplaintBasicDetails complaint={selectedComplaint} />
 
-                <ComplaintAdditionalDetails complaint={selectedComplaint}/>
+                <ComplaintAdditionalDetails complaint={selectedComplaint} />
 
                 <button
                   className="mt-6 px-4 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600"

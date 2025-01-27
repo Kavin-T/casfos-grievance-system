@@ -12,7 +12,7 @@ const ComplaintBasicDetails = ({ complaint }) => {
         {complaint.subject}
       </h2>
       <p className="text-lg font-medium mt-2">
-        <strong>Complaint ID:</strong> {complaint._id}
+        <strong>Complaint ID:</strong> {complaint.complaintID}
       </p>
       <p>
         <strong>Complainant:</strong> {complaint.complainantName}

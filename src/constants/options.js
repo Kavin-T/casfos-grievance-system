@@ -36,3 +36,11 @@ export const statusOptions = {
   JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "JE_WORKDONE" }],
   AE_NOT_SATISFIED: [{ value: "JE_WORKDONE", label: "JE_WORKDONE" }],
 };
+
+export const locationOptions = {
+  VanVigyan: ["VanVigyan1", "VanVigyan2", "VanVigyan3"],
+  VanVatika: ["VanVatika1", "VanVatika2"],
+  "CASFOS Sports Ground": ["Ground1", "Ground2"],
+  "Main Gate": ["Gate1", "Gate2"],
+  "Parking Area": ["Parking1", "Parking2"],
+};

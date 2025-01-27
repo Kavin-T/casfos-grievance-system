@@ -5,7 +5,7 @@ const confirmAction = (message) => {
   return new Promise((resolve, reject) => {
     confirmAlert({
       title: "Confirm",
-      message: <strong>{message}</strong>,
+      message: "",
       buttons: [
         {
           label: "Ok",
