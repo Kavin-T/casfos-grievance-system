@@ -12,7 +12,7 @@ import confirmAction from "../utils/confirmAction ";
 import Spinner from "./Spinner";
 import { Timer } from "./Timer";
 
-const YourActivity = () => {
+const YourActivity = ({ setComplaintCount }) => {
   const [complaints, setComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [statusChange, setStatusChange] = useState("");
@@ -75,6 +75,8 @@ const YourActivity = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await changeDepartment({
         id: selectedComplaint._id,
@@ -82,8 +84,11 @@ const YourActivity = () => {
       });
       toast.success(response.message);
       closeModal();
+      setComplaintCount(complaints.length);
     } catch (error) {
       toast.error(error);
+    } finally {
+      setLoading(false);
     }
     await fetchComplaints();
   };
@@ -100,6 +105,8 @@ const YourActivity = () => {
       toast.error("Choose the status to change");
       return;
     }
+
+    setLoading(true);
 
     if (
       statusChange === "JE_WORKDONE" &&
@@ -172,8 +179,11 @@ const YourActivity = () => {
 
       toast.success(response.message);
       closeModal();
+      setComplaintCount(complaints.length);
     } catch (error) {
       toast.error(error);
+    } finally {
+      setLoading(false);
     }
     await fetchComplaints();
   };
@@ -200,13 +210,6 @@ const YourActivity = () => {
                 <div key={complaint._id} className={bgColor}>
                   <div className="mb-4">
                     <ComplaintBasicDetails complaint={complaint} />
-                    {complaint.reRaised && (
-                      <p className="mt-2">
-                        <span className="bg-green-100 text-green-800 text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                          Re-raised
-                        </span>
-                      </p>
-                    )}
                   </div>
                   <div className="flex justify-between gap-2 mt-4">
                     <Timer

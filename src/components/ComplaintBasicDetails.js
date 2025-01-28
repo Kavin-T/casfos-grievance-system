@@ -1,16 +1,29 @@
 import React from "react";
-import { statusFormat, dateFormat, departmentFormat } from "../utils/formatting";
+import {
+  statusFormat,
+  dateFormat,
+  departmentFormat,
+} from "../utils/formatting";
 
 const ComplaintBasicDetails = ({ complaint }) => {
   return (
     <>
-      <h2
-        className={`text-xl font-bold ${
-          complaint.emergency ? "text-red-800" : "text-green-800"
-        }`}
-      >
-        {complaint.subject}
-      </h2>
+      <div className="flex justify-between gap-2 mt-2">
+        <h2
+          className={`text-xl font-bold ${
+            complaint.emergency ? "text-red-800" : "text-green-800"
+          }`}
+        >
+          {complaint.subject}
+        </h2>
+        {complaint.reRaised && (
+          <p className="mt-2">
+            <span className="bg-green-100 text-green-800 text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-900 dark:text-green-300">
+              Re-raised
+            </span>
+          </p>
+        )}
+      </div>
       <p className="text-lg font-medium mt-2">
         <strong>Complaint ID:</strong> {complaint.complaintID}
       </p>

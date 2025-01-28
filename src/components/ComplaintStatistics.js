@@ -4,46 +4,56 @@ import {
   ClockIcon,
   CheckCircleIcon,
   BoltIcon,
-  WrenchIcon, // Using WrenchIcon for departments
-  CurrencyRupeeIcon, // Assuming a rupee icon is available
+  WrenchIcon,
+  CurrencyRupeeIcon,
 } from "@heroicons/react/24/outline";
 import { fetchComplaintStatistics } from "../services/complaintApi";
 import { toast } from "react-toastify";
+import Spinner from "./Spinner";
 
 export default function ComplaintStatistics() {
   const [statistics, setStatistics] = useState({});
-  const [year, setYear] = useState("2025");
-  const [month, setMonth] = useState("All");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchStatistics();
-  }, []);
+    const currentDate = new Date();
+    const defaultToDate = currentDate.toISOString().split("T")[0];
+    const defaultFromDate = new Date(
+      currentDate.setMonth(currentDate.getMonth() - 1)
+    )
+      .toISOString()
+      .split("T")[0];
+
+    if (!fromDate) setFromDate(defaultFromDate);
+    if (!toDate) setToDate(defaultToDate);
+
+    if (fromDate) {
+      fetchStatistics();
+    }
+  }, [fromDate, toDate]);
 
   const fetchStatistics = async () => {
+    if (!fromDate) {
+      toast.error("Please specify the start date.");
+      return;
+    }
+
+    const endDate = toDate || new Date().toISOString().split("T")[0];
     try {
       setLoading(true);
-      const response = await fetchComplaintStatistics(year, month);
+      const response = await fetchComplaintStatistics(fromDate, endDate);
       setStatistics(response);
-      setLoading(false);
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleYearChange = (value) => {
-    setYear(value);
-    if (value === "All") {
-      setMonth("All");
-    }
-  };
-
-  const handleMonthChange = (value) => {
-    if (year !== "All") {
-      setMonth(value);
-    }
-  };
+  const handleFromDateChange = (e) => setFromDate(e.target.value);
+  const handleToDateChange = (e) => setToDate(e.target.value);
 
   return (
     <div className="bg-white shadow rounded-lg p-6 mb-8">
@@ -54,49 +64,25 @@ export default function ComplaintStatistics() {
       {/* Filters */}
       <div className="filters flex flex-col sm:flex-row sm:space-x-4 sm:items-center space-y-4 sm:space-y-0 mb-6">
         <label>
-          Year:
-          <select
-            value={year}
-            onChange={(e) => handleYearChange(e.target.value)}
-            className="ml-2 pl-2 pr-8 py-1 border rounded"
-          >
-            <option value="All">All</option>
-            {[2021, 2022, 2023, 2024, 2025].map((yr) => (
-              <option key={yr} value={yr}>
-                {yr}
-              </option>
-            ))}
-          </select>
+          From Date:
+          <input
+            type="date"
+            value={fromDate}
+            onChange={handleFromDateChange}
+            className="ml-2 py-1 border rounded"
+          />
         </label>
+
         <label>
-          Month:
-          <select
-            value={month}
-            onChange={(e) => handleMonthChange(e.target.value)}
-            className="ml-2 pl-2 pr-8 py-1 border rounded"
-            disabled={year === "All"}
-          >
-            <option value="All">All</option>
-            {[
-              "January",
-              "February",
-              "March",
-              "April",
-              "May",
-              "June",
-              "July",
-              "August",
-              "September",
-              "October",
-              "November",
-              "December",
-            ].map((m, index) => (
-              <option key={m} value={index + 1}>
-                {m}
-              </option>
-            ))}
-          </select>
+          To Date:
+          <input
+            type="date"
+            value={toDate}
+            onChange={handleToDateChange}
+            className="ml-2 py-1 border rounded"
+          />
         </label>
+
         <button
           onClick={fetchStatistics}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 sm:self-start"
@@ -106,10 +92,9 @@ export default function ComplaintStatistics() {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <Spinner />
       ) : (
         <div>
-          {/* General Statistics */}
           {statistics.totalComplaints ||
           statistics.pendingComplaints ||
           statistics.resolvedComplaints ||
@@ -178,8 +163,7 @@ export default function ComplaintStatistics() {
                     ([department, stats]) => {
                       const totalComplaints =
                         (stats.pending || 0) + (stats.resolved || 0);
-
-                      let IconComponent =
+                      const IconComponent =
                         department === "0" ? WrenchIcon : BoltIcon;
 
                       return (

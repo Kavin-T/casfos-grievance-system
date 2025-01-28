@@ -3,19 +3,20 @@ import { dateFormat } from "../utils/formatting";
 
 export const getReport = async (filters) => {
   try {
-    const response = await axios.get('/report', {
+    const response = await axios.get("/report", {
       params: filters,
       responseType: "blob",
     });
 
-    const url = window.URL.createObjectURL(
-      new Blob([response.data], { type: "application/pdf" })
-    );
+    const contentType = response.headers["content-type"];
+    const extension = contentType.includes("pdf") ? "pdf" : "csv";
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute(
       "download",
-      `complaints_report_${dateFormat(new Date())}.pdf`
+      `complaints_report_${dateFormat(new Date())}.${extension}`
     );
     document.body.appendChild(link);
     link.click();

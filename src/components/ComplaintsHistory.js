@@ -94,11 +94,11 @@ const ComplaintsHistory = () => {
     setToggle(!toggle);
   };
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = async (type) => {
     setLoading(true);
     try {
-      await getReport(filters);
-      toast.success("Report downloaded successfully!");
+      await getReport({ ...filters, type });
+      toast.success(`${type.toUpperCase()} Report downloaded successfully!`);
     } catch (error) {
       toast.error(error);
     } finally {
@@ -385,10 +385,19 @@ const ComplaintsHistory = () => {
 
         <div className="col-span-1">
           <button
-            onClick={handleGenerateReport}
+            onClick={() => handleGenerateReport("pdf")}
             className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
           >
-            Generate Report
+            Generate Report - PDF
+          </button>
+        </div>
+
+        <div className="col-span-1">
+          <button
+            onClick={() => handleGenerateReport("csv")}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
+          >
+            Generate Report - CSV
           </button>
         </div>
       </div>
@@ -413,13 +422,6 @@ const ComplaintsHistory = () => {
                 return (
                   <div key={complaint._id} className={bgColor}>
                     <ComplaintBasicDetails complaint={complaint} />
-                    {complaint.reRaised && (
-                      <p className="mt-2">
-                        <span className="bg-green-100 text-green-800 text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                          Re-raised
-                        </span>
-                      </p>
-                    )}
                     <div className="flex justify-between gap-2 mt-4">
                       <Timer
                         createdAt={complaint.createdAt}

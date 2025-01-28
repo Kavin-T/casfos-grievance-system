@@ -45,6 +45,9 @@ export default function Home() {
       try {
         const data = await fetchComplaintsByDesignation();
         setComplaintCount(data.length);
+        if (data.length > 0) {
+          toast.warning(`You have ${data.length} pending complaints.`);
+        }
       } catch (error) {
         console.error("Error fetching complaint data:", error);
       }
@@ -121,7 +124,7 @@ export default function Home() {
           <div className="sm:hidden">
             <div className="flex items-center justify-between bg-gray-200 p-2 rounded-md">
               <button
-                className="p-2 text-gray-700 bg-white rounded-md shadow"
+                className="relative p-2 text-gray-700 bg-white rounded-md shadow"
                 onClick={() => setIsMenuOpen((prev) => !prev)}
               >
                 <svg
@@ -138,6 +141,12 @@ export default function Home() {
                     d="M4 6h16M4 12h16m-7 6h7"
                   />
                 </svg>
+                {/* YourActivity count in hamburger icon */}
+                {complaintCount > 0 && (
+                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2">
+                    {complaintCount}
+                  </span>
+                )}
               </button>
 
               {/* Display Selected Tab */}
@@ -176,7 +185,6 @@ export default function Home() {
               </div>
             )}
           </div>
-
           {/* Desktop view: regular tab navigation */}
           <div className="hidden sm:block">
             <div className="border-b border-gray-200">
@@ -212,7 +220,9 @@ export default function Home() {
 
         {activeTab === "new_complaint" && <NewComplaint />}
 
-        {activeTab === "your_activity" && <YourActivity />}
+        {activeTab === "your_activity" && (
+          <YourActivity setComplaintCount={setComplaintCount} />
+        )}
 
         {activeTab === "complaints_history" && <ComplaintsHistory />}
 
