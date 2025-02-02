@@ -129,7 +129,7 @@ const YourActivityPopup = ({
 
           {statusChange === "EE_ACKNOWLEDGED" && (
             <div className="mt-4">
-              <label htmlFor="price">Enter Price:</label>
+              <label htmlFor="price">Enter Expenditure:</label>
               <div className="mt-2">
                 <input
                   id="price-input"
@@ -159,7 +159,7 @@ const YourActivityPopup = ({
                 <FileUpload
                   id="imgAfter_1"
                   name="imgAfter_1"
-                  label="Image After 1"
+                  label="Image 1 - After"
                   fileType="image"
                   files={files}
                   setFiles={setFiles}
@@ -169,7 +169,7 @@ const YourActivityPopup = ({
                 <FileUpload
                   id="imgAfter_2"
                   name="imgAfter_2"
-                  label="Image After 2"
+                  label="Image 2 - After"
                   fileType="image"
                   files={files}
                   setFiles={setFiles}
@@ -180,7 +180,7 @@ const YourActivityPopup = ({
                 <FileUpload
                   id="imgAfter_3"
                   name="imgAfter_3"
-                  label="Image After 3"
+                  label="Image 3 - After"
                   fileType="image"
                   files={files}
                   setFiles={setFiles}

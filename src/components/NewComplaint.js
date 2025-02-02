@@ -9,7 +9,7 @@ import {
 import { addComplaint } from "../services/complaintApi";
 import { toast } from "react-toastify";
 import confirmAction from "../utils/confirmAction ";
-import { locationOptions } from "../constants/options";
+import { locationOptions, subjectOptions } from "../constants/options";
 import Spinner from "./Spinner";
 import { FileUpload } from "./FileUpload";
 
@@ -32,6 +32,7 @@ export default function NewComplaint() {
 
   const [otherLocation, setOtherLocation] = useState("");
   const [otherPremises, setOtherPremises] = useState("");
+  const [otherSubject, setOtherSubject] = useState("");
 
   const [isEmergency, setIsEmergency] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +81,10 @@ export default function NewComplaint() {
       data.append(key, formData[key]);
     }
 
+    if (formData["subject"] === "Other") {
+      data.set("subject", otherSubject);
+    }
+
     if (formData["premises"] === "Other") {
       data.set("premises", otherPremises);
     }
@@ -113,6 +118,7 @@ export default function NewComplaint() {
 
       setOtherPremises("");
       setOtherLocation("");
+      setOtherSubject("");
       setIsEmergency(false);
 
       setFiles({
@@ -154,7 +160,7 @@ export default function NewComplaint() {
           </div>
         </div>
 
-        {/* Subject input */}
+        {/* Subject Select */}
         <div>
           <label
             htmlFor="subject"
@@ -169,16 +175,43 @@ export default function NewComplaint() {
                 aria-hidden="true"
               />
             </div>
-            <input
-              type="text"
+            <select
               name="subject"
               required
               className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
               value={formData.subject}
               onChange={handleInputChange}
-            />
+            >
+              <option value="">Select subject</option>
+              {subjectOptions.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
+              <option value="Other">Other</option>
+            </select>
           </div>
         </div>
+
+        {/* Show input for custom subject when "Other" is selected */}
+        {formData.subject === "Other" && (
+          <div>
+            <label
+              htmlFor="customSubject"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Specify Other Subject <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="customSubject"
+              required
+              className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              value={otherSubject}
+              onChange={(e) => setOtherSubject(e.target.value)}
+            />
+          </div>
+        )}
 
         {/* Date picker */}
         <div>
@@ -247,146 +280,141 @@ export default function NewComplaint() {
           </select>
         </div>
 
-        <div className="space-y-4">
-          {/* Premises Select */}
-          <div>
-            <label
-              htmlFor="premises"
-              className="block text-sm font-medium text-gray-700"
+        {/* Premises Select */}
+        <div>
+          <label
+            htmlFor="premises"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Premises <span className="text-red-500">*</span>
+          </label>
+          <div className="mt-1 relative rounded-md shadow-sm">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <BuildingOfficeIcon
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+            </div>
+            <select
+              name="premises"
+              required
+              className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+              value={formData.premises}
+              onChange={handlePremisesChange}
             >
-              Premises <span className="text-red-500">*</span>
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <BuildingOfficeIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <select
-                name="premises"
-                required
-                className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                value={formData.premises}
-                onChange={handlePremisesChange}
-              >
-                <option value="">Select premises</option>
-                <option value="VanVigyan">VanVigyan</option>
-                <option value="VanVatika">VanVatika</option>
-                <option value="CASFOS Sports Ground">
-                  CASFOS Sports Ground
+              <option value="">Select premises</option>
+              {Object.keys(locationOptions).map((location) => (
+                <option key={location} value={location}>
+                  {location}
                 </option>
-                <option value="Main Gate">Main Gate</option>
-                <option value="Parking Area">Parking Area</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+              ))}
+              <option value="Other">Other</option>
+            </select>
           </div>
+        </div>
 
-          {formData.premises === "Other" && (
-            <div>
-              <label
-                htmlFor="otherPremises"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Specify Other Premises <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="otherPremises"
-                required
-                className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                value={otherPremises}
-                onChange={(e) => setOtherPremises(e.target.value)}
-              />
-            </div>
-          )}
-
-          {/* Location Select */}
+        {formData.premises === "Other" && (
           <div>
             <label
-              htmlFor="location"
+              htmlFor="otherPremises"
               className="block text-sm font-medium text-gray-700"
             >
-              Location <span className="text-red-500">*</span>
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <MapPinIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <select
-                name="location"
-                required
-                className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                value={formData.location}
-                onChange={(e) => {
-                  handleInputChange(e); // Update formData with selected location
-                  if (e.target.value !== "Other") {
-                    setOtherLocation(""); // Clear the "Other Location" field if not selected
-                  }
-                }}
-                disabled={
-                  !formData.premises ||
-                  (formData.premises === "Other" && !otherPremises.trim())
-                }
-              >
-                <option value="">Select location</option>
-                {formData.premises &&
-                  locationOptions[formData.premises]?.map((loc, idx) => (
-                    <option key={idx} value={loc}>
-                      {loc}
-                    </option>
-                  ))}
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Other Location Text Box */}
-          {formData.location === "Other" && (
-            <div>
-              <label
-                htmlFor="otherLocation"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Specify Other Location <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="otherLocation"
-                required
-                className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                value={otherLocation}
-                onChange={(e) => setOtherLocation(e.target.value)}
-              />
-            </div>
-          )}
-
-          {/* Specific Location Text Box */}
-          <div>
-            <label
-              htmlFor="specificLocation"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Specific Location
+              Specify Other Premises <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              name="specificLocation"
+              name="otherPremises"
               required
               className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-              value={formData.specificLocation}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  specificLocation: e.target.value,
-                }))
-              }
+              value={otherPremises}
+              onChange={(e) => setOtherPremises(e.target.value)}
             />
           </div>
+        )}
+
+        {/* Location Select */}
+        <div>
+          <label
+            htmlFor="location"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Location <span className="text-red-500">*</span>
+          </label>
+          <div className="mt-1 relative rounded-md shadow-sm">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <MapPinIcon
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+            </div>
+            <select
+              name="location"
+              required
+              className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+              value={formData.location}
+              onChange={(e) => {
+                handleInputChange(e); // Update formData with selected location
+                if (e.target.value !== "Other") {
+                  setOtherLocation(""); // Clear the "Other Location" field if not selected
+                }
+              }}
+              disabled={
+                !formData.premises ||
+                (formData.premises === "Other" && !otherPremises.trim())
+              }
+            >
+              <option value="">Select location</option>
+              {formData.premises &&
+                locationOptions[formData.premises]?.map((loc, idx) => (
+                  <option key={idx} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Other Location Text Box */}
+        {formData.location === "Other" && (
+          <div>
+            <label
+              htmlFor="otherLocation"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Specify Other Location <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="otherLocation"
+              required
+              className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              value={otherLocation}
+              onChange={(e) => setOtherLocation(e.target.value)}
+            />
+          </div>
+        )}
+
+        {/* Specific Location Text Box */}
+        <div>
+          <label
+            htmlFor="specificLocation"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Specific Location
+          </label>
+          <input
+            type="text"
+            name="specificLocation"
+            className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+            value={formData.specificLocation}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                specificLocation: e.target.value,
+              }))
+            }
+          />
         </div>
 
         {/* Emergency checkbox */}
@@ -420,7 +448,7 @@ export default function NewComplaint() {
           <FileUpload
             id="imgBefore_1"
             name="imgBefore_1"
-            label="Image Before 1"
+            label="Image 1 - Before"
             fileType="image"
             files={files}
             setFiles={setFiles}
@@ -430,7 +458,7 @@ export default function NewComplaint() {
           <FileUpload
             id="imgBefore_2"
             name="imgBefore_2"
-            label="Image Before 2"
+            label="Image 2 - Before"
             fileType="image"
             files={files}
             setFiles={setFiles}
@@ -441,7 +469,7 @@ export default function NewComplaint() {
           <FileUpload
             id="imgBefore_3"
             name="imgBefore_3"
-            label="Image Before 3"
+            label="Image 3 - Before"
             fileType="image"
             files={files}
             setFiles={setFiles}

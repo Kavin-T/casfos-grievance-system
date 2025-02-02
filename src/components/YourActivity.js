@@ -84,7 +84,7 @@ const YourActivity = ({ setComplaintCount }) => {
       });
       toast.success(response.message);
       closeModal();
-      setComplaintCount(complaints.length);
+      setComplaintCount((prevCount) => prevCount - 1);
     } catch (error) {
       toast.error(error);
     } finally {
@@ -179,7 +179,9 @@ const YourActivity = ({ setComplaintCount }) => {
 
       toast.success(response.message);
       closeModal();
-      setComplaintCount(complaints.length);
+      if (statusChange !== "JE_ACKNOWLEDGED") {
+        setComplaintCount((prevCount) => prevCount - 1);
+      }
     } catch (error) {
       toast.error(error);
     } finally {

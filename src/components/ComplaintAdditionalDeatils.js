@@ -1,5 +1,9 @@
 import React from "react";
-import { priceFormat, dateFormat, calculateDuration } from "../utils/formatting";
+import {
+  priceFormat,
+  dateFormat,
+  calculateDuration,
+} from "../utils/formatting";
 import { handleMediaOpen } from "../services/fileApi";
 
 const ComplaintAdditionalDetails = ({ complaint }) => {
@@ -12,7 +16,7 @@ const ComplaintAdditionalDetails = ({ complaint }) => {
             {dateFormat(complaint.acknowledgeAt)}
           </p>
           <p>
-            <strong>Acknowledged Duration:</strong>{" "}
+            <strong>Time elapsed for Acknowledgement:</strong>{" "}
             {calculateDuration(complaint.createdAt, complaint.acknowledgeAt)}
           </p>
         </>
@@ -23,7 +27,7 @@ const ComplaintAdditionalDetails = ({ complaint }) => {
             <strong>Resolved On:</strong> {dateFormat(complaint.resolvedAt)}
           </p>
           <p>
-            <strong>Resolved Duration:</strong>{" "}
+            <strong>Time elapsed for Resolution:</strong>{" "}
             {calculateDuration(complaint.createdAt, complaint.resolvedAt)}
           </p>
         </>
@@ -41,51 +45,53 @@ const ComplaintAdditionalDetails = ({ complaint }) => {
       )}
       {parseFloat(complaint.price.$numberDecimal) > 0 && (
         <div className="text-green-600 font-bold border border-green-600 p-2 my-5">
-          Price: ₹ {priceFormat(complaint.price.$numberDecimal)}
+          Expenditure: ₹ {priceFormat(complaint.price.$numberDecimal)}
         </div>
       )}
       <div className="grid grid-cols-2 gap-4 mt-3">
+        {complaint.imgBefore &&
+          complaint.imgBefore.map((path, index) => (
+            <button
+              key={index}
+              className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
+              onClick={() => handleMediaOpen(path)}
+            >
+              {`Image ${index + 1} - Before`}
+            </button>
+          ))}
 
-        {complaint.imgBefore && complaint.imgBefore.map((path, index) => (
-          <button
-            key={index}
-            className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
-            onClick={() => handleMediaOpen(path)}
-          >
-            {`Image Before ${index + 1}`}
-          </button>
-        ))}
+        {complaint.vidBefore &&
+          complaint.vidBefore.map((path, index) => (
+            <button
+              key={index}
+              className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
+              onClick={() => handleMediaOpen(path)}
+            >
+              {`Video ${index + 1} - Before`}
+            </button>
+          ))}
 
-        {complaint.vidBefore && complaint.vidBefore.map((path, index) => (
-          <button
-            key={index}
-            className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
-            onClick={() => handleMediaOpen(path)}
-          >
-            {`Video Before ${index + 1}`}
-          </button>
-        ))}
+        {complaint.imgAfter &&
+          complaint.imgAfter.map((path, index) => (
+            <button
+              key={index}
+              className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
+              onClick={() => handleMediaOpen(path)}
+            >
+              {`Image ${index + 1} - After`}
+            </button>
+          ))}
 
-        {complaint.imgAfter && complaint.imgAfter.map((path, index) => (
-          <button
-            key={index}
-            className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
-            onClick={() => handleMediaOpen(path)}
-          >
-            {`Image After ${index + 1}`}
-          </button>
-        ))}
-        
-        {complaint.vidAfter && complaint.vidAfter.map((path, index) => (
-          <button
-            key={index}
-            className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
-            onClick={() => handleMediaOpen(path)}
-          >
-            {`Video After ${index + 1}`}
-          </button>
-        ))}
-        
+        {complaint.vidAfter &&
+          complaint.vidAfter.map((path, index) => (
+            <button
+              key={index}
+              className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 m-1"
+              onClick={() => handleMediaOpen(path)}
+            >
+              {`Video ${index + 1} - After`}
+            </button>
+          ))}
       </div>
     </>
   );

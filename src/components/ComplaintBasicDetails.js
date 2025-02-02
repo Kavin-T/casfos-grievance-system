@@ -18,7 +18,7 @@ const ComplaintBasicDetails = ({ complaint }) => {
         </h2>
         {complaint.reRaised && (
           <p className="mt-2">
-            <span className="bg-green-100 text-green-800 text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-900 dark:text-green-300">
+            <span className="bg-green-100 text-green-600 animate-pulse text-2 font-medium me-2 px-2.5 py-1.5 rounded-full dark:bg-green-600 dark:text-green-100 relative re-raised-tag">
               Re-raised
             </span>
           </p>
@@ -39,6 +39,11 @@ const ComplaintBasicDetails = ({ complaint }) => {
       <p>
         <strong>Location:</strong> {complaint.location}
       </p>
+      {complaint.specificLocation && (
+        <p>
+          <strong>Specific Location:</strong> {complaint.specificLocation}
+        </p>
+      )}
       <p>
         <strong>Status:</strong> {statusFormat(complaint.status)}
       </p>
