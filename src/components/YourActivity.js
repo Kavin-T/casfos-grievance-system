@@ -106,8 +106,6 @@ const YourActivity = ({ setComplaintCount }) => {
       return;
     }
 
-    setLoading(true);
-
     if (
       statusChange === "JE_WORKDONE" &&
       !files.imgAfter_1 &&
@@ -170,6 +168,7 @@ const YourActivity = ({ setComplaintCount }) => {
     }
 
     try {
+      setLoading(true);
       let response;
       if (statusChange === "JE_WORKDONE") {
         response = await updateWorkDone(body);

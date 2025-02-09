@@ -13,7 +13,7 @@ function App() {
 
       <footer className="bg-green-800 text-white text-center py-6 sm:py-8 lg:py-12">
         <p className="text-green-400">
-          &copy; 2023 Central Academy for State Forest Service. All rights
+          &copy; 2025 Central Academy for State Forest Service. All rights
           reserved.
         </p>
       </footer>
