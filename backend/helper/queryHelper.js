@@ -8,6 +8,7 @@ const getQuery = (req) => {
     acknowledgedEndDate,
     resolvedStartDate,
     resolvedEndDate,
+    status,
     ...filters
   } = req;
 
@@ -39,6 +40,14 @@ const getQuery = (req) => {
     if (resolvedEndDate) query.resolvedAt.$lte = new Date(resolvedEndDate);
   }
 
+  if (status) {
+    if (status === "TERMINATED" || status === "RESOLVED") {
+      query.status = status;
+    } else if (status === "PENDING") {
+      query.status = { $nin: ["TERMINATED", "RESOLVED"] };
+    }
+  }
+
   const filterableFields = [
     "raiserName",
     "subject",
@@ -48,20 +57,13 @@ const getQuery = (req) => {
     "specificLocation",
     "details",
     "emergency",
-    "status",
     "complaintID",
   ];
 
   filterableFields.forEach((field) => {
     if (filters[field] !== undefined && filters[field] !== "") {
       if (field === "emergency") {
-        if (filters[field] === "true") {
-          query[field] = true;
-        } else {
-          query[field] = false;
-        }
-      } else if (field === "status" || field === "department") {
-        query[field] = filters[field];
+        query[field] = filters[field] === "true";
       } else if (field === "complaintID") {
         const complaintID = Number(filters[field]);
         if (!isNaN(complaintID)) {

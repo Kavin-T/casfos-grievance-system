@@ -27,6 +27,14 @@ const ComplaintBasicDetails = ({ complaint }) => {
       <p className="text-lg font-medium mt-2">
         <strong>Complaint ID:</strong> {complaint.complaintID}
       </p>
+      <p
+      className={`text-lg font-bold ${
+      statusFormat(complaint.status) === "Resolved" ? "text-green-500" : "text-orange-500"
+      }`} 
+        >
+        <strong>Status:</strong> {statusFormat(complaint.status)}
+        {statusFormat(complaint.status) === "Resolved" ? "✔️" : statusFormat(complaint.status) === "Terminate" ? "❌": "⚠️"}
+      </p>
       <p>
         <strong>Complainant:</strong> {complaint.complainantName}
       </p>
@@ -44,9 +52,6 @@ const ComplaintBasicDetails = ({ complaint }) => {
           <strong>Specific Location:</strong> {complaint.specificLocation}
         </p>
       )}
-      <p>
-        <strong>Status:</strong> {statusFormat(complaint.status)}
-      </p>
       <p>
         <strong>Created On:</strong> {dateFormat(complaint.createdAt)}
       </p>

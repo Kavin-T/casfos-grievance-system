@@ -95,7 +95,7 @@ const generateReport = async (complaints) => {
                         <th>Created On</th>
                         <th>Resolved On</th>
                         <th>Status</th>
-                        <th>Time elapsed for Resolution</th>
+                        <th>Time elapsed</th>
                         <th>Expenditure</th>
                     </tr>
                 </thead>
@@ -108,13 +108,16 @@ const generateReport = async (complaints) => {
         : "N/A";
       const formattedResolvedAt = complaint.resolvedAt
         ? dateFormat(complaint.resolvedAt)
-        : "N/A";
+        : "In Progress";
 
       const status = statusFormat(complaint.status);
 
       let duration = "N/A";
       if (complaint.createdAt && complaint.resolvedAt) {
         duration = calculateDuration(complaint.createdAt, complaint.resolvedAt);
+      }
+      else{
+        duration = calculateDuration(complaint.createdAt, new Date());
       }
 
       const price = parseFloat(complaint.price.toString()) || 0;
@@ -131,7 +134,7 @@ const generateReport = async (complaints) => {
                 <td>${formattedResolvedAt}</td>
                 <td>${status}</td>
                 <td>${duration}</td>
-                <td>${price.toFixed(2)}</td>
+                <td>${price == 0 ? "Not Entered" : price.toFixed(2)}</td>
             </tr>
         `;
     });

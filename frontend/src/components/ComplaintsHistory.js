@@ -220,13 +220,9 @@ const ComplaintsHistory = () => {
           className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="">All Statuses</option>
-          <option value="RAISED">Raised</option>
-          <option value="JE_ACKNOWLEDGED">JE Acknowledged</option>
-          <option value="WORKDONE">Work Done</option>
-          <option value="AE_ACKNOWLEDGED">AE Acknowledged</option>
-          <option value="EE_ACKNOWLEDGED">EE Acknowledged</option>
+          <option value="PENDING">Pending</option>
           <option value="RESOLVED">Resolved</option>
-          <option value="CLOSED">Closed</option>
+          <option value="TERMINATED">Terminated</option>
         </select>
 
         <div>
@@ -423,10 +419,10 @@ const ComplaintsHistory = () => {
                   <div key={complaint._id} className={bgColor}>
                     <ComplaintBasicDetails complaint={complaint} />
                     <div className="flex justify-between gap-2 mt-4">
-                      <Timer
+                      {complaint.status!=="RESOLVED" && complaint.status!=="TERMINATED" && <Timer
                         createdAt={complaint.createdAt}
                         isEmergency={complaint.emergency}
-                      />
+                      />}
                       <button
                         className="mt-8 px-4 py-2 bg-green-500 text-white rounded shadow hover:bg-green-600 min-w-20 max-h-11"
                         onClick={() => setSelectedComplaint(complaint)}

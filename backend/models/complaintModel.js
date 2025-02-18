@@ -27,7 +27,7 @@ const complaintSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    enum: ["CIVIL", "ELECTRICAL"],
+    enum: ["CIVIL", "ELECTRICAL","IT"],
     required: true,
   },
   premises: {
@@ -78,11 +78,20 @@ const complaintSchema = new mongoose.Schema({
       "AE_ACKNOWLEDGED",
       "EE_ACKNOWLEDGED",
       "RESOLVED",
-      "CLOSED",
       "RESOURCE_REQUIRED",
       "AE_NOT_SATISFIED",
       "EE_NOT_SATISFIED",
+      "CR_NOT_SATISFIED",
+      "AE_NOT_TERMINATE",
+      "AE_TERMINATE",
+      "EE_TERMINATE",
+      "EE_NOT_TERMINATE",
+      "TERMINATED",
     ],
+  },
+  isPriceEntered: {
+    type: Boolean,
+    default: false,
   },
   price: {
     type: mongoose.Schema.Types.Decimal128,
@@ -97,6 +106,10 @@ const complaintSchema = new mongoose.Schema({
     default: null,
   },
   resolvedAt: {
+    type: Date,
+    default: null,
+  },
+  terminatedAt: {
     type: Date,
     default: null,
   },
