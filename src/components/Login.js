@@ -35,7 +35,7 @@ export default function Login() {
               alt="CASFOS Logo"
               className="h-12 w-auto mr-4"
             />
-            <h1 className="text-2xl font-bold">CASFOS Grievance System</h1>
+            <h1 className="text-2xl font-bold">CASFOS Grievance Redressal System</h1>
           </div>
         </div>
       </header>

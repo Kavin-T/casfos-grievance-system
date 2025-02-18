@@ -137,7 +137,7 @@ export default function ComplaintStatistics() {
                 <CurrencyRupeeIcon className="h-10 w-10 text-blue-600 mr-4" />
                 <div>
                   <p className="text-sm font-medium text-gray-500">
-                    Total Price
+                    Total Expenditure
                   </p>
                   <p className="text-2xl font-semibold text-gray-900">
                     ₹{statistics.totalPrice || 0}
@@ -200,7 +200,7 @@ export default function ComplaintStatistics() {
                                 {stats.resolved || 0}
                               </p>
                               <p className="text-sm font-medium text-gray-500 mt-4">
-                                Price
+                                Expenditure
                               </p>
                               <p className="text-xl font-semibold text-gray-900">
                                 ₹{stats.price || 0}
