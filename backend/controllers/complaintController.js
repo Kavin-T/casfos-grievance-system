@@ -115,7 +115,7 @@ const yourActivity = asyncHandler(async (req, res) => {
   }
 
   let statuses = [];
-  let department = null;
+  let departmentQuery = null;
 
   switch (designation) {
     case "PRINCIPAL":
@@ -125,34 +125,44 @@ const yourActivity = asyncHandler(async (req, res) => {
       statuses = ["EE_ACKNOWLEDGED", "RESOURCE_REQUIRED"];
       break;
 
-    case "EXECUTIVE_ENGINEER_CIVIL":
+    case "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL":
       statuses = ["AE_ACKNOWLEDGED"];
-      department = "CIVIL";
+      departmentQuery = { $in: ["CIVIL", "ELECTRICAL"] };
       break;
 
-    case "EXECUTIVE_ENGINEER_ELECTRICAL":
+    case "EXECUTIVE_ENGINEER_IT":
       statuses = ["AE_ACKNOWLEDGED"];
-      department = "ELECTRICAL";
+      departmentQuery = "IT";
       break;
 
     case "ASSISTANT_ENGINEER_CIVIL":
       statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED"];
-      department = "CIVIL";
+      departmentQuery = "CIVIL";
       break;
 
     case "ASSISTANT_ENGINEER_ELECTRICAL":
       statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED"];
-      department = "ELECTRICAL";
+      departmentQuery = "ELECTRICAL";
+      break;
+
+    case "ASSISTANT_ENGINEER_IT":
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED"];
+      departmentQuery = "IT";
       break;
 
     case "JUNIOR_ENGINEER_CIVIL":
       statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED"];
-      department = "CIVIL";
+      departmentQuery = "CIVIL";
       break;
 
     case "JUNIOR_ENGINEER_ELECTRICAL":
       statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED"];
-      department = "ELECTRICAL";
+      departmentQuery = "ELECTRICAL";
+      break;
+
+    case "JUNIOR_ENGINEER_IT":
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED"];
+      departmentQuery = "IT";
       break;
 
     default:
@@ -164,8 +174,8 @@ const yourActivity = asyncHandler(async (req, res) => {
     status: { $in: statuses },
   };
 
-  if (department) {
-    query.department = department;
+  if (departmentQuery) {
+    query.department = departmentQuery;
   }
 
   const complaints = await Complaint.find(query).sort({
@@ -184,10 +194,17 @@ const getComplaintStatistics = asyncHandler(async (req, res) => {
     throw new Error("Start date (fromDate) is required.");
   }
 
+  // Convert dates to include entire day
+  const startDate = new Date(fromDate);
+  startDate.setHours(0, 0, 0, 0); // Start of the fromDate (00:00 AM)
+
+  const endDate = new Date(toDate || new Date().toISOString());
+  endDate.setHours(23, 59, 59, 999); // End of the toDate (11:59 PM)
+
   let match = {
     createdAt: {
-      $gte: new Date(fromDate),
-      $lt: new Date(toDate || new Date().toISOString()),
+      $gte: startDate, // Include complaints from fromDate 00:00 AM
+      $lte: endDate, // Include complaints until toDate 11:59 PM
     },
   };
 
@@ -198,10 +215,10 @@ const getComplaintStatistics = asyncHandler(async (req, res) => {
         _id: "$department",
         totalComplaints: { $sum: 1 },
         pendingComplaints: {
-          $sum: { $cond: [{ $ne: ["$status", "Resolved"] }, 1, 0] },
+          $sum: { $cond: [{ $ne: ["$status", "RESOLVED"] }, 1, 0] },
         },
         resolvedComplaints: {
-          $sum: { $cond: [{ $eq: ["$status", "Resolved"] }, 1, 0] },
+          $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
         },
         totalPrice: { $sum: { $toDouble: "$price" } },
       },

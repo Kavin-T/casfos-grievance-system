@@ -277,6 +277,7 @@ export default function NewComplaint() {
             <option value="">Select a department</option>
             <option value="CIVIL">Civil</option>
             <option value="ELECTRICAL">Electrical</option>
+            <option value="IT">IT</option>
           </select>
         </div>
 

@@ -6,6 +6,7 @@ import {
   BoltIcon,
   WrenchIcon,
   CurrencyRupeeIcon,
+  ComputerDesktopIcon,
 } from "@heroicons/react/24/outline";
 import { fetchComplaintStatistics } from "../services/complaintApi";
 import { toast } from "react-toastify";
@@ -54,6 +55,13 @@ export default function ComplaintStatistics() {
 
   const handleFromDateChange = (e) => setFromDate(e.target.value);
   const handleToDateChange = (e) => setToDate(e.target.value);
+
+  // Map department names to appropriate icons
+  const departmentIcons = {
+    CIVIL: WrenchIcon,
+    ELECTRICAL: BoltIcon,
+    IT: ComputerDesktopIcon,
+  };
 
   return (
     <div className="bg-white shadow rounded-lg p-6 mb-8">
@@ -153,64 +161,62 @@ export default function ComplaintStatistics() {
 
           {/* Department-Wise Statistics */}
           {statistics.departmentWise &&
-            Object.keys(statistics.departmentWise).length > 0 && (
+            statistics.departmentWise.length > 0 && (
               <>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Department-wise Statistics
                 </h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {Object.entries(statistics.departmentWise).map(
-                    ([department, stats]) => {
-                      const totalComplaints =
-                        (stats.pending || 0) + (stats.resolved || 0);
-                      const IconComponent =
-                        department === "0" ? WrenchIcon : BoltIcon;
+                  {statistics.departmentWise.map((dept) => {
+                    const { department, pending, resolved, price } = dept;
+                    const totalComplaints = (pending || 0) + (resolved || 0);
+                    const IconComponent =
+                      departmentIcons[department] || ChartBarIcon;
 
-                      return (
-                        <div
-                          key={department}
-                          className="bg-green-50 rounded-lg p-4"
-                        >
-                          <div className="flex items-center mb-4">
-                            <IconComponent className="h-8 w-8 text-green-600 mr-3" />
-                            <h4 className="text-lg font-semibold text-gray-900">
-                              {department === "0" ? "Civil" : "Electrical"}
-                            </h4>
+                    return (
+                      <div
+                        key={department}
+                        className="bg-green-50 rounded-lg p-4"
+                      >
+                        <div className="flex items-center mb-4">
+                          <IconComponent className="h-8 w-8 text-green-600 mr-3" />
+                          <h4 className="text-lg font-semibold text-gray-900">
+                            {department}
+                          </h4>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Pending
+                            </p>
+                            <p className="text-xl font-semibold text-gray-900">
+                              {pending || 0}
+                            </p>
+                            <p className="text-sm font-medium text-gray-500 mt-4">
+                              Total Complaints
+                            </p>
+                            <p className="text-xl font-semibold text-gray-900">
+                              {totalComplaints}
+                            </p>
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Pending
-                              </p>
-                              <p className="text-xl font-semibold text-gray-900">
-                                {stats.pending || 0}
-                              </p>
-                              <p className="text-sm font-medium text-gray-500 mt-4">
-                                Total Complaints
-                              </p>
-                              <p className="text-xl font-semibold text-gray-900">
-                                {totalComplaints}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-500">
-                                Resolved
-                              </p>
-                              <p className="text-xl font-semibold text-gray-900">
-                                {stats.resolved || 0}
-                              </p>
-                              <p className="text-sm font-medium text-gray-500 mt-4">
-                                Expenditure
-                              </p>
-                              <p className="text-xl font-semibold text-gray-900">
-                                ₹{stats.price || 0}
-                              </p>
-                            </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Resolved
+                            </p>
+                            <p className="text-xl font-semibold text-gray-900">
+                              {resolved || 0}
+                            </p>
+                            <p className="text-sm font-medium text-gray-500 mt-4">
+                              Expenditure
+                            </p>
+                            <p className="text-xl font-semibold text-gray-900">
+                              ₹{price || 0}
+                            </p>
                           </div>
                         </div>
-                      );
-                    }
-                  )}
+                      </div>
+                    );
+                  })}
                 </div>
               </>
             )}

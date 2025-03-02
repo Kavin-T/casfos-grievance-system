@@ -73,6 +73,7 @@ const YourActivityPopup = ({
                 <option value="">Select Department</option>
                 <option value="CIVIL">CIVIL</option>
                 <option value="ELECTRICAL">ELECTRICAL</option>
+                <option value="IT">IT</option>
               </select>
               <div className="flex justify-end gap-2">
                 <button

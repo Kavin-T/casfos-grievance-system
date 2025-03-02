@@ -164,6 +164,7 @@ const ComplaintsHistory = () => {
           <option value="">All Departments</option>
           <option value="CIVIL">Civil</option>
           <option value="ELECTRICAL">Electrical</option>
+          <option value="IT">IT</option>
         </select>
 
         <input

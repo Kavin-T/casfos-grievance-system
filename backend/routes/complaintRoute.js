@@ -14,7 +14,7 @@ router.post(
   "/add",
   validateDesignation([
     "ESTATE_OFFICER",
-    "COMPLAINT_RAISER",
+    "COMPLAINANT",
     "PRINCIPAL",
     "ASSISTANT_TO_ESTATE_OFFICER",
   ]),

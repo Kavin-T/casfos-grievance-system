@@ -6,21 +6,23 @@ export const designations = [
     label: "Assistant to Estate Officer",
   },
   { value: "COMPLAINANT", label: "Complainant" },
-  { value: "EXECUTIVE_ENGINEER_CIVIL", label: "Executive Engineer (Civil)" },
-  {
-    value: "EXECUTIVE_ENGINEER_ELECTRICAL",
-    label: "Executive Engineer (Electrical)",
-  },
+  { value: "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", label: "Executive Engineer" },
+  { value: "EXECUTIVE_ENGINEER_IT", label: "Head of Office (IT)" },
   { value: "ASSISTANT_ENGINEER_CIVIL", label: "Assistant Engineer (Civil)" },
   {
     value: "ASSISTANT_ENGINEER_ELECTRICAL",
     label: "Assistant Engineer (Electrical)",
+  },
+  {
+    value: "ASSISTANT_ENGINEER_IT",
+    label: "Officer in Charge (IT)",
   },
   { value: "JUNIOR_ENGINEER_CIVIL", label: "Junior Engineer (Civil)" },
   {
     value: "JUNIOR_ENGINEER_ELECTRICAL",
     label: "Junior Engineer (Electrical)",
   },
+  { value: "JUNIOR_ENGINEER_IT", label: "System Analyst (IT)" },
 ];
 
 export const statusOptions = {

@@ -18,12 +18,20 @@ const router = express.Router();
 
 router.put(
   "/raised/je-acknowledged",
-  validateDesignation(["JUNIOR_ENGINEER_CIVIL", "JUNIOR_ENGINEER_ELECTRICAL"]),
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
   raisedToJeAcknowledged
 );
 router.post(
   "/je-acknowledged/je-workdone",
-  validateDesignation(["JUNIOR_ENGINEER_CIVIL", "JUNIOR_ENGINEER_ELECTRICAL"]),
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
   ensureTempDirectory,
   upload.fields([
     { name: "imgAfter_1", maxCount: 1 },
@@ -38,21 +46,22 @@ router.put(
   validateDesignation([
     "ASSISTANT_ENGINEER_CIVIL",
     "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
   ]),
   jeWorkDoneToAeAcknowledged
 );
 router.put(
   "/ae-acknowledged/ee-acknowledged",
   validateDesignation([
-    "EXECUTIVE_ENGINEER_CIVIL",
-    "EXECUTIVE_ENGINEER_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
   ]),
   aeAcknowledgedToEeAcknowledged
 );
 router.put(
   "/ee-acknowledged/resolved",
   validateDesignation([
-    "COMPLAINT_RAISER",
+    "COMPLAINANT",
     "ESTATE_OFFICER",
     "PRINCIPAL",
     "ASSISTANT_TO_ESTATE_OFFICER",
@@ -64,26 +73,31 @@ router.put(
   validateDesignation([
     "ASSISTANT_ENGINEER_CIVIL",
     "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
   ]),
   jeWorkdoneToAeNotSatisfied
 );
 router.put(
   "/ae-acknowledged/ee-not-satisfied",
   validateDesignation([
-    "EXECUTIVE_ENGINEER_CIVIL",
-    "EXECUTIVE_ENGINEER_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
   ]),
   aeAcknowledgedToEeNotSatisfied
 );
 router.put(
   "/raised/resource-required",
-  validateDesignation(["JUNIOR_ENGINEER_CIVIL", "JUNIOR_ENGINEER_ELECTRICAL"]),
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
   raisedToResourceRequired
 );
 router.put(
   "/resource-required/closed",
   validateDesignation([
-    "COMPLAINT_RAISER",
+    "COMPLAINANT",
     "ESTATE_OFFICER",
     "PRINCIPAL",
     "ASSISTANT_TO_ESTATE_OFFICER",
@@ -93,7 +107,7 @@ router.put(
 router.put(
   "/resource-required/raised",
   validateDesignation([
-    "COMPLAINT_RAISER",
+    "COMPLAINANT",
     "ESTATE_OFFICER",
     "PRINCIPAL",
     "ASSISTANT_TO_ESTATE_OFFICER",
@@ -103,7 +117,11 @@ router.put(
 
 router.put(
   "/change-department",
-  validateDesignation(["JUNIOR_ENGINEER_CIVIL", "JUNIOR_ENGINEER_ELECTRICAL"]),
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
   changeComplaintDepartment
 );
 

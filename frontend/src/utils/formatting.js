@@ -8,18 +8,22 @@ export const designationFormat = (input) => {
       return "Assistant to Estate Officer";
     case "COMPLAINANT":
       return "Complainant";
-    case "EXECUTIVE_ENGINEER_CIVIL":
-      return "Executive Engineer (Civil)";
-    case "EXECUTIVE_ENGINEER_ELECTRICAL":
-      return "Executive Engineer (Electrical)";
+    case "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL":
+      return "Executive Engineer";
+    case "EXECUTIVE_ENGINEER_IT":
+      return "Head of Office (IT)";
     case "ASSISTANT_ENGINEER_CIVIL":
       return "Assistant Engineer (Civil)";
     case "ASSISTANT_ENGINEER_ELECTRICAL":
       return "Assistant Engineer (Electrical)";
+    case "ASSISTANT_ENGINEER_IT":
+      return "Officer in Charge (IT)";
     case "JUNIOR_ENGINEER_CIVIL":
       return "Junior Engineer (Civil)";
     case "JUNIOR_ENGINEER_ELECTRICAL":
       return "Junior Engineer (Electrical)";
+    case "JUNIOR_ENGINEER_IT":
+      return "System Analyst (IT)";
     default:
       return "Unknown Role";
   }
@@ -57,6 +61,8 @@ export const departmentFormat = (input) => {
       return "Civil";
     case "ELECTRICAL":
       return "Electrical";
+    case "IT":
+      return "IT";
     default:
       return "Unknown Department";
   }
