@@ -25,7 +25,7 @@ export const designations = [
   { value: "JUNIOR_ENGINEER_IT", label: "System Analyst (IT)" },
 ];
 
-export const statusOptions = {
+export const statusOptions = { 
   RAISED: [
     { value: "JE_ACKNOWLEDGED", label: "JE Acknowledged" },
     { value: "RESOURCE_REQUIRED", label: "Resource Required" },
@@ -38,10 +38,13 @@ export const statusOptions = {
     { value: "EE_ACKNOWLEDGED", label: "EE Approved" },
     { value: "EE_NOT_SATISFIED", label: "EE Not Satisfied" },
   ],
-  EE_ACKNOWLEDGED: [{ value: "RESOLVED", label: "Resolved" }],
+  EE_ACKNOWLEDGED: [
+    { value: "RESOLVED", label: "Resolved" },
+    { value: "eeAcknowledgedToCrNotSatisfied", label: "CR Not Satisfied" },
+  ],
   RESOURCE_REQUIRED: [
-    { value: "CLOSED", label: "Closed" },
-    { value: "RAISED", label: "Raised" },
+    { value: "resourceRequiredToAeNotTerminated", label: "AE Not Terminated" },
+    { value: "resourceRequiredToAeTerminated", label: "AE Terminated" }
   ],
   EE_NOT_SATISFIED: [
     { value: "AE_NOT_SATISFIED", label: "AE Not Satisfied" },
@@ -49,6 +52,25 @@ export const statusOptions = {
   ],
   JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "JE Work Done" }],
   AE_NOT_SATISFIED: [{ value: "JE_WORKDONE", label: "JE Work Done" }],
+  CR_NOT_SATISFIED: [
+    { value: "crNotSatisfiedToEeAcknowledged", label: "EE Acknowledged" },
+    { value: "crNotSatisfiedToEeNotSatisfied", label: "EE Not Satisfied" },
+  ],
+  AE_NOT_TERMINATED: [
+    { value: "aeNotTerminatedToRaised", label: "Raised" },
+    { value: "aeNotTerminatedToResourceRequired", label: "Resource Required" },
+  ],
+  EE_NOT_TERMINATED: [
+    { value: "eeNotTerminatedToAeNotTerminated", label: "AE Not Terminated" },
+    { value: "eeNotTerminatedToAeTerminated", label: "AE Terminated" },
+  ],
+  AE_TERMINATED: [
+    { value: "aeTerminatedToEeNotTerminated", label: "EE Not Terminated" },
+    { value: "aeTerminatedToEeTerminated", label: "EE Terminated" },
+  ],
+  EE_TERMINATED: [
+    { value: "eeTerminatedToTerminated", label: "Terminated" }
+  ],
 };
 
 export const locationOptions = {

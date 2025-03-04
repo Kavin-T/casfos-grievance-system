@@ -33,7 +33,7 @@ const ComplaintBasicDetails = ({ complaint }) => {
       }`} 
         >
         <strong>Status:</strong> {statusFormat(complaint.status)}
-        {statusFormat(complaint.status) === "Resolved" ? "✔️" : statusFormat(complaint.status) === "Terminate" ? "❌": "⚠️"}
+        {statusFormat(complaint.status) === "Resolved" ? "✔️" : statusFormat(complaint.status) === "Terminated" ? "❌": "⚠️"}
       </p>
       <p>
         <strong>Complainant:</strong> {complaint.complainantName}

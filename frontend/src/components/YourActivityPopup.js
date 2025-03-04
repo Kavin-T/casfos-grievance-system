@@ -54,6 +54,46 @@ const YourActivityPopup = ({
               />
             )}
 
+          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
+            selectedComplaint.remark_CR && (
+              <RemarkDisplay
+                remark={selectedComplaint.remark_CR}
+                label="CR Remark :"
+              />
+            )}
+
+            {selectedComplaint.status === "AE_NOT_TERMINATED" &&
+            selectedComplaint.remark_AE && (
+              <RemarkDisplay
+                remark={selectedComplaint.remark_AE}
+                label="AE Remark :"
+              />
+            )}
+
+            {selectedComplaint.status === "AE_TERMINATED" &&
+            selectedComplaint.remark_AE && (
+              <RemarkDisplay
+                remark={selectedComplaint.remark_AE}
+                label="AE Remark :"
+              />
+            )}
+
+            {selectedComplaint.status === "EE_TERMINATED" &&
+            selectedComplaint.remark_EE && (
+              <RemarkDisplay
+                remark={selectedComplaint.remark_EE}
+                label="EE Remark :"
+              />
+            )}
+
+            {selectedComplaint.status === "EE_NOT_TERMINATED" &&
+            selectedComplaint.remark_EE && (
+              <RemarkDisplay
+                remark={selectedComplaint.remark_AE}
+                label="EE Remark :"
+              />
+            )}
+
           {selectedComplaint.status === "RAISED" &&
             selectedComplaint.remark_CR && (
               <RemarkDisplay
@@ -110,7 +150,10 @@ const YourActivityPopup = ({
           {([
             "RESOURCE_REQUIRED",
             "AE_NOT_SATISFIED",
-            "EE_NOT_SATISFIED",
+            "EE_NOT_SATISFIED","eeAcknowledgedToCrNotSatisfied","resourceRequiredToAeNotTerminated",
+            "resourceRequiredToAeTerminated","crNotSatisfiedToEeNotSatisfied","aeNotTerminatedToResourceRequired",
+            "eeNotTerminatedToAeNotTerminated", "eeNotTerminatedToAeNotTerminated",
+            "aeTerminatedToEeNotTerminated", "aeTerminatedToEeTerminated"
           ].includes(statusChange) ||
             (selectedComplaint.status === "RESOURCE_REQUIRED" &&
               statusChange === "RAISED")) && (
@@ -128,7 +171,7 @@ const YourActivityPopup = ({
             </div>
           )}
 
-          {statusChange === "EE_ACKNOWLEDGED" && (
+          {(statusChange === "EE_ACKNOWLEDGED" || statusChange=== "crNotSatisfiedToEeAcknowledged")&& (
             <div className="mt-4">
               <label htmlFor="price">Enter Expenditure:</label>
               <div className="mt-2">

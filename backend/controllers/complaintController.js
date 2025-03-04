@@ -122,46 +122,46 @@ const yourActivity = asyncHandler(async (req, res) => {
     case "ESTATE_OFFICER":
     case "ASSISTANT_TO_ESTATE_OFFICER":
     case "COMPLAINANT":
-      statuses = ["EE_ACKNOWLEDGED", "RESOURCE_REQUIRED"];
+      statuses = ["EE_ACKNOWLEDGED","EE_TERMINATED"];
       break;
 
     case "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL":
-      statuses = ["AE_ACKNOWLEDGED"];
+      statuses = ["AE_ACKNOWLEDGED","AE_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = { $in: ["CIVIL", "ELECTRICAL"] };
       break;
 
     case "EXECUTIVE_ENGINEER_IT":
-      statuses = ["AE_ACKNOWLEDGED"];
+      statuses = ["AE_ACKNOWLEDGED","AE_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "IT";
       break;
 
     case "ASSISTANT_ENGINEER_CIVIL":
-      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED"];
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED"];
       departmentQuery = "CIVIL";
       break;
 
     case "ASSISTANT_ENGINEER_ELECTRICAL":
-      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED"];
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED"];
       departmentQuery = "ELECTRICAL";
       break;
 
     case "ASSISTANT_ENGINEER_IT":
-      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED"];
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED"];
       departmentQuery = "IT";
       break;
 
     case "JUNIOR_ENGINEER_CIVIL":
-      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED"];
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED"];
       departmentQuery = "CIVIL";
       break;
 
     case "JUNIOR_ENGINEER_ELECTRICAL":
-      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED"];
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED"];
       departmentQuery = "ELECTRICAL";
       break;
 
     case "JUNIOR_ENGINEER_IT":
-      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED"];
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED"];
       departmentQuery = "IT";
       break;
 
@@ -194,17 +194,16 @@ const getComplaintStatistics = asyncHandler(async (req, res) => {
     throw new Error("Start date (fromDate) is required.");
   }
 
-  // Convert dates to include entire day
   const startDate = new Date(fromDate);
-  startDate.setHours(0, 0, 0, 0); // Start of the fromDate (00:00 AM)
+  startDate.setHours(0, 0, 0, 0); 
 
   const endDate = new Date(toDate || new Date().toISOString());
-  endDate.setHours(23, 59, 59, 999); // End of the toDate (11:59 PM)
+  endDate.setHours(23, 59, 59, 999); 
 
   let match = {
     createdAt: {
-      $gte: startDate, // Include complaints from fromDate 00:00 AM
-      $lte: endDate, // Include complaints until toDate 11:59 PM
+      $gte: startDate, 
+      $lte: endDate, 
     },
   };
 

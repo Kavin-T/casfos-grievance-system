@@ -11,6 +11,18 @@ const {
   resourceRequiredToClosed,
   resourceRequiredToRaised,
   changeComplaintDepartment,
+  crNotSatisfiedToEeAcknowledged,
+  aeNotTerminatedToRaised,
+  eeTerminatedToTerminated,
+  crNotSatisfiedToEeNotSatisfied,
+  eeAcknowledgedToCrNotSatisfied,
+  aeNotTerminatedToResourceRequired,
+  resourceRequiredToAeNotTerminated,
+  resourceRequiredToAeTerminated,
+  aeTerminatedToEeNotTerminated,
+  eeNotTerminatedToAeTerminated,
+  aeTerminatedToEeTerminated,
+  eeNotTerminatedToAeNotTerminated,
 } = require("../controllers/statusController");
 const { upload, ensureTempDirectory } = require("../middleware/fileHandler");
 const validateDesignation = require("../middleware/validateDesignationHandler");
@@ -114,7 +126,113 @@ router.put(
   ]),
   resourceRequiredToRaised
 );
+router.put(
+  "/cr-not-satisfied/ee-acknowledged",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  crNotSatisfiedToEeAcknowledged
+);
+router.put(
+  "/ae-not-terminated/raised",
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
+  aeNotTerminatedToRaised
+);
+router.put(
+  "/ee-terminated/terminated",
+  validateDesignation([
+    "COMPLAINANT",
+    "ESTATE_OFFICER",
+    "PRINCIPAL",
+    "ASSISTANT_TO_ESTATE_OFFICER",
+  ]),
+  eeTerminatedToTerminated
+);
 
+router.put(
+  "/cr-not-satisfied/ee-not-satisfied",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  crNotSatisfiedToEeNotSatisfied
+);
+router.put(
+  "/ee-acknowledged/cr-not-satisfied",
+  validateDesignation([
+    "COMPLAINANT",
+    "ESTATE_OFFICER",
+    "PRINCIPAL",
+    "ASSISTANT_TO_ESTATE_OFFICER",
+  ]),
+  eeAcknowledgedToCrNotSatisfied
+);
+router.put(
+  "/ae-not-terminated/resource-required",
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
+  aeNotTerminatedToResourceRequired
+);
+router.put(
+  "/resource-required/ae-not-terminated",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+  ]),
+  resourceRequiredToAeNotTerminated
+);
+router.put(
+  "/resource-required/ae-terminated",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+  ]),
+  resourceRequiredToAeTerminated
+);
+router.put(
+  "/ae-terminated/ee-not-terminated",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  aeTerminatedToEeNotTerminated
+);
+router.put(
+  "/ee-not-terminated/ae-terminated",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+  ]),
+  eeNotTerminatedToAeTerminated
+);
+router.put(
+  "/ae-terminated/ee-terminated",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  aeTerminatedToEeTerminated
+);
+router.put(
+  "/ee-not-terminated/ae-not-terminated",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+  ]),
+  eeNotTerminatedToAeNotTerminated
+);
 router.put(
   "/change-department",
   validateDesignation([

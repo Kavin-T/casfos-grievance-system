@@ -139,6 +139,105 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
   });
 });
 
+const crNotSatisfiedToEeAcknowledged = asyncHandler(async (req, res) => {
+  const { id ,price} = req.body;
+
+  if (!id) {
+    res.status(400);
+    throw new Error("Complaint ID is required.");
+  }
+  if (price === undefined || !price) {
+    res.status(400);
+    throw new Error("Price is required.");
+  }
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "EE_ACKNOWLEDGED" ||
+    complaint.status === "EE_NOT_SATISFIED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "EE_ACKNOWLEDGED";
+  complaint.price = price;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    complaint,
+  });
+});
+
+const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    res.status(400);
+    throw new Error("Complaint ID is required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "RAISED" ||
+    complaint.status === "RESOURCE_REQUIRED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "RAISED";
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    complaint,
+  });
+});
+
+const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    res.status(400);
+    throw new Error("Complaint ID is required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "TERMINATED";
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    complaint,
+  });
+});
+
 const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
   const { id, price } = req.body;
 
@@ -203,6 +302,305 @@ const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     message: "Complaint status updated to RESOLVED successfully.",
+    complaint,
+  });
+});
+
+const crNotSatisfiedToEeNotSatisfied = asyncHandler(async (req, res) => {
+  const { id, remark_EE } = req.body;
+
+  if (!id || !remark_EE) {
+    res.status(400);
+    throw new Error("Complaint ID and EE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "EE_NOT_SATISFIED" ||
+    complaint.status === "EE_ACKNOWLEDGED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "EE_NOT_SATISFIED";
+  complaint.remark_EE = remark_EE;
+  complaint.reRaised = true;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to EE NOT SATISFIED successfully.",
+    complaint,
+  });
+});
+
+const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
+  const { id, remark_CR } = req.body;
+
+  if (!id || !remark_CR) {
+    res.status(400);
+    throw new Error("Complaint ID and CR remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "CR_NOT_SATISFIED" ||
+    complaint.status === "RESOLVED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "CR_NOT_SATISFIED";
+  complaint.remark_CR = remark_CR;
+  complaint.reRaised = true;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to CR NOT SATISFIED successfully.",
+    complaint,
+  });
+});
+
+const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
+  const { id, remark_JE } = req.body;
+
+  if (!id || !remark_JE) {
+    res.status(400);
+    throw new Error("Complaint ID and JE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "RAISED" ||
+    complaint.status === "RESOURCE_REQUIRED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "RESOURCE_REQUIRED";
+  complaint.remark_JE = remark_JE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to RESOURCE REQUIRED successfully.",
+    complaint,
+  });
+});
+
+const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_AE } = req.body;
+
+  if (!id || !remark_AE) {
+    res.status(400);
+    throw new Error("Complaint ID and AE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "AE_TERMINATED" ||
+    complaint.status === "AE_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "AE_NOT_TERMINATED";
+  complaint.remark_AE = remark_AE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE NOT TERMINATED successfully.",
+    complaint,
+  });
+});
+
+const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_AE } = req.body;
+
+  if (!id || !remark_AE) {
+    res.status(400);
+    throw new Error("Complaint ID and AE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "AE_TERMINATED" ||
+    complaint.status === "AE_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "AE_TERMINATED";
+  complaint.remark_AE = remark_AE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE TERMINATED successfully.",
+    complaint,
+  });
+});
+
+const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_EE } = req.body;
+
+  if (!id || !remark_EE) {
+    res.status(400);
+    throw new Error("Complaint ID and EE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "EE_TERMINATED" ||
+    complaint.status === "EE_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "EE_NOT_TERMINATED";
+  complaint.remark_EE = remark_EE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to EE NOT TERMINATED successfully.",
+    complaint,
+  });
+});
+
+const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_AE } = req.body;
+
+  if (!id || !remark_AE) {
+    res.status(400);
+    throw new Error("Complaint ID and AE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "AE_TERMINATED" ||
+    complaint.status === "AE_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "AE_TERMINATED";
+  complaint.remark_AE = remark_AE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE TERMINATED successfully.",
+    complaint,
+  });
+});
+
+const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_EE } = req.body;
+
+  if (!id || !remark_EE) {
+    res.status(400);
+    throw new Error("Complaint ID and EE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "EE_TERMINATED" ||
+    complaint.status === "EE_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "EE_TERMINATED";
+  complaint.remark_EE = remark_EE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to EE TERMINATED successfully.",
+    complaint,
+  });
+});
+
+const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_AE } = req.body;
+
+  if (!id || !remark_AE) {
+    res.status(400);
+    throw new Error("Complaint ID and AE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "AE_TERMINATED" ||
+    complaint.status === "AE_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "AE_NOT_TERMINATED";
+  complaint.remark_AE = remark_AE;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to AE NOT TERMINATED successfully.",
     complaint,
   });
 });
@@ -403,4 +801,16 @@ module.exports = {
   resourceRequiredToClosed,
   resourceRequiredToRaised,
   changeComplaintDepartment,
+  crNotSatisfiedToEeAcknowledged,
+  aeNotTerminatedToRaised,
+  eeTerminatedToTerminated,
+  crNotSatisfiedToEeNotSatisfied,
+  eeAcknowledgedToCrNotSatisfied,
+  aeNotTerminatedToResourceRequired,
+  resourceRequiredToAeNotTerminated,
+  resourceRequiredToAeTerminated,
+  aeTerminatedToEeNotTerminated,
+  eeNotTerminatedToAeTerminated,
+  aeTerminatedToEeTerminated,
+  eeNotTerminatedToAeNotTerminated,
 };

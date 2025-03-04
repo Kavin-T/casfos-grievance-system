@@ -29,7 +29,7 @@ export const designationFormat = (input) => {
   }
 };
 
-export const statusFormat = (input) => {
+export const statusFormat = (input) => { 
   if (input === "RAISED") {
     return "Raised";
   } else if (input === "JE_ACKNOWLEDGED") {
@@ -50,6 +50,18 @@ export const statusFormat = (input) => {
     return "AE Not Satisfied";
   } else if (input === "EE_NOT_SATISFIED") {
     return "EE Not Satisfied";
+  } else if (input === "CR_NOT_SATISFIED") {
+    return "CR Not Satisfied";
+  } else if (input === "AE_NOT_TERMINATED") {
+    return "AE Not Terminated";
+  } else if (input === "AE_TERMINATED") {
+    return "AE Terminated";
+  } else if (input === "EE_TERMINATED") {
+    return "EE Terminated";
+  } else if (input === "EE_NOT_TERMINATED") {
+    return "EE Not Terminated";
+  } else if (input === "TERMINATED") {
+    return "Terminated";
   } else {
     return "Unknown Status";
   }

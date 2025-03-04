@@ -147,9 +147,6 @@ const YourActivity = ({ setComplaintCount }) => {
       case "RESOLVED":
         endpoint = "ee-acknowledged/resolved";
         break;
-      case "CLOSED":
-        endpoint = "resource-required/closed";
-        break;
       case "RAISED":
         endpoint = "resource-required/raised";
         body["remark_CR"] = remark;
@@ -163,8 +160,54 @@ const YourActivity = ({ setComplaintCount }) => {
         if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
         if (files.vidAfter) body.append("vidAfter", files.vidAfter);
         break;
+      case "crNotSatisfiedToEeAcknowledged":
+          endpoint = "cr-not-satisfied/ee-acknowledged";
+          body["price"] = price;
+          break;
+      case "crNotSatisfiedToEeNotSatisfied":
+          body["remark_EE"] = remark;
+          endpoint = "cr-not-satisfied/ee-not-satisfied";
+          break;
+      case "aeNotTerminatedToRaised":
+          endpoint = "ae-not-terminated/raised";
+          break;
+      case "eeAcknowledgedToCrNotSatisfied":
+          body["remark_CR"] = remark;
+          endpoint = "ee-acknowledged/cr-not-satisfied";
+          break;
+      case "aeNotTerminatedToResourceRequired":
+          body["remark_JE"] = remark;
+          endpoint = "ae-not-terminated/resource-required";
+          break;
+      case "resourceRequiredToAeNotTerminated":
+          body["remark_AE"] = remark;
+          endpoint = "resource-required/ae-not-terminated";
+          break;
+      case "resourceRequiredToAeTerminated":
+          body["remark_AE"] = remark;
+          endpoint = "resource-required/ae-terminated";
+          break;
+      case "aeTerminatedToEeNotTerminated":
+          body["remark_EE"] = remark;
+          endpoint = "ae-terminated/ee-not-terminated";
+          break;
+      case "eeNotTerminatedToAeTerminated":
+          body["remark_AE"] = remark;
+          endpoint = "ee-not-terminated/ae-terminated";
+          break;
+      case "aeTerminatedToEeTerminated":
+          body["remark_EE"] = remark;
+          endpoint = "ae-terminated/ee-terminated";
+          break;
+      case "eeTerminatedToTerminated":
+          endpoint = "ee-terminated/terminated";
+          break;
+      case "eeNotTerminatedToAeNotTerminated":
+          body["remark_AE"] = remark;
+          endpoint = "ee-not-terminated/ae-not-terminated";
+          break;
       default:
-        break;
+          break;
     }
 
     try {
