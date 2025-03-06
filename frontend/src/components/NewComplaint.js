@@ -68,11 +68,6 @@ export default function NewComplaint() {
       return;
     }
 
-    if (!files.imgBefore_1 && !files.vidBefore) {
-      toast.error("At least one of imgBefore_1 or vidBefore must be uploaded.");
-      return;
-    }
-
     setIsSubmitting(true);
 
     const data = new FormData();
