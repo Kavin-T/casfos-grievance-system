@@ -133,6 +133,14 @@ const complaintSchema = new mongoose.Schema({
     trim: true,
     default: null,
   },
+  multiple_remark_ae: {
+    type: [{ type: String, trim: true }],
+    default: [],
+  },
+  multiple_remark_ee: {
+    type: [{ type: String, trim: true }],
+    default: [],
+  },  
   resolvedName: {
     type: String,
     trim: true,

@@ -107,6 +107,69 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
   });
 });
 
+const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    res.status(400);
+    throw new Error("Complaint ID is required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (complaint.status === "JE_WORKDONE") {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  const complaintID = complaint.complaintID;
+
+  const uploadsDir = path.resolve(__dirname, "../uploads");
+  const complaintDir = path.join(uploadsDir, `${complaintID}`);
+  fs.mkdirSync(complaintDir, { recursive: true });
+
+  let imgAfterPaths = [];
+  let vidAfterPaths = [];
+
+  Object.keys(req.files).forEach((key) => {
+    if (key.startsWith("imgAfter")) {
+      const file = req.files[key][0];
+      const imgAfterFileName = `${key}_${complaintID}.jpg`;
+      const imgAfterFullPath = path.join(complaintDir, imgAfterFileName);
+      fs.renameSync(file.path, imgAfterFullPath);
+      imgAfterPaths.push(`uploads/${complaintID}/${imgAfterFileName}`);
+    }
+  });
+
+  Object.keys(req.files).forEach((key) => {
+    if (key.startsWith("vidAfter")) {
+      const file = req.files[key][0];
+      const vidAfterFileName = `${key}_${complaintID}.mp4`;
+      const vidAfterFullPath = path.join(complaintDir, vidAfterFileName);
+      fs.renameSync(file.path, vidAfterFullPath);
+      vidAfterPaths.push(`uploads/${complaintID}/${vidAfterFileName}`);
+    }
+  });
+
+  complaint.imgAfter = imgAfterPaths;
+  complaint.vidAfter = vidAfterPaths;
+
+  complaint.status = "JE_WORKDONE";
+  complaint.multiple_remark_ee = [];
+  complaint.multiple_remark_ae = [];
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Media files uploaded and status updated successfully.",
+    complaint,
+  });
+});
+
 const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -139,17 +202,15 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
   });
 });
 
-const crNotSatisfiedToEeAcknowledged = asyncHandler(async (req, res) => {
-  const { id ,price} = req.body;
+
+const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
+  const { id } = req.body;
 
   if (!id) {
     res.status(400);
     throw new Error("Complaint ID is required.");
   }
-  if (price === undefined || !price) {
-    res.status(400);
-    throw new Error("Price is required.");
-  }
+
   const complaint = await Complaint.findById(id);
   if (!complaint) {
     res.status(404);
@@ -157,20 +218,53 @@ const crNotSatisfiedToEeAcknowledged = asyncHandler(async (req, res) => {
   }
 
   if (
-    complaint.status === "EE_ACKNOWLEDGED" ||
-    complaint.status === "EE_NOT_SATISFIED"
+    complaint.status === "RESOLVED" ||
+    complaint.status === "CR_NOT_SATISFIED"
   ) {
     return res.status(200).json({
       message: "Complaint already updated.",
     });
   }
 
-  complaint.status = "EE_ACKNOWLEDGED";
-  complaint.price = price;
+  complaint.status = "RESOLVED";
   await complaint.save();
 
   res.status(200).json({
-    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    message: "Complaint status updated to RESOLVED successfully.",
+    complaint,
+  });
+});
+
+
+const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
+  const { id , remark_CR} = req.body;
+
+  if (!id || !remark_CR) {
+    res.status(400);
+    throw new Error("Complaint ID and CR remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "RESOLVED" ||
+    complaint.status === "CR_NOT_SATISFIED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "CR_NOT_SATISFIED";
+  complaint.remark_CR = remark_CR;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to CR_NOT_SATISFIED successfully.",
     complaint,
   });
 });
@@ -302,74 +396,6 @@ const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     message: "Complaint status updated to RESOLVED successfully.",
-    complaint,
-  });
-});
-
-const crNotSatisfiedToEeNotSatisfied = asyncHandler(async (req, res) => {
-  const { id, remark_EE } = req.body;
-
-  if (!id || !remark_EE) {
-    res.status(400);
-    throw new Error("Complaint ID and EE remark are required.");
-  }
-
-  const complaint = await Complaint.findById(id);
-  if (!complaint) {
-    res.status(404);
-    throw new Error("Complaint not found.");
-  }
-
-  if (
-    complaint.status === "EE_NOT_SATISFIED" ||
-    complaint.status === "EE_ACKNOWLEDGED"
-  ) {
-    return res.status(200).json({
-      message: "Complaint already updated.",
-    });
-  }
-
-  complaint.status = "EE_NOT_SATISFIED";
-  complaint.remark_EE = remark_EE;
-  complaint.reRaised = true;
-  await complaint.save();
-
-  res.status(200).json({
-    message: "Complaint status updated to EE NOT SATISFIED successfully.",
-    complaint,
-  });
-});
-
-const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
-  const { id, remark_CR } = req.body;
-
-  if (!id || !remark_CR) {
-    res.status(400);
-    throw new Error("Complaint ID and CR remark are required.");
-  }
-
-  const complaint = await Complaint.findById(id);
-  if (!complaint) {
-    res.status(404);
-    throw new Error("Complaint not found.");
-  }
-
-  if (
-    complaint.status === "CR_NOT_SATISFIED" ||
-    complaint.status === "RESOLVED"
-  ) {
-    return res.status(200).json({
-      message: "Complaint already updated.",
-    });
-  }
-
-  complaint.status = "CR_NOT_SATISFIED";
-  complaint.remark_CR = remark_CR;
-  complaint.reRaised = true;
-  await complaint.save();
-
-  res.status(200).json({
-    message: "Complaint status updated to CR NOT SATISFIED successfully.",
     complaint,
   });
 });
@@ -765,6 +791,86 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
   });
 });
 
+const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
+  const { id, remark } = req.body;
+
+  if (!id || !remark) { 
+    res.status(400);
+    throw new Error("Complaint ID and AE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  complaint.multiple_remark_ae.push(remark);
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated successfully.",
+    complaint,
+  });
+});
+
+const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
+  const { id, remark } = req.body;
+
+  if (!id || !remark) { 
+    res.status(400);
+    throw new Error("Complaint ID and EE remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+  
+  complaint.multiple_remark_ee.push(remark);
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated successfully.",
+    complaint,
+  });
+});
+
+const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
+  const { id, remark_CR } = req.body;
+
+  if (!id || !remark_CR) {
+    res.status(400);
+    throw new Error("Complaint ID and CR remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "CR_NOT_SATISFIED" ||
+    complaint.status === "RESOLVED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  complaint.status = "CR_NOT_SATISFIED";
+  complaint.remark_CR = remark_CR;
+  complaint.reRaised = true;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint status updated to CR NOT SATISFIED successfully.",
+    complaint,
+  });
+});
+
 const changeComplaintDepartment = asyncHandler(async (req, res) => {
   const { id, newDepartment } = req.body;
 
@@ -801,11 +907,8 @@ module.exports = {
   resourceRequiredToClosed,
   resourceRequiredToRaised,
   changeComplaintDepartment,
-  crNotSatisfiedToEeAcknowledged,
   aeNotTerminatedToRaised,
   eeTerminatedToTerminated,
-  crNotSatisfiedToEeNotSatisfied,
-  eeAcknowledgedToCrNotSatisfied,
   aeNotTerminatedToResourceRequired,
   resourceRequiredToAeNotTerminated,
   resourceRequiredToAeTerminated,
@@ -813,4 +916,10 @@ module.exports = {
   eeNotTerminatedToAeTerminated,
   aeTerminatedToEeTerminated,
   eeNotTerminatedToAeNotTerminated,
+  jeWorkDoneToResolved,
+  jeWorkDoneToCrNotSatisfied,
+  aeRemarkWhenCrNotSatisfied,
+  eeRemarkWhenCrNotSatisfied,
+  crNotSatisfiedToJeWorkdone,
+  eeAcknowledgedToCrNotSatisfied,
 };

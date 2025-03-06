@@ -34,13 +34,17 @@ export const statusOptions = {
     { value: "AE_ACKNOWLEDGED", label: "AE Approved" },
     { value: "AE_NOT_SATISFIED", label: "AE Not Satisfied" },
   ],
+  JE_WORKDONE_DISPLAYING_TO_CR: [
+    { value: "jeWorkDoneToResolved", label: "Resolved" },
+    { value: "jeWorkDoneToCrNotSatisfied", label: "Complainant Not Satisfied" },
+  ],
   AE_ACKNOWLEDGED: [
     { value: "EE_ACKNOWLEDGED", label: "EE Approved" },
     { value: "EE_NOT_SATISFIED", label: "EE Not Satisfied" },
   ],
   EE_ACKNOWLEDGED: [
     { value: "RESOLVED", label: "Resolved" },
-    { value: "eeAcknowledgedToCrNotSatisfied", label: "CR Not Satisfied" },
+    { value: "eeAcknowledgedToCrNotSatisfied", label: "Complainant Not Satisfied" },
   ],
   RESOURCE_REQUIRED: [
     { value: "resourceRequiredToAeNotTerminated", label: "AE Not Terminated" },
@@ -53,8 +57,7 @@ export const statusOptions = {
   JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "JE Work Done" }],
   AE_NOT_SATISFIED: [{ value: "JE_WORKDONE", label: "JE Work Done" }],
   CR_NOT_SATISFIED: [
-    { value: "crNotSatisfiedToEeAcknowledged", label: "EE Acknowledged" },
-    { value: "crNotSatisfiedToEeNotSatisfied", label: "EE Not Satisfied" },
+    { value: "crNotSatisfiedToJeWorkdone", label: "JE Work Done" },
   ],
   AE_NOT_TERMINATED: [
     { value: "aeNotTerminatedToRaised", label: "Raised" },

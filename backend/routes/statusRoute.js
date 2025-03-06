@@ -11,11 +11,8 @@ const {
   resourceRequiredToClosed,
   resourceRequiredToRaised,
   changeComplaintDepartment,
-  crNotSatisfiedToEeAcknowledged,
   aeNotTerminatedToRaised,
   eeTerminatedToTerminated,
-  crNotSatisfiedToEeNotSatisfied,
-  eeAcknowledgedToCrNotSatisfied,
   aeNotTerminatedToResourceRequired,
   resourceRequiredToAeNotTerminated,
   resourceRequiredToAeTerminated,
@@ -23,6 +20,12 @@ const {
   eeNotTerminatedToAeTerminated,
   aeTerminatedToEeTerminated,
   eeNotTerminatedToAeNotTerminated,
+  jeWorkDoneToCrNotSatisfied,
+  jeWorkDoneToResolved,
+  aeRemarkWhenCrNotSatisfied,
+  eeRemarkWhenCrNotSatisfied,
+  crNotSatisfiedToJeWorkdone,
+  eeAcknowledgedToCrNotSatisfied,
 } = require("../controllers/statusController");
 const { upload, ensureTempDirectory } = require("../middleware/fileHandler");
 const validateDesignation = require("../middleware/validateDesignationHandler");
@@ -52,6 +55,22 @@ router.post(
     { name: "vidAfter", maxCount: 1 },
   ]),
   jeAcknowledgedToJeWorkdone
+);
+router.post(
+  "/cr-not-satisfied/je-workdone",
+  validateDesignation([
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
+  ]),
+  ensureTempDirectory,
+  upload.fields([
+    { name: "imgAfter_1", maxCount: 1 },
+    { name: "imgAfter_2", maxCount: 1 },
+    { name: "imgAfter_3", maxCount: 1 },
+    { name: "vidAfter", maxCount: 1 },
+  ]),
+  crNotSatisfiedToJeWorkdone
 );
 router.put(
   "/je-workdone/ae-acknowledged",
@@ -127,14 +146,6 @@ router.put(
   resourceRequiredToRaised
 );
 router.put(
-  "/cr-not-satisfied/ee-acknowledged",
-  validateDesignation([
-    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
-    "EXECUTIVE_ENGINEER_IT",
-  ]),
-  crNotSatisfiedToEeAcknowledged
-);
-router.put(
   "/ae-not-terminated/raised",
   validateDesignation([
     "JUNIOR_ENGINEER_CIVIL",
@@ -152,25 +163,6 @@ router.put(
     "ASSISTANT_TO_ESTATE_OFFICER",
   ]),
   eeTerminatedToTerminated
-);
-
-router.put(
-  "/cr-not-satisfied/ee-not-satisfied",
-  validateDesignation([
-    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
-    "EXECUTIVE_ENGINEER_IT",
-  ]),
-  crNotSatisfiedToEeNotSatisfied
-);
-router.put(
-  "/ee-acknowledged/cr-not-satisfied",
-  validateDesignation([
-    "COMPLAINANT",
-    "ESTATE_OFFICER",
-    "PRINCIPAL",
-    "ASSISTANT_TO_ESTATE_OFFICER",
-  ]),
-  eeAcknowledgedToCrNotSatisfied
 );
 router.put(
   "/ae-not-terminated/resource-required",
@@ -232,6 +224,59 @@ router.put(
     "ASSISTANT_ENGINEER_IT",
   ]),
   eeNotTerminatedToAeNotTerminated
+);
+router.put(
+  "/je-workdone/resolved",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+    "COMPLAINANT",
+    "ESTATE_OFFICER",
+    "PRINCIPAL",
+    "ASSISTANT_TO_ESTATE_OFFICER",
+  ]),
+  jeWorkDoneToResolved
+);
+router.put(
+  "/je-workdone/cr-not-satisfied",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+    "COMPLAINANT",
+    "ESTATE_OFFICER",
+    "PRINCIPAL",
+    "ASSISTANT_TO_ESTATE_OFFICER",
+  ]),
+  jeWorkDoneToCrNotSatisfied
+);
+router.put(
+  "/ae-remark/cr-not-satisfied",
+  validateDesignation([
+    "ASSISTANT_ENGINEER_CIVIL",
+    "ASSISTANT_ENGINEER_ELECTRICAL",
+    "ASSISTANT_ENGINEER_IT",
+  ]),
+  aeRemarkWhenCrNotSatisfied
+);
+router.put(
+  "/ee-remark/cr-not-satisfied",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  eeRemarkWhenCrNotSatisfied
+);
+router.put(
+  "/ee-acknowledged/cr-not-satisfied",
+  validateDesignation([
+    "COMPLAINANT",
+    "ESTATE_OFFICER",
+    "PRINCIPAL",
+    "ASSISTANT_TO_ESTATE_OFFICER",
+  ]),
+  eeAcknowledgedToCrNotSatisfied
 );
 router.put(
   "/change-department",

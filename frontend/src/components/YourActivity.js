@@ -12,6 +12,11 @@ import confirmAction from "../utils/confirmAction ";
 import Spinner from "./Spinner";
 import { Timer } from "./Timer";
 
+const getUser = () => {
+  const designation = localStorage.getItem("designation");
+  return { designation };
+};
+
 const YourActivity = ({ setComplaintCount }) => {
   const [complaints, setComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
@@ -101,7 +106,7 @@ const YourActivity = ({ setComplaintCount }) => {
       return;
     }
 
-    if (!statusChange) {
+    if (!statusChange && (selectedComplaint.status !== "CR_NOT_SATISFIED" && !["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation))) {
       toast.error("Choose the status to change");
       return;
     }
@@ -120,7 +125,6 @@ const YourActivity = ({ setComplaintCount }) => {
     let body = {};
     body["id"] = selectedComplaint._id;
     let endpoint = "";
-
     switch (statusChange) {
       case "JE_ACKNOWLEDGED":
         endpoint = "raised/je-acknowledged";
@@ -206,6 +210,30 @@ const YourActivity = ({ setComplaintCount }) => {
           body["remark_AE"] = remark;
           endpoint = "ee-not-terminated/ae-not-terminated";
           break;
+      case "jeWorkDoneToResolved":
+            endpoint = "je-workdone/resolved";
+            break;
+      case "jeWorkDoneToCrNotSatisfied":
+            body["remark_CR"] = remark;
+            endpoint = "je-workdone/cr-not-satisfied";
+            break;
+      case "crNotSatisfiedToJeWorkdone":
+            endpoint = "cr-not-satisfied/je-workdone";
+            body = new FormData();
+            body.append("id", selectedComplaint._id);
+            if (files.imgAfter_1) body.append("imgAfter_1", files.imgAfter_1);
+            if (files.imgAfter_2) body.append("imgAfter_2", files.imgAfter_2);
+            if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
+            if (files.vidAfter) body.append("vidAfter", files.vidAfter);
+            break;
+      case "aeRemarkWhenCrNotSatisfied":
+            body["remark"] = remark;
+            endpoint = "ae-remark/cr-not-satisfied";
+            break;
+      case "eeRemarkWhenCrNotSatisfied":
+            body["remark"] = remark;
+            endpoint = "ee-remark/cr-not-satisfied";
+            break;
       default:
           break;
     }
@@ -213,8 +241,8 @@ const YourActivity = ({ setComplaintCount }) => {
     try {
       setLoading(true);
       let response;
-      if (statusChange === "JE_WORKDONE") {
-        response = await updateWorkDone(body);
+      if (statusChange === "JE_WORKDONE" || statusChange === "crNotSatisfiedToJeWorkdone") {
+        response = await updateWorkDone(body,endpoint);
       } else {
         response = await updateStatus(body, endpoint);
       }

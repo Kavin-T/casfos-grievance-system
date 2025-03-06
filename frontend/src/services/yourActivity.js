@@ -26,10 +26,10 @@ export const updateStatus = async (formData, endpoint) => {
 };
 
 // Update work done status
-export const updateWorkDone = async (formData) => {
+export const updateWorkDone = async (formData,endpoint) => {
   try {
     const response = await axios.post(
-      `/status/je-acknowledged/je-workdone`,
+      `/status/${endpoint}`,
       formData
     );
     return response.data;

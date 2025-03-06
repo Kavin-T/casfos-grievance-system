@@ -4,6 +4,11 @@ import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
 import { statusOptions } from "../constants/options";
 import { FileUpload } from "./FileUpload";
 
+const getUser = () => {
+  const designation = localStorage.getItem("designation");
+  return { designation };
+};
+
 const YourActivityPopup = ({
   selectedComplaint,
   statusChange,
@@ -20,8 +25,21 @@ const YourActivityPopup = ({
   setNewDepartment,
   handleDepartmentChange,
 }) => {
-  const statusChangeOptions = statusOptions[selectedComplaint.status] || [];
 
+  const statusChangeOptions = 
+  (["COMPLAINANT", "ESTATE_OFFICER", "PRINCIPAL", "ASSISTANT_TO_ESTATE_OFFICER"].includes(getUser().designation) &&
+    selectedComplaint.status === "JE_WORKDONE")
+    ? statusOptions["JE_WORKDONE_DISPLAYING_TO_CR"]
+    : (["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation) &&
+       selectedComplaint.status === "CR_NOT_SATISFIED")
+      ? []
+      : statusOptions[selectedComplaint.status] || [];
+
+  const allowedDesignations = [
+        "JUNIOR_ENGINEER_CIVIL",
+        "JUNIOR_ENGINEER_ELECTRICAL",
+        "JUNIOR_ENGINEER_IT"
+  ];
   return (
     <>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -54,15 +72,44 @@ const YourActivityPopup = ({
               />
             )}
 
-          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
-            selectedComplaint.remark_CR && (
+          {(selectedComplaint.status === "CR_NOT_SATISFIED" &&
+            ["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL",
+               "ASSISTANT_ENGINEER_IT","JUNIOR_ENGINEER_CIVIL","JUNIOR_ENGINEER_ELECTRICAL","JUNIOR_ENGINEER_IT"].includes(getUser().designation))
+            && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_CR}
                 label="CR Remark :"
               />
-            )}
+            ) 
+          }
 
-            {selectedComplaint.status === "AE_NOT_TERMINATED" &&
+          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
+            allowedDesignations.includes(getUser().designation) &&
+            selectedComplaint.multiple_remark_ae?.length > 0 && (
+              <div className="text-red-600 font-bold mt-5 mb-5">
+                <div className="mb-2">Assistant Engineer Remarks:</div>
+                <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
+                  {selectedComplaint.multiple_remark_ae.map((remark, index) => (
+                    <p key={index} className="m-0 whitespace-pre-wrap break-words">{remark}</p>
+                  ))}
+                </div>
+              </div>
+          )}
+
+          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
+            allowedDesignations.includes(getUser().designation) &&
+            selectedComplaint.multiple_remark_ee?.length > 0 && (
+              <div className="text-red-600 font-bold mt-5 mb-5">
+                <div className="mb-2">Executive Engineer Remarks:</div>
+                <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
+                  {selectedComplaint.multiple_remark_ee.map((remark, index) => (
+                    <p key={index} className="m-0 whitespace-pre-wrap break-words">{remark}</p>
+                  ))}
+                </div>
+              </div>
+          )}
+
+          {selectedComplaint.status === "AE_NOT_TERMINATED" &&
             selectedComplaint.remark_AE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_AE}
@@ -70,7 +117,7 @@ const YourActivityPopup = ({
               />
             )}
 
-            {selectedComplaint.status === "AE_TERMINATED" &&
+          {selectedComplaint.status === "AE_TERMINATED" &&
             selectedComplaint.remark_AE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_AE}
@@ -78,7 +125,7 @@ const YourActivityPopup = ({
               />
             )}
 
-            {selectedComplaint.status === "EE_TERMINATED" &&
+          {selectedComplaint.status === "EE_TERMINATED" &&
             selectedComplaint.remark_EE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_EE}
@@ -86,7 +133,7 @@ const YourActivityPopup = ({
               />
             )}
 
-            {selectedComplaint.status === "EE_NOT_TERMINATED" &&
+          {selectedComplaint.status === "EE_NOT_TERMINATED" &&
             selectedComplaint.remark_EE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_AE}
@@ -126,37 +173,45 @@ const YourActivityPopup = ({
             </div>
           )}
 
-          <div className="mt-4">
-            <label className="text-lg font-bold" htmlFor="statusChange">
-              Change Status:
-            </label>
-            <div className="mt-2">
-              <select
-                id="statusChange"
-                value={statusChange}
-                onChange={(e) => setStatusChange(e.target.value)}
-                className="block p-2 border rounded w-full"
-              >
-                <option value="">Select</option>
-                {statusChangeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+          {statusChangeOptions.length > 0 ? (
+            <div className="mt-4">
+              <label className="text-lg font-bold" htmlFor="statusChange">
+                Change Status:
+              </label>
+              <div className="mt-2">
+                <select
+                  id="statusChange"
+                  value={statusChange}
+                  onChange={(e) => setStatusChange(e.target.value)}
+                  className="block p-2 border rounded w-full"
+                >
+                  <option value="">Select</option>
+                  {statusChangeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
+          ) : (
+            ["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", ""].includes(getUser().designation)
+              ? setStatusChange("eeRemarkWhenCrNotSatisfied")
+              : ["ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation)
+              ? setStatusChange("aeRemarkWhenCrNotSatisfied")
+              : null
+          )}
 
           {([
             "RESOURCE_REQUIRED",
             "AE_NOT_SATISFIED",
-            "EE_NOT_SATISFIED","eeAcknowledgedToCrNotSatisfied","resourceRequiredToAeNotTerminated",
-            "resourceRequiredToAeTerminated","crNotSatisfiedToEeNotSatisfied","aeNotTerminatedToResourceRequired",
+            "EE_NOT_SATISFIED","resourceRequiredToAeNotTerminated",
+            "resourceRequiredToAeTerminated","aeNotTerminatedToResourceRequired",
             "eeNotTerminatedToAeNotTerminated", "eeNotTerminatedToAeNotTerminated",
-            "aeTerminatedToEeNotTerminated", "aeTerminatedToEeTerminated"
+            "aeTerminatedToEeNotTerminated", "aeTerminatedToEeTerminated", "jeWorkDoneToCrNotSatisfied","eeAcknowledgedToCrNotSatisfied",
           ].includes(statusChange) ||
             (selectedComplaint.status === "RESOURCE_REQUIRED" &&
-              statusChange === "RAISED")) && (
+              statusChange === "RAISED") || (selectedComplaint.status === "CR_NOT_SATISFIED" && ["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation))) && (
             <div className="mt-4">
               <label htmlFor="remark">Enter Remark:</label>
               <div className="mt-2">
@@ -188,7 +243,7 @@ const YourActivityPopup = ({
             </div>
           )}
 
-          {statusChange === "JE_WORKDONE" && (
+          {(statusChange === "JE_WORKDONE" || statusChange === "crNotSatisfiedToJeWorkdone") && (
             <>
               <div className="text-red-500 mt-2 text-wrap">
                 <strong>Warning:</strong> The file must meet the following size

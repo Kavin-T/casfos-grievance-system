@@ -122,7 +122,7 @@ const yourActivity = asyncHandler(async (req, res) => {
     case "ESTATE_OFFICER":
     case "ASSISTANT_TO_ESTATE_OFFICER":
     case "COMPLAINANT":
-      statuses = ["EE_ACKNOWLEDGED","EE_TERMINATED"];
+      statuses = ["EE_ACKNOWLEDGED","EE_TERMINATED","JE_WORKDONE"];
       break;
 
     case "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL":
@@ -136,32 +136,32 @@ const yourActivity = asyncHandler(async (req, res) => {
       break;
 
     case "ASSISTANT_ENGINEER_CIVIL":
-      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED"];
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "CIVIL";
       break;
 
     case "ASSISTANT_ENGINEER_ELECTRICAL":
-      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED"];
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "ELECTRICAL";
       break;
 
     case "ASSISTANT_ENGINEER_IT":
-      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED"];
+      statuses = ["JE_WORKDONE", "EE_NOT_SATISFIED", "RESOURCE_REQUIRED","EE_NOT_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "IT";
       break;
 
     case "JUNIOR_ENGINEER_CIVIL":
-      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED"];
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "CIVIL";
       break;
 
     case "JUNIOR_ENGINEER_ELECTRICAL":
-      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED"];
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "ELECTRICAL";
       break;
 
     case "JUNIOR_ENGINEER_IT":
-      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED"];
+      statuses = ["RAISED", "JE_ACKNOWLEDGED", "AE_NOT_SATISFIED","AE_NOT_TERMINATED","CR_NOT_SATISFIED"];
       departmentQuery = "IT";
       break;
 
