@@ -890,43 +890,6 @@ const raisedToResourceRequired = asyncHandler(async (req, res) => {
   });
 });
 
-const resourceRequiredToClosed = asyncHandler(async (req, res) => {
-  const { id } = req.body;
-
-  if (!id) {
-    res.status(400);
-    throw new Error("Complaint ID is required.");
-  }
-
-  const complaint = await Complaint.findById(id);
-  if (!complaint) {
-    res.status(404);
-    throw new Error("Complaint not found.");
-  }
-
-  if (complaint.status === "CLOSED" || complaint.status === "RAISED") {
-    return res.status(200).json({
-      message: "Complaint already updated.",
-    });
-  }
-
-  const previousStatus = complaint.status;
-  complaint.status = "CLOSED";
-  await complaint.save();
-
-  updateNotification(
-    complaint.complaintID,
-    complaint.subject,
-    previousStatus,
-    "CLOSED"
-  );
-
-  res.status(200).json({
-    message: "Complaint status updated to CLOSED successfully.",
-    complaint,
-  });
-});
-
 const resourceRequiredToRaised = asyncHandler(async (req, res) => {
   const { id, remark_CR } = req.body;
 
@@ -941,7 +904,7 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
-  if (complaint.status === "RAISED" || complaint.status === "CLOSED") {
+  if (complaint.status === "RAISED" || complaint.status === "TERMINATED") {
     return res.status(200).json({
       message: "Complaint already updated.",
     });
@@ -1122,7 +1085,6 @@ module.exports = {
   jeWorkdoneToAeNotSatisfied,
   aeAcknowledgedToEeNotSatisfied,
   raisedToResourceRequired,
-  resourceRequiredToClosed,
   resourceRequiredToRaised,
   changeComplaintDepartment,
   aeNotTerminatedToRaised,
