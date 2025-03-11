@@ -53,7 +53,7 @@ const ComplaintBasicDetails = ({ complaint }) => {
         </p>
       )}
       <p>
-        <strong>Created On:</strong> {dateFormat(complaint.createdAt)}
+        <strong>Reported On:</strong> {dateFormat(complaint.createdAt)}
       </p>
     </>
   );

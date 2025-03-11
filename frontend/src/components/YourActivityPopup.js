@@ -24,21 +24,33 @@ const YourActivityPopup = ({
   newDepartment,
   setNewDepartment,
   handleDepartmentChange,
+  priceLater,
+  setPriceLater
 }) => {
-
-  const statusChangeOptions = 
-  (["COMPLAINANT", "ESTATE_OFFICER", "PRINCIPAL", "ASSISTANT_TO_ESTATE_OFFICER"].includes(getUser().designation) &&
-    selectedComplaint.status === "JE_WORKDONE")
-    ? statusOptions["JE_WORKDONE_DISPLAYING_TO_CR"]
-    : (["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation) &&
-       selectedComplaint.status === "CR_NOT_SATISFIED")
+  const statusChangeOptions =
+    [
+      "COMPLAINANT",
+      "ESTATE_OFFICER",
+      "PRINCIPAL",
+      "ASSISTANT_TO_ESTATE_OFFICER",
+    ].includes(getUser().designation) &&
+    selectedComplaint.status === "JE_WORKDONE"
+      ? statusOptions["JE_WORKDONE_DISPLAYING_TO_CR"]
+      : [
+          "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+          "EXECUTIVE_ENGINEER_IT",
+          "ASSISTANT_ENGINEER_CIVIL",
+          "ASSISTANT_ENGINEER_ELECTRICAL",
+          "ASSISTANT_ENGINEER_IT",
+        ].includes(getUser().designation) &&
+        selectedComplaint.status === "CR_NOT_SATISFIED"
       ? []
       : statusOptions[selectedComplaint.status] || [];
 
   const allowedDesignations = [
-        "JUNIOR_ENGINEER_CIVIL",
-        "JUNIOR_ENGINEER_ELECTRICAL",
-        "JUNIOR_ENGINEER_IT"
+    "JUNIOR_ENGINEER_CIVIL",
+    "JUNIOR_ENGINEER_ELECTRICAL",
+    "JUNIOR_ENGINEER_IT",
   ];
   return (
     <>
@@ -72,16 +84,22 @@ const YourActivityPopup = ({
               />
             )}
 
-          {(selectedComplaint.status === "CR_NOT_SATISFIED" &&
-            ["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL",
-               "ASSISTANT_ENGINEER_IT","JUNIOR_ENGINEER_CIVIL","JUNIOR_ENGINEER_ELECTRICAL","JUNIOR_ENGINEER_IT"].includes(getUser().designation))
-            && (
+          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
+            [
+              "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+              "EXECUTIVE_ENGINEER_IT",
+              "ASSISTANT_ENGINEER_CIVIL",
+              "ASSISTANT_ENGINEER_ELECTRICAL",
+              "ASSISTANT_ENGINEER_IT",
+              "JUNIOR_ENGINEER_CIVIL",
+              "JUNIOR_ENGINEER_ELECTRICAL",
+              "JUNIOR_ENGINEER_IT",
+            ].includes(getUser().designation) && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_CR}
                 label="CR Remark :"
               />
-            ) 
-          }
+            )}
 
           {selectedComplaint.status === "CR_NOT_SATISFIED" &&
             allowedDesignations.includes(getUser().designation) &&
@@ -90,11 +108,16 @@ const YourActivityPopup = ({
                 <div className="mb-2">Assistant Engineer Remarks:</div>
                 <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
                   {selectedComplaint.multiple_remark_ae.map((remark, index) => (
-                    <p key={index} className="m-0 whitespace-pre-wrap break-words">{remark}</p>
+                    <p
+                      key={index}
+                      className="m-0 whitespace-pre-wrap break-words"
+                    >
+                      {remark}
+                    </p>
                   ))}
                 </div>
               </div>
-          )}
+            )}
 
           {selectedComplaint.status === "CR_NOT_SATISFIED" &&
             allowedDesignations.includes(getUser().designation) &&
@@ -103,11 +126,16 @@ const YourActivityPopup = ({
                 <div className="mb-2">Executive Engineer Remarks:</div>
                 <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
                   {selectedComplaint.multiple_remark_ee.map((remark, index) => (
-                    <p key={index} className="m-0 whitespace-pre-wrap break-words">{remark}</p>
+                    <p
+                      key={index}
+                      className="m-0 whitespace-pre-wrap break-words"
+                    >
+                      {remark}
+                    </p>
                   ))}
                 </div>
               </div>
-          )}
+            )}
 
           {selectedComplaint.status === "AE_NOT_TERMINATED" &&
             selectedComplaint.remark_AE && (
@@ -194,24 +222,44 @@ const YourActivityPopup = ({
                 </select>
               </div>
             </div>
-          ) : (
-            ["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", ""].includes(getUser().designation)
-              ? setStatusChange("eeRemarkWhenCrNotSatisfied")
-              : ["ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation)
-              ? setStatusChange("aeRemarkWhenCrNotSatisfied")
-              : null
-          )}
+          ) : [
+              "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+              "EXECUTIVE_ENGINEER_IT",
+              "",
+            ].includes(getUser().designation) ? (
+            setStatusChange("eeRemarkWhenCrNotSatisfied")
+          ) : [
+              "ASSISTANT_ENGINEER_CIVIL",
+              "ASSISTANT_ENGINEER_ELECTRICAL",
+              "ASSISTANT_ENGINEER_IT",
+            ].includes(getUser().designation) ? (
+            setStatusChange("aeRemarkWhenCrNotSatisfied")
+          ) : null}
 
           {([
             "RESOURCE_REQUIRED",
             "AE_NOT_SATISFIED",
-            "EE_NOT_SATISFIED","resourceRequiredToAeNotTerminated",
-            "resourceRequiredToAeTerminated","aeNotTerminatedToResourceRequired",
-            "eeNotTerminatedToAeNotTerminated", "eeNotTerminatedToAeNotTerminated",
-            "aeTerminatedToEeNotTerminated", "aeTerminatedToEeTerminated", "jeWorkDoneToCrNotSatisfied","eeAcknowledgedToCrNotSatisfied",
+            "EE_NOT_SATISFIED",
+            "resourceRequiredToAeNotTerminated",
+            "resourceRequiredToAeTerminated",
+            "aeNotTerminatedToResourceRequired",
+            "eeNotTerminatedToAeNotTerminated",
+            "eeNotTerminatedToAeNotTerminated",
+            "aeTerminatedToEeNotTerminated",
+            "aeTerminatedToEeTerminated",
+            "jeWorkDoneToCrNotSatisfied",
+            "eeAcknowledgedToCrNotSatisfied",
           ].includes(statusChange) ||
             (selectedComplaint.status === "RESOURCE_REQUIRED" &&
-              statusChange === "RAISED") || (selectedComplaint.status === "CR_NOT_SATISFIED" && ["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation))) && (
+              statusChange === "RAISED") ||
+            (selectedComplaint.status === "CR_NOT_SATISFIED" &&
+              [
+                "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+                "EXECUTIVE_ENGINEER_IT",
+                "ASSISTANT_ENGINEER_CIVIL",
+                "ASSISTANT_ENGINEER_ELECTRICAL",
+                "ASSISTANT_ENGINEER_IT",
+              ].includes(getUser().designation))) && (
             <div className="mt-4">
               <label htmlFor="remark">Enter Remark:</label>
               <div className="mt-2">
@@ -226,7 +274,8 @@ const YourActivityPopup = ({
             </div>
           )}
 
-          {(statusChange === "EE_ACKNOWLEDGED" || statusChange=== "crNotSatisfiedToEeAcknowledged")&& (
+          {(statusChange === "EE_ACKNOWLEDGED" ||
+            statusChange === "crNotSatisfiedToEeAcknowledged") && (
             <div className="mt-4">
               <label htmlFor="price">Enter Expenditure:</label>
               <div className="mt-2">
@@ -239,11 +288,30 @@ const YourActivityPopup = ({
                   onChange={(e) => setPrice(e.target.value)}
                   min={1}
                 />
+                <div className="mt-2">
+                  <label>
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setPrice("0");
+                          setPriceLater(e.target.checked);
+                        }
+                        else{
+                          setPrice("");
+                          setPriceLater(e.target.checked);
+                        }
+                      }}
+                    />
+                    <span className="ml-2">Will be entered later</span>
+                  </label>
+                </div>
               </div>
             </div>
           )}
 
-          {(statusChange === "JE_WORKDONE" || statusChange === "crNotSatisfiedToJeWorkdone") && (
+          {(statusChange === "JE_WORKDONE" ||
+            statusChange === "crNotSatisfiedToJeWorkdone") && (
             <>
               <div className="text-red-500 mt-2 text-wrap">
                 <strong>Warning:</strong> The file must meet the following size

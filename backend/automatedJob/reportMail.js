@@ -19,7 +19,7 @@ const fetchPDF = async (filters) => {
     const response = await axios.get(
       `http://localhost:${process.env.PORT}/api/v1/report/automate`,
       {
-        params: { ...filters },
+        params: { ...filters, type: "pdf" },
         responseType: "arraybuffer",
       }
     );
@@ -32,7 +32,7 @@ const fetchPDF = async (filters) => {
 const fetchExecutiveEngineerEmails = async () => {
   try {
     const users = await User.find(
-      { designation: "EXECUTIVE_ENGINEER" },
+      { designation: "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL" },
       "email"
     );
     return users.map((user) => user.email);

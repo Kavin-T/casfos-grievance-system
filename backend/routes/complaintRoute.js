@@ -4,6 +4,7 @@ const {
   fetchComplaints,
   yourActivity,
   getComplaintStatistics,
+  fetchComplaintsWithPriceLater,
 } = require("../controllers/complaintController");
 const { ensureTempDirectory, upload } = require("../middleware/fileHandler");
 const validateDesignation = require("../middleware/validateDesignationHandler");
@@ -29,5 +30,13 @@ router.post(
 );
 router.get("/statistics", getComplaintStatistics);
 router.get("/", fetchComplaints);
+router.get(
+  "/complaints-with-price-later",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  fetchComplaintsWithPriceLater
+);
 
 module.exports = router;

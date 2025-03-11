@@ -17,13 +17,14 @@ const getUser = () => {
   return { designation };
 };
 
-const YourActivity = ({ setComplaintCount }) => {
+const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
   const [complaints, setComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [statusChange, setStatusChange] = useState("");
   const [remark, setRemark] = useState("");
   const [price, setPrice] = useState("");
   const [newDepartment, setNewDepartment] = useState("");
+  const [priceLater, setPriceLater] = useState(false);
   const [files, setFiles] = useState({
     imgAfter_1: null,
     imgAfter_2: null,
@@ -143,6 +144,7 @@ const YourActivity = ({ setComplaintCount }) => {
       case "EE_ACKNOWLEDGED":
         endpoint = "ae-acknowledged/ee-acknowledged";
         body["price"] = price;
+        body["priceLater"] = priceLater;
         break;
       case "EE_NOT_SATISFIED":
         endpoint = "ae-acknowledged/ee-not-satisfied";
@@ -164,14 +166,6 @@ const YourActivity = ({ setComplaintCount }) => {
         if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
         if (files.vidAfter) body.append("vidAfter", files.vidAfter);
         break;
-      case "crNotSatisfiedToEeAcknowledged":
-          endpoint = "cr-not-satisfied/ee-acknowledged";
-          body["price"] = price;
-          break;
-      case "crNotSatisfiedToEeNotSatisfied":
-          body["remark_EE"] = remark;
-          endpoint = "cr-not-satisfied/ee-not-satisfied";
-          break;
       case "aeNotTerminatedToRaised":
           endpoint = "ae-not-terminated/raised";
           break;
@@ -252,6 +246,9 @@ const YourActivity = ({ setComplaintCount }) => {
       if (statusChange !== "JE_ACKNOWLEDGED") {
         setComplaintCount((prevCount) => prevCount - 1);
       }
+      if (["RESOLVED", "eeTerminatedToTerminated", "jeWorkDoneToResolved"].includes(statusChange)) {
+        handleComplaintStatusChange(selectedComplaint._id, statusChange);
+      }
     } catch (error) {
       toast.error(error);
     } finally {
@@ -322,6 +319,8 @@ const YourActivity = ({ setComplaintCount }) => {
           newDepartment={newDepartment}
           setNewDepartment={setNewDepartment}
           handleDepartmentChange={handleDepartmentChange}
+          priceLater={priceLater}
+          setPriceLater={setPriceLater}
         />
       )}
     </div>

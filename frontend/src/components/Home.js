@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import Notifications from "./Notifications";
 import NewComplaint from "./NewComplaint";
 import ComplaintStatistics from "./ComplaintStatistics";
 import ComplaintsHistory from "./ComplaintsHistory";
 import YourActivity from "./YourActivity";
 import Users from "./Users";
+import PriceEntry from "./PriceEntry";
 import casfos_logo from "../assets/images/casfos_logo.jpg";
 import { useNavigate } from "react-router-dom";
 import { designationFormat } from "../utils/formatting";
@@ -11,6 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { checkAuthentication } from "../services/authApi";
 import { useCookies } from "react-cookie";
 import { fetchComplaintsByDesignation } from "../services/yourActivity";
+import { fetchNotifications } from "../services/notificationApi";
 
 const getUser = () => {
   const username = localStorage.getItem("username");
@@ -20,6 +23,8 @@ const getUser = () => {
 
 export default function Home() {
   const [complaintCount, setComplaintCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationUpdate, setNotificationUpdate] = useState(false);
   const [activeTab, setActiveTab] = useState("complaint_statistics");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cookies, removeCookie] = useCookies([]);
@@ -55,6 +60,19 @@ export default function Home() {
     fetchComplaintCount();
   }, []);
 
+  useEffect(() => {
+    const fetchNotificationsData = async () => {
+      try {
+        const response = await fetchNotifications();
+        setNotificationCount(response.length);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    fetchNotificationsData();
+  }, [notificationUpdate]); // Re-fetch when notificationUpdate changes
+
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
     {
@@ -75,6 +93,22 @@ export default function Home() {
         userInfo.designation === "ESTATE_OFFICER" ||
         userInfo.designation === "PRINCIPAL",
     },
+    {
+      id: "price_entry",
+      label: "Price Entry",
+      show:
+        userInfo.designation === "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL" ||
+        userInfo.designation === "EXECUTIVE_ENGINEER_IT",
+    },
+    {
+      id: "notification",
+      label: "Notifications",
+      show:
+        userInfo.designation === "ESTATE_OFFICER" ||
+        userInfo.designation === "PRINCIPAL" ||
+        userInfo.designation === "COMPLAINANT" ||
+        userInfo.designation === "ASSISTANT_TO_ESTATE_OFFICER",
+    },
   ];
 
   const handleLogout = async () => {
@@ -82,6 +116,12 @@ export default function Home() {
     localStorage.removeItem("username");
     localStorage.removeItem("designation");
     navigate("/");
+  };
+
+  const handleComplaintStatusChange = (complaintID, newStatus) => {
+    if (newStatus === "RESOLVED" || newStatus === "TERMINATED") {
+      setNotificationUpdate((prev) => !prev); // Toggle state to trigger re-fetch
+    }
   };
 
   return (
@@ -210,6 +250,11 @@ export default function Home() {
                           {complaintCount}
                         </span>
                       )}
+                      {tab.id === "notification" && notificationCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full px-2">
+                          {notificationCount}
+                        </span>
+                      )}
                     </button>
                   ))}
               </nav>
@@ -223,12 +268,19 @@ export default function Home() {
         {activeTab === "new_complaint" && <NewComplaint />}
 
         {activeTab === "your_activity" && (
-          <YourActivity setComplaintCount={setComplaintCount} />
+          <YourActivity
+            setComplaintCount={setComplaintCount}
+            handleComplaintStatusChange={handleComplaintStatusChange}
+          />
         )}
 
         {activeTab === "complaints_history" && <ComplaintsHistory />}
 
         {activeTab === "users" && <Users />}
+
+        {activeTab === "price_entry" && <PriceEntry />}
+
+        {activeTab === "notification" && <Notifications />}
       </div>
     </>
   );

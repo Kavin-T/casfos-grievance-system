@@ -47,3 +47,14 @@ export const fetchComplaintStatistics = async (fromDate, toDate) => {
       : 'Unable to fetch complaints statistics.';
   }
 };
+
+export const fetchComplaintsWithPriceLater = async () => {
+  try {
+    const response = await axios.get('/complaint/complaints-with-price-later');
+    return response.data;
+  } catch (error) {
+    throw error.response && error.response.data.message
+      ? error.response.data.message
+      : 'Unable to fetch complaints.';
+  }
+};

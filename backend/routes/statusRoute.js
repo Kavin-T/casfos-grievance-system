@@ -25,6 +25,7 @@ const {
   aeRemarkWhenCrNotSatisfied,
   eeRemarkWhenCrNotSatisfied,
   crNotSatisfiedToJeWorkdone,
+  updateComplaintPrice,
   eeAcknowledgedToCrNotSatisfied,
 } = require("../controllers/statusController");
 const { upload, ensureTempDirectory } = require("../middleware/fileHandler");
@@ -286,6 +287,14 @@ router.put(
     "JUNIOR_ENGINEER_IT",
   ]),
   changeComplaintDepartment
+);
+router.put(
+  "/update-complaint-price",
+  validateDesignation([
+    "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+    "EXECUTIVE_ENGINEER_IT",
+  ]),
+  updateComplaintPrice
 );
 
 module.exports = router;

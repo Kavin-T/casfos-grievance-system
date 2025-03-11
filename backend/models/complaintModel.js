@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
+const emailMiddleware = require("../middleware/emailHandler");
 
 const complaintSchema = new mongoose.Schema({
   complaintID: {
@@ -27,7 +28,7 @@ const complaintSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    enum: ["CIVIL", "ELECTRICAL","IT"],
+    enum: ["CIVIL", "ELECTRICAL", "IT"],
     required: true,
   },
   premises: {
@@ -140,7 +141,7 @@ const complaintSchema = new mongoose.Schema({
   multiple_remark_ee: {
     type: [{ type: String, trim: true }],
     default: [],
-  },  
+  },
   resolvedName: {
     type: String,
     trim: true,
@@ -149,6 +150,8 @@ const complaintSchema = new mongoose.Schema({
 });
 
 complaintSchema.plugin(AutoIncrement, { inc_field: "complaintID" });
+
+complaintSchema.plugin(emailMiddleware);
 
 const Complaint = mongoose.model("Complaint", complaintSchema);
 

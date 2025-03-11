@@ -24,7 +24,7 @@ const generateCSVReport = (complaints) => {
     { label: "Re-Raised", value: (row) => (row.reRaised ? "Yes" : "No") },
     { label: "Status", value: (row) => statusFormat(row.status) },
     {
-      label: "Created On",
+      label: "Reported On",
       value: (row) => (row.createdAt ? dateFormat(row.createdAt) : "N/A"),
     },
     {

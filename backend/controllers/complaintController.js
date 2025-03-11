@@ -262,9 +262,21 @@ const getComplaintStatistics = asyncHandler(async (req, res) => {
   );
 });
 
+const fetchComplaintsWithPriceLater = asyncHandler(async (req, res) => {
+    const complaints = await Complaint.find({
+      isPriceEntered: false,
+      status: 'EE_ACKNOWLEDGED'
+    }).sort({
+      createdAt: -1,
+    });
+
+    res.status(200).json(complaints);
+});
+
 module.exports = {
   addComplaint,
   fetchComplaints,
   yourActivity,
   getComplaintStatistics,
+  fetchComplaintsWithPriceLater,
 };

@@ -41,7 +41,10 @@ const getQuery = (req) => {
   }
 
   if (status) {
-    if (status === "TERMINATED" || status === "RESOLVED") {
+    if(status === "JE_WORKDONE"){
+      query.status = status;
+    }
+    else if (status === "TERMINATED" || status === "RESOLVED") {
       query.status = status;
     } else if (status === "PENDING") {
       query.status = { $nin: ["TERMINATED", "RESOLVED"] };
@@ -49,7 +52,7 @@ const getQuery = (req) => {
   }
 
   const filterableFields = [
-    "raiserName",
+    "complainantName",
     "subject",
     "department",
     "premises",

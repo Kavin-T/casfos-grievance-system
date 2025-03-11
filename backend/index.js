@@ -44,6 +44,7 @@ app.use(validateToken);
 app.use("/api/v1/complaint", require("./routes/complaintRoute"));
 app.use("/api/v1/status", require("./routes/statusRoute"));
 app.use("/api/v1/user", require("./routes/userRoute"));
+app.use("/api/v1/notification", require("./routes/notificationRoute"));
 
 app.use(errorHandler);
 

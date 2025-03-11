@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const path = require("path");
 const fs = require("fs");
 const Complaint = require("../models/complaintModel");
+const { updateNotification } = require("./notificationController");
 
 const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
   const { id } = req.body;
@@ -33,11 +34,19 @@ const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "JE_ACKNOWLEDGED";
   complaint.acknowledgeAt = new Date();
   complaint.resolvedName = username;
 
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "JE_ACKNOWLEDGED"
+  );
 
   res.status(200).json({
     message: "Complaint acknowledged successfully.",
@@ -96,10 +105,17 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
 
   complaint.imgAfter = imgAfterPaths;
   complaint.vidAfter = vidAfterPaths;
-
+  const previousStatus = complaint.status;
   complaint.status = "JE_WORKDONE";
 
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "JE_WORKDONE"
+  );
 
   res.status(200).json({
     message: "Media files uploaded and status updated successfully.",
@@ -158,11 +174,18 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
 
   complaint.imgAfter = imgAfterPaths;
   complaint.vidAfter = vidAfterPaths;
-
+  const previousStatus = complaint.status;
   complaint.status = "JE_WORKDONE";
   complaint.multiple_remark_ee = [];
   complaint.multiple_remark_ae = [];
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "JE_WORKDONE"
+  );
 
   res.status(200).json({
     message: "Media files uploaded and status updated successfully.",
@@ -193,15 +216,22 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "AE_ACKNOWLEDGED";
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "AE_ACKNOWLEDGED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
     complaint,
   });
 });
-
 
 const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
   const { id } = req.body;
@@ -226,8 +256,16 @@ const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "RESOLVED";
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "RESOLVED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to RESOLVED successfully.",
@@ -235,9 +273,8 @@ const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
   });
 });
 
-
 const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
-  const { id , remark_CR} = req.body;
+  const { id, remark_CR } = req.body;
 
   if (!id || !remark_CR) {
     res.status(400);
@@ -258,10 +295,18 @@ const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
       message: "Complaint already updated.",
     });
   }
-
+  complaint.reRaised = true;
+  const previousStatus = complaint.status;
   complaint.status = "CR_NOT_SATISFIED";
   complaint.remark_CR = remark_CR;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "CR_NOT_SATISFIED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to CR_NOT_SATISFIED successfully.",
@@ -292,8 +337,16 @@ const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "RAISED";
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "RAISED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
@@ -315,16 +368,22 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
-  if (
-    complaint.status === "TERMINATED"
-  ) {
+  if (complaint.status === "TERMINATED") {
     return res.status(200).json({
       message: "Complaint already updated.",
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "TERMINATED";
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
@@ -333,7 +392,7 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
 });
 
 const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
-  const { id, price } = req.body;
+  const { id, price, priceLater } = req.body;
 
   if (!id) {
     res.status(400);
@@ -360,9 +419,20 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "EE_ACKNOWLEDGED";
   complaint.price = price;
+  if (!priceLater) {
+    complaint.isPriceEntered = true;
+  }
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "EE_ACKNOWLEDGED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to EE ACKNOWLEDGED successfully.",
@@ -390,9 +460,17 @@ const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "RESOLVED";
   complaint.resolvedAt = new Date();
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "RESOLVED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to RESOLVED successfully.",
@@ -423,9 +501,17 @@ const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "RESOURCE_REQUIRED";
   complaint.remark_JE = remark_JE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "RESOURCE_REQUIRED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to RESOURCE REQUIRED successfully.",
@@ -456,9 +542,17 @@ const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "AE_NOT_TERMINATED";
   complaint.remark_AE = remark_AE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "AE_NOT_TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE NOT TERMINATED successfully.",
@@ -489,9 +583,17 @@ const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "AE_TERMINATED";
   complaint.remark_AE = remark_AE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "AE_TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE TERMINATED successfully.",
@@ -522,9 +624,17 @@ const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "EE_NOT_TERMINATED";
   complaint.remark_EE = remark_EE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "EE_NOT_TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to EE NOT TERMINATED successfully.",
@@ -555,9 +665,17 @@ const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "AE_TERMINATED";
   complaint.remark_AE = remark_AE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "AE_TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE TERMINATED successfully.",
@@ -588,9 +706,17 @@ const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "EE_TERMINATED";
   complaint.remark_EE = remark_EE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "EE_TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to EE TERMINATED successfully.",
@@ -621,9 +747,17 @@ const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "AE_NOT_TERMINATED";
   complaint.remark_AE = remark_AE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "AE_NOT_TERMINATED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE NOT TERMINATED successfully.",
@@ -654,10 +788,18 @@ const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "AE_NOT_SATISFIED";
   complaint.remark_AE = remark_AE;
   complaint.reRaised = true;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "AE_NOT_SATISFIED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to AE NOT SATISFIED successfully.",
@@ -688,10 +830,18 @@ const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "EE_NOT_SATISFIED";
   complaint.remark_EE = remark_EE;
   complaint.reRaised = true;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "EE_NOT_SATISFIED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to EE NOT SATISFIED successfully.",
@@ -722,9 +872,17 @@ const raisedToResourceRequired = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "RESOURCE_REQUIRED";
   complaint.remark_JE = remark_JE;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "RESOURCE_REQUIRED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to RESOURCE REQUIRED successfully.",
@@ -752,8 +910,16 @@ const resourceRequiredToClosed = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "CLOSED";
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "CLOSED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to CLOSED successfully.",
@@ -781,9 +947,17 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "RAISED";
   complaint.remark_CR = remark_CR;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "RAISED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to RAISED successfully.",
@@ -794,7 +968,7 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
 const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark } = req.body;
 
-  if (!id || !remark) { 
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and AE remark are required.");
   }
@@ -817,7 +991,7 @@ const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
 const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark } = req.body;
 
-  if (!id || !remark) { 
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and EE remark are required.");
   }
@@ -827,7 +1001,7 @@ const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Complaint not found.");
   }
-  
+
   complaint.multiple_remark_ee.push(remark);
   await complaint.save();
 
@@ -860,10 +1034,18 @@ const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
 
+  const previousStatus = complaint.status;
   complaint.status = "CR_NOT_SATISFIED";
   complaint.remark_CR = remark_CR;
   complaint.reRaised = true;
   await complaint.save();
+
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    previousStatus,
+    "CR_NOT_SATISFIED"
+  );
 
   res.status(200).json({
     message: "Complaint status updated to CR NOT SATISFIED successfully.",
@@ -886,11 +1068,47 @@ const changeComplaintDepartment = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
+  const previousDepartment = complaint.department;
+
   complaint.department = newDepartment;
   await complaint.save();
 
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    null, // No status change, so we pass null
+    null, // No new status, so we pass null
+    previousDepartment,
+    newDepartment,
+    `Department changed from ${previousDepartment} to ${newDepartment}`
+  );
+
   res.status(200).json({
     message: "Complaint department updated successfully.",
+    complaint,
+  });
+});
+
+const updateComplaintPrice = asyncHandler(async (req, res) => {
+  const { id, price } = req.body;
+
+  if (!id || price === undefined || (!price && price !== 0)) {
+    res.status(400);
+    throw new Error("Price is required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  complaint.price = price;
+  complaint.isPriceEntered = true;
+  await complaint.save();
+
+  res.status(200).json({
+    message: "Complaint price updated successfully.",
     complaint,
   });
 });
@@ -922,4 +1140,5 @@ module.exports = {
   eeRemarkWhenCrNotSatisfied,
   crNotSatisfiedToJeWorkdone,
   eeAcknowledgedToCrNotSatisfied,
+  updateComplaintPrice,
 };

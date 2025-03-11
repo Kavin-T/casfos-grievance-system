@@ -53,3 +53,15 @@ export const changeDepartment = async ({ id, newDepartment }) => {
       : "Unable to change department.";
   }
 };
+
+export const updateComplaintPrice = async (body) => {
+  try{
+    const response = await axios.put("/status/update-complaint-price", body);
+    return response.data;
+  }
+  catch(error){
+    throw error.response && error.response.data.message
+      ? error.response.data.message
+      : "Unable to update price.";
+  }
+};

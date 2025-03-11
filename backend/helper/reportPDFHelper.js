@@ -92,7 +92,7 @@ const generateReport = async (complaints) => {
                         <th>Complainant Name</th>
                         <th>Subject</th>
                         <th>Department</th>
-                        <th>Created On</th>
+                        <th>Reported On</th>
                         <th>Resolved On</th>
                         <th>Status</th>
                         <th>Time elapsed</th>
