@@ -287,6 +287,7 @@ const YourActivityPopup = ({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   min={1}
+                  disabled={priceLater}
                 />
                 <div className="mt-2">
                   <label>

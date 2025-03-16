@@ -399,7 +399,7 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
     throw new Error("Complaint ID is required.");
   }
 
-  if (price === undefined || !price) {
+  if (!priceLater && (price === undefined || !price)) {
     res.status(400);
     throw new Error("Price is required.");
   }

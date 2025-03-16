@@ -27,52 +27,52 @@ export const designations = [
 
 export const statusOptions = { 
   RAISED: [
-    { value: "JE_ACKNOWLEDGED", label: "JE Acknowledged" },
+    { value: "JE_ACKNOWLEDGED", label: "Acknowledge" },
     { value: "RESOURCE_REQUIRED", label: "Resource Required" },
   ],
   JE_WORKDONE: [
-    { value: "AE_ACKNOWLEDGED", label: "AE Approved" },
-    { value: "AE_NOT_SATISFIED", label: "AE Not Satisfied" },
+    { value: "AE_ACKNOWLEDGED", label: "Approve" },
+    { value: "AE_NOT_SATISFIED", label: "Not Satisfied" },
   ],
   JE_WORKDONE_DISPLAYING_TO_CR: [
     { value: "jeWorkDoneToResolved", label: "Resolved" },
     { value: "jeWorkDoneToCrNotSatisfied", label: "Complainant Not Satisfied" },
   ],
   AE_ACKNOWLEDGED: [
-    { value: "EE_ACKNOWLEDGED", label: "EE Approved" },
-    { value: "EE_NOT_SATISFIED", label: "EE Not Satisfied" },
+    { value: "EE_ACKNOWLEDGED", label: "Approve" },
+    { value: "EE_NOT_SATISFIED", label: "Not Satisfied" },
   ],
   EE_ACKNOWLEDGED: [
     { value: "RESOLVED", label: "Resolved" },
     { value: "eeAcknowledgedToCrNotSatisfied", label: "Complainant Not Satisfied" },
   ],
   RESOURCE_REQUIRED: [
-    { value: "resourceRequiredToAeNotTerminated", label: "AE Not Terminated" },
-    { value: "resourceRequiredToAeTerminated", label: "AE Terminated" }
+    { value: "resourceRequiredToAeNotTerminated", label: "Not Terminate" },
+    { value: "resourceRequiredToAeTerminated", label: "Terminate" }
   ],
   EE_NOT_SATISFIED: [
-    { value: "AE_NOT_SATISFIED", label: "AE Not Satisfied" },
-    { value: "AE_ACKNOWLEDGED", label: "AE Approved" },
+    { value: "AE_NOT_SATISFIED", label: "Not Satisfy" },
+    { value: "AE_ACKNOWLEDGED", label: "Approve" },
   ],
-  JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "JE Work Done" }],
-  AE_NOT_SATISFIED: [{ value: "JE_WORKDONE", label: "JE Work Done" }],
+  JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "Work Done" }],
+  AE_NOT_SATISFIED: [{ value: "JE_WORKDONE", label: "Work Done" }],
   CR_NOT_SATISFIED: [
-    { value: "crNotSatisfiedToJeWorkdone", label: "JE Work Done" },
+    { value: "crNotSatisfiedToJeWorkdone", label: "Work Done" },
   ],
   AE_NOT_TERMINATED: [
     { value: "aeNotTerminatedToRaised", label: "Raised" },
     { value: "aeNotTerminatedToResourceRequired", label: "Resource Required" },
   ],
   EE_NOT_TERMINATED: [
-    { value: "eeNotTerminatedToAeNotTerminated", label: "AE Not Terminated" },
-    { value: "eeNotTerminatedToAeTerminated", label: "AE Terminated" },
+    { value: "eeNotTerminatedToAeNotTerminated", label: "Not Terminate" },
+    { value: "eeNotTerminatedToAeTerminated", label: "Terminate" },
   ],
   AE_TERMINATED: [
-    { value: "aeTerminatedToEeNotTerminated", label: "EE Not Terminated" },
-    { value: "aeTerminatedToEeTerminated", label: "EE Terminated" },
+    { value: "aeTerminatedToEeNotTerminated", label: "Not Terminate" },
+    { value: "aeTerminatedToEeTerminated", label: "Terminate" },
   ],
   EE_TERMINATED: [
-    { value: "eeTerminatedToTerminated", label: "Terminated" }
+    { value: "eeTerminatedToTerminated", label: "Terminate" }
   ],
 };
 

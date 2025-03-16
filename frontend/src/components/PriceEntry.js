@@ -56,10 +56,6 @@ const PriceEntry = () => {
     }
   };
 
-  const filteredComplaints = complaints.filter(
-    (c) => !c.isPriceEntered && c.status === "EE_ACKNOWLEDGED"
-  );
-
   return (
     <div className="p-4 bg-green-50 min-h-screen">
       <h2 className="text-2xl font-bold text-green-700 mb-4">Price Entry</h2>
@@ -73,7 +69,7 @@ const PriceEntry = () => {
               : "bg-green-500 hover:bg-green-600"
           } text-white`}
         >
-          View in Modal
+          View in Card
         </button>
         <button
           onClick={() => setViewMode("list")}
@@ -93,7 +89,7 @@ const PriceEntry = () => {
         <>
           {viewMode === "modal" ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {filteredComplaints.map((complaint) => {
+              {complaints.map((complaint) => {
                 const bgColor =
                   complaint.status === "RESOLVED"
                     ? "bg-green-100 border-green-300"
@@ -156,7 +152,7 @@ const PriceEntry = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredComplaints.map((complaint) => {
+                  {complaints.map((complaint) => {
                     const rowBg =
                       complaint.status === "RESOLVED"
                         ? "bg-green-50"

@@ -67,6 +67,10 @@ export default function NewComplaint() {
     if (!isConfirmed) {
       return;
     }
+    if(!files.imgBefore_1 || !files.vidBefore){
+      toast.error("Please upload at least one image and one video before submitting the form.");
+      return;
+    }
 
     setIsSubmitting(true);
 

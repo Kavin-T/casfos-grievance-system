@@ -366,7 +366,7 @@ const ComplaintsHistory = () => {
               : "bg-green-500 hover:bg-green-600"
           } text-white`}
         >
-          View in Modal
+          View in Card
         </button>
         <button
           onClick={() => handleViewModeChange("list")}

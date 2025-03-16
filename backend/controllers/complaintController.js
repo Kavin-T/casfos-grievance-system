@@ -265,7 +265,6 @@ const getComplaintStatistics = asyncHandler(async (req, res) => {
 const fetchComplaintsWithPriceLater = asyncHandler(async (req, res) => {
     const complaints = await Complaint.find({
       isPriceEntered: false,
-      status: 'EE_ACKNOWLEDGED'
     }).sort({
       createdAt: -1,
     });
