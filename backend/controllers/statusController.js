@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const Complaint = require("../models/complaintModel");
 const { updateNotification } = require("./notificationController");
+const { sendComplaintRaisedMail } = require("../middleware/emailHandler");
 
 const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
   const { id } = req.body;
@@ -1035,6 +1036,8 @@ const changeComplaintDepartment = asyncHandler(async (req, res) => {
 
   complaint.department = newDepartment;
   await complaint.save();
+
+  sendComplaintRaisedMail(complaint._id);
 
   updateNotification(
     complaint.complaintID,

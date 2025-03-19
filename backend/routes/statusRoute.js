@@ -8,7 +8,6 @@ const {
   jeWorkdoneToAeNotSatisfied,
   aeAcknowledgedToEeNotSatisfied,
   raisedToResourceRequired,
-  resourceRequiredToClosed,
   resourceRequiredToRaised,
   changeComplaintDepartment,
   aeNotTerminatedToRaised,
@@ -125,16 +124,6 @@ router.put(
     "JUNIOR_ENGINEER_IT",
   ]),
   raisedToResourceRequired
-);
-router.put(
-  "/resource-required/closed",
-  validateDesignation([
-    "COMPLAINANT",
-    "ESTATE_OFFICER",
-    "PRINCIPAL",
-    "ASSISTANT_TO_ESTATE_OFFICER",
-  ]),
-  resourceRequiredToClosed
 );
 router.put(
   "/resource-required/raised",

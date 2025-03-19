@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const Complaint = require("../models/complaintModel");
 const getQuery = require("../helper/queryHelper");
+const { sendComplaintRaisedMail } = require("../middleware/emailHandler");
 
 const addComplaint = asyncHandler(async (req, res) => {
   const {
@@ -77,6 +78,8 @@ const addComplaint = asyncHandler(async (req, res) => {
   savedComplaint.imgBefore = imgBeforePaths;
   savedComplaint.vidBefore = vidBeforePaths;
   await savedComplaint.save();
+
+  sendComplaintRaisedMail(savedComplaint._id);
 
   res.status(200).json({
     message: "Complaint added successfully.",

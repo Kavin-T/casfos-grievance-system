@@ -23,3 +23,6 @@
 /backend/node_modules/
 /backend/uploads/
 /backend/build/
+
+/backend/.env
+/frontend/.env

@@ -1,118 +1,93 @@
-const nodemailer = require("nodemailer");
-const mongoose = require("mongoose");
+const Complaint = require("../models/complaintModel");
 const User = require("../models/userModel");
-require("dotenv").config();
+const transporter = require("../config/transporterConnect");
 
-const emailMiddleware = (schema) => {
-  schema.pre("save", function (next) {
-    if (this.isNew || this.isModified("status")) {
-      this._statusChanged = true;
-      this._newStatus = this.status;
-    }
-    next();
-  });
+const sendEmail = async (subject, body, recipients) => {
+  const mailOptions = {
+    from: "Grievance Redressal System <your-email@gmail.com>",
+    to: recipients.join(", "),
+    subject: subject,
+    html: body,
+  };
 
-  schema.post("save", async function (doc) {
-    if (doc._statusChanged) {
-      console.log("✅ Status change detected:", doc._newStatus);
-      try {
-        await sendStatusChangeEmail(doc._id, doc._newStatus);
-      } catch (error) {
-        console.error("❌ Middleware email trigger failed:", error.message);
-      }
-    }
-  });
-};
-
-// Correct SMTP config
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
-
-const sendStatusChangeEmail = async (complaintId, newStatus) => {
   try {
-    const Complaint = mongoose.model("Complaint");
-    const complaint = await Complaint.findById(complaintId);
-    if (!complaint) throw new Error("Complaint not found");
-
-    const targetDesignations = ["PRINCIPAL", "ESTATE_OFFICER", "ASSISTANT_TO_ESTATE_OFFICER","COMPLAINANT"];
-    const recipients = await User.find(
-      { designation: { $in: targetDesignations } },
-      "email"
-    );
-    const emailAddresses = recipients.map((u) => u.email);
-    if (emailAddresses.length === 0) {
-      console.log("⚠️ No recipients found for status:", newStatus);
-      return;
-    }
-
-    const formatDate = (date) =>
-      date ? date.toLocaleDateString() : "Not available";
-
-    const emailBody = `
-      Complaint Status Update - ID: ${complaint.complaintID}
-      ================================================
-
-      Subject: ${complaint.subject}
-      Raised By: ${complaint.complainantName}
-      Incident Date: ${formatDate(complaint.createdAt)}
-      Location: ${complaint.location} (${complaint.premises})
-      Department: ${complaint.department}
-      Emergency: ${complaint.emergency ? "Yes" : "No"}
-
-      Status Changed To: ${newStatus}
-      Last Updated: ${formatDate(new Date())}
-
-      Details:
-      ${complaint.details}
-
-      ${
-        newStatus === "RESOLVED"
-          ? `
-      Resolution Information:
-      -----------------------
-      Resolved Date: ${formatDate(complaint.resolvedAt)}
-      Resolution Remarks: ${complaint.remark_CR || "No remarks provided"}
-      `
-          : ""
-      }
-
-      ${
-        newStatus === "TERMINATED"
-          ? `
-      Termination Information:
-      ------------------------
-      Termination Date: ${formatDate(complaint.terminatedAt)}
-      Termination Reason: ${complaint.remark_EE || "No reason provided"}
-      `
-          : ""
-      }
-
-      Regards,
-      CASFOS Automation System
-    `;
-
-    const mailOptions = {
-      from: `"CASFOS System" <${process.env.GMAIL_USER}>`,
-      to: emailAddresses.join(","),
-      subject: `Complaint ${newStatus} - ID: ${complaint.complaintID} - ${complaint.subject}`,
-      text: emailBody.replace(/\n/g, "\r\n"),
-    };
-
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Notification sent for complaint ${complaintId}`);
+    console.log("Email sent successfully");
   } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
+    console.log("Email sending failed. Retrying in 5 seconds...", error);
+    await new Promise((res) => setTimeout(res, 5000));
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully on retry");
+    } catch (error) {
+      console.log("Email sending failed after retry", error);
+    }
   }
 };
 
-module.exports = emailMiddleware;
+const sendComplaintRaisedMail = async (complaintId) => {
+  try {
+    const complaint = await Complaint.findById(complaintId);
+    if (!complaint) {
+      console.log("Complaint not found");
+      return;
+    }
+
+    const departmentRecipients = {
+      IT: [
+        "EXECUTIVE_ENGINEER_IT",
+        "ASSISTANT_ENGINEER_IT",
+        "JUNIOR_ENGINEER_IT",
+      ],
+      ELECTRICAL: [
+        "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+        "ASSISTANT_ENGINEER_ELECTRICAL",
+        "JUNIOR_ENGINEER_ELECTRICAL",
+      ],
+      CIVIL: [
+        "JUNIOR_ENGINEER_CIVIL",
+        "ASSISTANT_ENGINEER_CIVIL",
+        "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+      ],
+    };
+
+    const roles = departmentRecipients[complaint.department] || [];
+    const users = await User.find({ designation: { $in: roles } });
+    if (!users.length) {
+      console.log("No recipients found for department");
+      return;
+    }
+
+    const recipients = users.map((user) => user.email);
+    const subject = `New Complaint Raised - ID: ${complaint.complaintID}`;
+    const emailBody = `
+        <html>
+        <body>
+            <h3>New Complaint Raised</h3>
+            <p><strong>Complainant:</strong> ${complaint.complainantName}</p>
+            <p><strong>Subject:</strong> ${complaint.subject}</p>
+            <p><strong>Department:</strong> ${complaint.department}</p>
+            <p><strong>Premises:</strong> ${complaint.premises}</p>
+            <p><strong>Location:</strong> ${complaint.location} - ${
+      complaint.specificLocation || "N/A"
+    }</p>
+            <p><strong>Details:</strong> ${complaint.details}</p>
+            <p><strong>Emergency:</strong> ${
+              complaint.emergency ? "Yes" : "No"
+            }</p>
+            <p><strong>Status:</strong> ${complaint.status}</p>
+            <p><strong>Complaint Raised Date:</strong> ${new Date(
+              complaint.createdAt
+            ).toLocaleString()}</p>
+            <p>Regards,<br>Grievance Redressal System</p>
+        </body>
+        </html>`;
+
+    sendEmail(subject, emailBody, recipients);
+  } catch (error) {
+    console.log("Internal server error", error);
+  }
+};
+
+module.exports = { sendEmail, sendComplaintRaisedMail };
