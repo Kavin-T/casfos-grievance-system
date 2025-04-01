@@ -64,7 +64,10 @@ export default function Home() {
     const fetchNotificationsData = async () => {
       try {
         const response = await fetchNotifications();
+<<<<<<< HEAD
         console.log("Fetched notifications:", response.length);
+=======
+>>>>>>> fbd22962950b8d262d843bf7ccb994629bacfa4d
         setNotificationCount(response.length);
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -285,4 +288,8 @@ export default function Home() {
       </div>
     </>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> fbd22962950b8d262d843bf7ccb994629bacfa4d

@@ -28,7 +28,11 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.16",
+<<<<<<< HEAD
     "nodemon": "^3.1.9",
+=======
+    "nodemon": "^3.1.7",
+>>>>>>> fbd22962950b8d262d843bf7ccb994629bacfa4d
     "path": "^0.12.7"
   }
 }
