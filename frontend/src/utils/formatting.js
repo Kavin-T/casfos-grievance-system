@@ -1,5 +1,5 @@
-export const designationFormat = (input) => {
-  switch (input) {
+export const designationFormat = (designation) => {
+  switch (designation) {
     case "PRINCIPAL":
       return "Principal";
     case "ESTATE_OFFICER":
@@ -29,46 +29,81 @@ export const designationFormat = (input) => {
   }
 };
 
-export const statusFormat = (input) => { 
-  if (input === "RAISED") {
+export const statusFormat = (status, department) => { 
+  if (status === "RAISED") {
     return "Raised";
-  } else if (input === "JE_ACKNOWLEDGED") {
+  } else if (status === "JE_ACKNOWLEDGED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "JE Acknowledged";
-  } else if (input === "JE_WORKDONE") {
+  } else if( status === "JE_ACKNOWLEDGED" && department==="IT") {
+    return "SA Acknowledged";
+  }
+
+  else if (status === "JE_WORKDONE" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "JE Work Done";
-  } else if (input === "AE_ACKNOWLEDGED") {
+  } else if( status === "JE_WORKDONE" && department==="IT") {
+    return "SA Work Done";
+  }
+  
+  else if (status === "AE_ACKNOWLEDGED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "AE Approved";
-  } else if (input === "EE_ACKNOWLEDGED") {
+  } else if( status === "AE_ACKNOWLEDGED" && department==="IT") {
+    return "OC Approved";
+  }
+  else if (status === "EE_ACKNOWLEDGED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "EE Approved";
-  } else if (input === "RESOLVED") {
+  } else if( status === "EE_ACKNOWLEDGED" && department==="IT") {
+    return "HO Approved";
+  }
+  else if (status === "RESOLVED") {
     return "Resolved";
-  } else if (input === "CLOSED") {
+  } else if (status === "CLOSED") {
     return "Closed";
-  } else if (input === "RESOURCE_REQUIRED") {
+  } else if (status === "RESOURCE_REQUIRED") {
     return "Resource Required";
-  } else if (input === "AE_NOT_SATISFIED") {
+  } 
+  
+  else if (status === "AE_NOT_SATISFIED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "AE Not Satisfied";
-  } else if (input === "EE_NOT_SATISFIED") {
+  } else if( status === "AE_NOT_SATISFIED" && department==="IT") {
+    return "OC Not Satisfied";
+  }
+  else if (status === "EE_NOT_SATISFIED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "EE Not Satisfied";
-  } else if (input === "CR_NOT_SATISFIED") {
+  } else if( status === "EE_NOT_SATISFIED" && department==="IT") {
+    return "HO Not Satisfied";
+  }
+  else if (status === "CR_NOT_SATISFIED") {
     return "CR Not Satisfied";
-  } else if (input === "AE_NOT_TERMINATED") {
+  } 
+  else if (status === "AE_NOT_TERMINATED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "AE Not Terminated";
-  } else if (input === "AE_TERMINATED") {
+  } else if( status === "AE_NOT_TERMINATED" && department==="IT") {
+    return "OC Not Terminated";
+  }
+  else if (status === "AE_TERMINATED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "AE Terminated";
-  } else if (input === "EE_TERMINATED") {
+  } else if( status === "AE_TERMINATED" && department==="IT") {
+    return "OC Terminated";
+  }
+  else if (status === "EE_TERMINATED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "EE Terminated";
-  } else if (input === "EE_NOT_TERMINATED") {
+  } else if( status === "EE_TERMINATED" && department==="IT") {
+    return "HO Terminated";
+  }
+  else if (status === "EE_NOT_TERMINATED" && (department==="CIVIL" || department==="ELECTRICAL") ) {
     return "EE Not Terminated";
-  } else if (input === "TERMINATED") {
+  } else if( status === "EE_NOT_TERMINATED" && department==="IT") {
+    return "HO Not Terminated";
+  }
+  else if (status === "TERMINATED") {
     return "Terminated";
   } else {
     return "Unknown Status";
   }
 };
 
-export const departmentFormat = (input) => {
-  switch (input) {
+export const departmentFormat = (department) => {
+  switch (department) {
     case "CIVIL":
       return "Civil";
     case "ELECTRICAL":
@@ -80,12 +115,12 @@ export const departmentFormat = (input) => {
   }
 };
 
-export const dateFormat = (input) => {
-  return new Date(input).toLocaleString("ru-RU");
+export const dateFormat = (date) => {
+  return new Date(date).toLocaleString("ru-RU");
 };
 
-export const priceFormat = (input) => {
-  return parseFloat(input).toLocaleString("en-IN", {
+export const priceFormat = (price) => {
+  return parseFloat(price).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });

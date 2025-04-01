@@ -29,11 +29,11 @@ const ComplaintBasicDetails = ({ complaint }) => {
       </p>
       <p
       className={`text-lg font-bold ${
-      statusFormat(complaint.status) === "Resolved" ? "text-green-500" : "text-orange-500"
+      statusFormat(complaint.status, complaint.department) === "Resolved" ? "text-green-500" : "text-orange-500"
       }`} 
         >
-        <strong>Status:</strong> {statusFormat(complaint.status)}
-        {statusFormat(complaint.status) === "Resolved" ? "✔️" : statusFormat(complaint.status) === "Terminated" ? "❌": "⚠️"}
+        <strong>Status:</strong> {statusFormat(complaint.status, complaint.department)}
+        {statusFormat(complaint.status, complaint.department) === "Resolved" ? "✔️" : statusFormat(complaint.status, complaint.department) === "Terminated" ? "❌": "⚠️"}
       </p>
       <p>
         <strong>Complainant:</strong> {complaint.complainantName}
