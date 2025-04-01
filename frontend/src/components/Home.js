@@ -39,7 +39,7 @@ export default function Home() {
       if (!response) {
         removeCookie("token");
         toast.error("Session expired. Please login again.");
-        navigate("/");
+        navigate("/login");
       }
     };
     verifyUser();
@@ -116,7 +116,7 @@ export default function Home() {
     removeCookie("token");
     localStorage.removeItem("username");
     localStorage.removeItem("designation");
-    navigate("/");
+    navigate("/login");
   };
 
   const handleComplaintStatusChange = (complaintID, newStatus) => {
