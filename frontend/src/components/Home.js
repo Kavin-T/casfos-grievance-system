@@ -131,7 +131,7 @@ export default function Home() {
       <header className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <a href="http://localhost:3000/"><img
+            <a href={process.env.LANDING_PAGE_URL}><img
               src={casfos_logo}
               alt="CASFOS Logo"
               className="h-12 w-auto mr-4"
