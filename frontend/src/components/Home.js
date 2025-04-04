@@ -116,7 +116,7 @@ export default function Home() {
     removeCookie("token");
     localStorage.removeItem("username");
     localStorage.removeItem("designation");
-    navigate("/login");
+    navigate("/");
   };
 
   const handleComplaintStatusChange = (complaintID, newStatus) => {
