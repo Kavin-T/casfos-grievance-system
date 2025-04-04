@@ -25,6 +25,7 @@ import axios from "./axios";
 export const fetchNotifications = async () => {
   try {
     const response = await axios.get("/notification");
+    console.log("Fetched notifications:", response.data);
     return response.data;
   } catch (error) {
     throw error.response && error.response.data.message

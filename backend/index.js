@@ -49,6 +49,7 @@ app.use(validateToken);
 app.use("/api/v1/complaint", require("./routes/complaintRoute"));
 app.use("/api/v1/status", require("./routes/statusRoute"));
 app.use("/api/v1/user", require("./routes/userRoute"));
+app.use("/api/v1/notification", require("./routes/notificationRoute"));
 
 // Global Error Handler
 app.use(errorHandler);
@@ -90,6 +91,7 @@ cron.schedule("0 0 1 4,8,12 *", () => {
 const start = async () => {
   try {
     await dbConnect();
+    require("./config/transporterConnect");
     app.listen(port, () => {
       console.log(`Server is running on port ${port}...`);
     });
