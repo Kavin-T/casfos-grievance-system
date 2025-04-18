@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useCallback, useState, useEffect } from "react";
 import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
 import { fetchComplaint } from "../services/complaintApi";
@@ -41,11 +41,9 @@ const ComplaintsHistory = () => {
     setSelectedComplaint(null);
   };
 
-  useEffect(() => {
-    handleFetchComplaints();
-  }, [toggle, page]);
+  
 
-  const handleFetchComplaints = async () => {
+  const handleFetchComplaints = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetchComplaint(filters, page);
@@ -56,7 +54,11 @@ const ComplaintsHistory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page]);
+
+  useEffect(() => {
+    handleFetchComplaints();
+  }, [toggle, page, handleFetchComplaints]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
