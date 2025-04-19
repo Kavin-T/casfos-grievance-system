@@ -20,6 +20,7 @@ export const FileUpload = ({
     if (file.type.startsWith("image")) {
       if (file.size > maxImageSize) {
         toast.error("Image file size should not exceed 5MB.");
+        event.target.value = null;
         return;
       }
     }
@@ -27,6 +28,7 @@ export const FileUpload = ({
     if (file.type.startsWith("video")) {
       if (file.size > maxVideoSize) {
         toast.error("Video file size should not exceed 100MB.");
+        event.target.value = null;
         return;
       }
     }
