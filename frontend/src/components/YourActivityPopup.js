@@ -3,6 +3,7 @@ import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
 import { statusOptions } from "../constants/options";
 import { FileUpload } from "./FileUpload";
+import { toast } from "react-toastify";
 
 const getUser = () => {
   const designation = localStorage.getItem("designation");
@@ -285,22 +286,30 @@ const YourActivityPopup = ({
                   className="block mt-2 p-2 border rounded w-full"
                   placeholder="Enter price"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  min={1}
-                  disabled={priceLater}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value);
+                    if (value < 0) {
+                      toast.error("Price cannot be negative.");
+                      setPrice("0");
+                    } else {
+                      setPrice(e.target.value);
+                    }
+                  }}
+                  min={0}
+                  disabled={priceLater} 
                 />
                 <div className="mt-2">
                   <label>
                     <input
                       type="checkbox"
+                      checked={priceLater}
                       onChange={(e) => {
-                        if (e.target.checked) {
-                          setPrice("0");
-                          setPriceLater(e.target.checked);
-                        }
-                        else{
-                          setPrice("");
-                          setPriceLater(e.target.checked);
+                        const checked = e.target.checked;
+                        setPriceLater(checked);
+                        if (checked) {
+                          setPrice("0");    
+                        } else {
+                          setPrice("");      
                         }
                       }}
                     />
