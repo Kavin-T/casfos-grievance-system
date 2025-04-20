@@ -1,6 +1,9 @@
 import React from "react";
 import { toast } from "react-toastify";
 
+const ACCEPTED_IMAGE_EXTENSIONS = ".jpg,.jpeg,.png,.bmp,.gif,.webp,.tiff,.heic";
+const ACCEPTED_VIDEO_EXTENSIONS = ".mp4,.mov,.avi,.mkv,.webm,.flv,.wmv";
+
 export const FileUpload = ({
   id,
   name,
@@ -14,21 +17,27 @@ export const FileUpload = ({
     const file = event.target.files[0];
     if (!file) return;
 
-    const maxImageSize = 5 * 1024 * 1024;
-    const maxVideoSize = 100 * 1024 * 1024;
+    const maxImageSize = 5 * 1024 * 1024; 
+    const maxVideoSize = 100 * 1024 * 1024; 
 
-    if (file.type.startsWith("image")) {
+    if (fileType === "image") {
+      if (!ACCEPTED_IMAGE_EXTENSIONS.includes(file.name.split(".").pop().toLowerCase())) {
+        toast.error("Unsupported image format.");
+        return;
+      }
       if (file.size > maxImageSize) {
         toast.error("Image file size should not exceed 5MB.");
-        event.target.value = null;
         return;
       }
     }
 
-    if (file.type.startsWith("video")) {
+    if (fileType === "video") {
+      if (!ACCEPTED_VIDEO_EXTENSIONS.includes(file.name.split(".").pop().toLowerCase())) {
+        toast.error("Unsupported video format.");
+        return;
+      }
       if (file.size > maxVideoSize) {
         toast.error("Video file size should not exceed 100MB.");
-        event.target.value = null;
         return;
       }
     }
@@ -58,7 +67,7 @@ export const FileUpload = ({
         id={id}
         name={name}
         type="file"
-        accept={fileType === "image" ? "image/*" : "video/*"}
+        accept={fileType === "image" ? ACCEPTED_IMAGE_EXTENSIONS : ACCEPTED_VIDEO_EXTENSIONS}
         className="sr-only"
         onChange={handleFileChange}
         disabled={isDisabled}
