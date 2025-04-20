@@ -40,18 +40,31 @@ export default function ComplaintStatistics() {
       toast.error("Please specify the start date.");
       return;
     }
-
-    const endDate = toDate || new Date().toISOString().split("T")[0];
+  
+    const minAllowedDate = new Date("2025-03-01");
+    const from = new Date(fromDate);
+    const to = new Date(toDate || new Date().toISOString().split("T")[0]);
+  
+    if (from < minAllowedDate) {
+      toast.error("Start date must be from March 2025 onwards.");
+      return;
+    }
+  
+    if (to < from) {
+      toast.error("End date cannot be earlier than start date.");
+      return;
+    }
+  
     try {
       setLoading(true);
-      const response = await fetchComplaintStatistics(fromDate, endDate);
+      const response = await fetchComplaintStatistics(fromDate, toDate);
       setStatistics(response);
     } catch (error) {
       toast.error(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const handleFromDateChange = (e) => setFromDate(e.target.value);
   const handleToDateChange = (e) => setToDate(e.target.value);
@@ -77,6 +90,7 @@ export default function ComplaintStatistics() {
             type="date"
             value={fromDate}
             onChange={handleFromDateChange}
+            min="2025-03-01"
             className="ml-2 py-1 border rounded"
           />
         </label>
