@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const complaintSchema = new mongoose.Schema({
   complaintID: {
-    type: Number,
+    type: String,
     unique: true,
   },
   complainantName: {
@@ -148,7 +147,34 @@ const complaintSchema = new mongoose.Schema({
   },
 });
 
-complaintSchema.plugin(AutoIncrement, { inc_field: "complaintID" });
+// Pre-save middleware to generate complaintID
+complaintSchema.pre("save", async function (next) {
+  if (!this.isNew) return next();
+
+  const departmentCode = getDepartmentCode(this.department);
+  const Complaint = mongoose.model("Complaint");
+
+  // Count existing complaints for the department
+  const count = await Complaint.countDocuments({ department: this.department });
+
+  // Generate complaintID in the required format
+  this.complaintID = `COMP_${departmentCode}_${String(count + 1).padStart(4, "0")}`;
+  next();
+});
+
+// Helper function to get department code
+const getDepartmentCode = (department) => {
+  switch (department.toUpperCase()) {
+    case "IT":
+      return "IT";
+    case "ELECTRICAL":
+      return "EL";
+    case "CIVIL":
+      return "CI";
+    default:
+      return "OT"; // Default code for other departments
+  }
+};
 
 const Complaint = mongoose.model("Complaint", complaintSchema);
 
