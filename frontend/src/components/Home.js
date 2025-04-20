@@ -14,6 +14,7 @@ import { checkAuthentication } from "../services/authApi";
 import { useCookies } from "react-cookie";
 import { fetchComplaintsByDesignation } from "../services/yourActivity";
 import { fetchNotifications } from "../services/notificationApi";
+import { jwtDecode } from "jwt-decode";
 
 const getUser = () => {
   const username = localStorage.getItem("username");
@@ -27,7 +28,7 @@ export default function Home() {
   const [notificationUpdate, setNotificationUpdate] = useState(false);
   const [activeTab, setActiveTab] = useState("complaint_statistics");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cookies, removeCookie] = useCookies([]);
+  const [cookies, setCookie, removeCookie] = useCookies([]);
 
   const navigate = useNavigate();
 
@@ -44,6 +45,36 @@ export default function Home() {
     };
     verifyUser();
   }, [cookies, navigate, removeCookie]);
+
+  useEffect(() => {
+    const handleAutoLogout = () => {
+      toast.error("Session expired. Please login again.");
+      removeCookie("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("designation");
+      navigate("/login");
+    };
+
+    const token = cookies.token;
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode(token);
+      const expiryTime = decoded.exp * 1000;
+      const currentTime = Date.now();
+      const timeLeft = expiryTime - currentTime;
+
+      if (timeLeft <= 0) {
+        handleAutoLogout();
+      } else {
+        const timeout = setTimeout(handleAutoLogout, timeLeft);
+        return () => clearTimeout(timeout);
+      }
+    } catch (err) {
+      toast.error("Invalid token. Login Again");
+      handleAutoLogout();
+    }
+  }, [cookies.token, navigate, removeCookie]);
 
   useEffect(() => {
     const fetchComplaintCount = async () => {
@@ -131,11 +162,13 @@ export default function Home() {
       <header className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <a href={process.env.REACT_APP_LANDING_PAGE_URL}><img
-              src={casfos_logo}
-              alt="CASFOS Logo"
-              className="h-12 w-auto mr-4"
-            /></a>
+            <a href={process.env.REACT_APP_LANDING_PAGE_URL}>
+              <img
+                src={casfos_logo}
+                alt="CASFOS Logo"
+                className="h-12 w-auto mr-4"
+              />
+            </a>
             <h1 className="text-2xl font-bold">
               CASFOS Grievance Redressal System
             </h1>
