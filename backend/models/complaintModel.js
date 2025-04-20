@@ -158,7 +158,7 @@ complaintSchema.pre("save", async function (next) {
   const count = await Complaint.countDocuments({ department: this.department });
 
   // Generate complaintID in the required format
-  this.complaintID = `COMP_${departmentCode}_${String(count + 1).padStart(4, "0")}`;
+  this.complaintID = `COMP_${departmentCode}_${String(count + 1)}`;
   next();
 });
 
