@@ -67,10 +67,63 @@ export default function NewComplaint() {
     if (!isConfirmed) {
       return;
     }
-    if(!files.imgBefore_1 || !files.vidBefore){
-      toast.error("Please upload at least one image and one video before submitting the form.");
-      return;
+    // Collect reasons for errors
+    const reasons = [];
+
+    // Check for required fields
+    if (!formData.complainantName || formData.complainantName.trim() === "") {
+      reasons.push("Complainant name is required.");
     }
+
+    if (!formData.subject || formData.subject.trim() === "") {
+      reasons.push("Subject is required.");
+    }
+
+    if (!formData.date || formData.date.trim() === "") {
+      reasons.push("Date is required.");
+    }
+
+    if (!formData.details || formData.details.trim() === "") {
+      reasons.push("Details are required.");
+    }
+
+    if (!formData.department || formData.department.trim() === "") {
+      reasons.push("Department is required.");
+    }
+
+    if (!formData.premises || formData.premises.trim() === "") {
+      reasons.push("Premises are required.");
+    }
+
+    if (!formData.location || formData.location.trim() === "") {
+      reasons.push("Location is required.");
+    }
+
+    // Check if required files are uploaded
+    if (!files.imgBefore_1 || !files.vidBefore) {
+      reasons.push("At least one image and one video must be uploaded.");
+    }
+
+    // Check file types if necessary
+    if (files.imgBefore_1 && !["image/jpeg", "image/png"].includes(files.imgBefore_1.type)) {
+      reasons.push("Image must be in .jpg or .png format.");
+    }
+
+    if (files.vidBefore && !["video/mp4", "video/quicktime"].includes(files.vidBefore.type)) {
+      reasons.push("Video must be in .mp4 or .mov format.");
+    }
+
+    // If there are any errors, show the collective reason and prevent submission
+    if (reasons.length > 0) {
+      toast.error(`Unable to submit complaint: ${reasons.join(" ")}`);
+      return;  // Exit function if there are validation errors
+    }
+
+
+    // if(!files.imgBefore_1 || !files.vidBefore){
+    //   toast.error("Please upload at least one image and one video before submitting the form.");
+    //   return;
+    // }
 
     setIsSubmitting(true);
 
@@ -151,6 +204,7 @@ export default function NewComplaint() {
             <input
               type="text"
               name="complainantName"
+              maxLength={100}
               required
               className="focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
               value={formData.complainantName}
@@ -452,6 +506,7 @@ export default function NewComplaint() {
             fileType="image"
             files={files}
             setFiles={setFiles}
+            accept=".jpg,.jpeg,.png,.heic"
           />
 
           {/* Image Before 2 */}
@@ -463,6 +518,7 @@ export default function NewComplaint() {
             files={files}
             setFiles={setFiles}
             dependentFileKey="imgBefore_1"
+            accept=".jpg,.jpeg,.png,.heic"
           />
 
           {/* Image Before 3 */}
@@ -474,6 +530,7 @@ export default function NewComplaint() {
             files={files}
             setFiles={setFiles}
             dependentFileKey="imgBefore_2"
+            accept=".jpg,.jpeg,.png,.heic"
           />
 
           {/* Video Before */}
@@ -484,6 +541,7 @@ export default function NewComplaint() {
             fileType="video"
             files={files}
             setFiles={setFiles}
+            accept=".mp4,.mov"
           />
         </div>
 

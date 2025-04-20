@@ -146,6 +146,7 @@ const ComplaintsHistory = () => {
           type="text"
           name="complainantName"
           placeholder="Complainant Name"
+          maxLength={100}
           value={filters.complainantName}
           onChange={handleFilterChange}
           className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -234,6 +235,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="startDate"
+            min="2025-03-01"
             value={filters.startDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -246,6 +248,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="endDate"
+            min={filters.startDate}
             value={filters.endDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -258,6 +261,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="createdStartDate"
+            min="2025-03-01"
             value={filters.createdStartDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -270,6 +274,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="createdEndDate"
+            min={filters.createdStartDate}
             value={filters.createdEndDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -282,6 +287,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="acknowledgedStartDate"
+            min="2025-03-01"
             value={filters.acknowledgedStartDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -294,6 +300,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="acknowledgedEndDate"
+            min={filters.acknowledgedStartDate}
             value={filters.acknowledgedEndDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -306,6 +313,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="resolvedStartDate"
+            min="2025-03-01"
             value={filters.resolvedStartDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -318,6 +326,7 @@ const ComplaintsHistory = () => {
           <input
             type="date"
             name="resolvedEndDate"
+            min={filters.resolvedStartDate}
             value={filters.resolvedEndDate}
             onChange={handleFilterChange}
             className="p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useCallback, useState, useEffect } from "react";
 import {
   ChartBarIcon,
   ClockIcon,
@@ -18,6 +18,38 @@ export default function ComplaintStatistics() {
   const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Memoizing the fetchStatistics function to prevent unnecessary re-renders
+  const fetchStatistics = useCallback(async () => {
+    if (!fromDate) {
+      toast.error("Please specify the start date.");
+      return;
+    }
+
+    const minAllowedDate = new Date("2025-03-01");
+    const from = new Date(fromDate);
+    const to = new Date(toDate || new Date().toISOString().split("T")[0]);
+
+    if (from < minAllowedDate) {
+      toast.error("Start date must be from March 2025 onwards.");
+      return;
+    }
+
+    if (to < from) {
+      toast.error("End date cannot be earlier than start date.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetchComplaintStatistics(fromDate, toDate);
+      setStatistics(response);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [fromDate, toDate]); // Adding fromDate and toDate as dependencies
+
   useEffect(() => {
     const currentDate = new Date();
     const defaultToDate = currentDate.toISOString().split("T")[0];
@@ -33,38 +65,7 @@ export default function ComplaintStatistics() {
     if (fromDate) {
       fetchStatistics();
     }
-  }, [fromDate, toDate]);
-
-  const fetchStatistics = async () => {
-    if (!fromDate) {
-      toast.error("Please specify the start date.");
-      return;
-    }
-  
-    const minAllowedDate = new Date("2025-03-01");
-    const from = new Date(fromDate);
-    const to = new Date(toDate || new Date().toISOString().split("T")[0]);
-  
-    if (from < minAllowedDate) {
-      toast.error("Start date must be from March 2025 onwards.");
-      return;
-    }
-  
-    if (to < from) {
-      toast.error("End date cannot be earlier than start date.");
-      return;
-    }
-  
-    try {
-      setLoading(true);
-      const response = await fetchComplaintStatistics(fromDate, toDate);
-      setStatistics(response);
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };  
+  }, [fromDate, toDate, fetchStatistics]); // Adding fetchStatistics to the dependency array
 
   const handleFromDateChange = (e) => setFromDate(e.target.value);
   const handleToDateChange = (e) => setToDate(e.target.value);
@@ -100,6 +101,7 @@ export default function ComplaintStatistics() {
           <input
             type="date"
             value={toDate}
+            min={fromDate}
             onChange={handleToDateChange}
             className="ml-2 py-1 border rounded"
           />
