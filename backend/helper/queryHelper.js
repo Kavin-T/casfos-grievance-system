@@ -67,12 +67,8 @@ const getQuery = (req) => {
     if (filters[field] !== undefined && filters[field] !== "") {
       if (field === "emergency") {
         query[field] = filters[field] === "true";
-      } else if (field === "complaintID") {
-        const complaintID = Number(filters[field]);
-        if (!isNaN(complaintID)) {
-          query[field] = complaintID;
-        }
-      } else {
+      } 
+      else {
         query[field] = { $regex: filters[field], $options: "i" };
       }
     }
