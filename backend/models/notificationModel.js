@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({
   complaintID: {
-    type: Number,
+    type: String,
     required: true,
     ref: "Complaint",
   },
