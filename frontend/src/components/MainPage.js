@@ -102,7 +102,7 @@ const MainPage = () => {
               rel="noopener noreferrer"
               className="cursor-pointer text-sm md:text-lg text-white hover:underline"
             >
-              Certificate
+              Accreditation
             </a>
           </div>
           <button
@@ -123,12 +123,11 @@ const MainPage = () => {
           <div className="text-center max-w-4xl w-full pt-[10rem]">
             <h1 className="text-2xl md:text-3xl font-bold mb-4">About Us</h1>
             <p className="text-sm md:text-lg text-justify mb-6">
-              The Central Academy for State Forest Service, Central Academy For
-              State Forest Service, Coimbatore (erstwhile State Forest Service
+              The Central Academy for State Forest Service, CASFOS, Coimbatore (erstwhile State Forest Service
               college) is one of the premier institutions under the aegis of
               Directorate of Forest Education, Ministry of Environment, Forests
               and Climate Change, which imparts professional training to newly
-              recruited RFO’s and in-service training to the State Forest
+              recruited ACF’s and RFO’s and in-service training to the State Forest
               Service Officers of ACF and DCF ranks.
             </p>
             <img
@@ -140,7 +139,7 @@ const MainPage = () => {
               The Academy was set up in the year 1980. Earlier to this, the
               State Forest Service Officers had been were trained at the
               erstwhile Indian Forest College, Dehradun and State Forest Service
-              College, Burnihat . With the advent developmental schemes in
+              College, Burnihat . With the advent of developmental schemes in
               Forestry sector during the IV and V Five year plans, and launching
               of the Social Forestry Projects in many States, the Government of
               India felt the urgency of starting two more institutions to train
