@@ -437,6 +437,7 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
 
 const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
   const { id, price, priceLater } = req.body;
+  const designation = req.user.designation;
 
   if (!id) {
     res.status(400);
@@ -454,6 +455,24 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
+  if (designation === "EXECUTIVE_ENGINEER_IT") {
+    complaint.status = "RESOLVED";
+    complaint.resolvedAt = new Date();
+    await complaint.save();
+
+    updateNotification(
+      complaint.complaintID,
+      complaint.subject,
+      "RESOLVED",
+      "Complaint is RESOLVED by HEAD OF OFFICE (IT)"
+    );
+
+    return res.status(200).json({
+      message: "Complaint status updated to RESOLVED successfully.",
+      complaint,
+    });
+  }
+
   if (
     complaint.status === "EE_ACKNOWLEDGED" ||
     complaint.status === "EE_NOT_SATISFIED"
@@ -463,26 +482,14 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
     });
   }
 
-  let msg = "";
-  let sts="EE_ACKNOWLEDGED";
   complaint.status = "EE_ACKNOWLEDGED";
-  complaint.price = price;
-  if (!priceLater) {
-    complaint.isPriceEntered = true;
-  }
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Complaint is APPROVED by HEAD OF OFFICE(HO)";
-  }
-  else{
-    msg="Complaint is APPROVED by EXECUTIVE ENGINEER(EE)";
-  }
   updateNotification(
     complaint.complaintID,
     complaint.subject,
-    sts,
-    msg,
+    "EE_ACKNOWLEDGED",
+    "Complaint is APPROVED by EXECUTIVE ENGINEER"
   );
 
   res.status(200).json({
