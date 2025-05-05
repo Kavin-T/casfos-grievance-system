@@ -126,6 +126,11 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     let body = {};
     body["id"] = selectedComplaint._id;
     let endpoint = "";
+    if (getUser().designation === "EXECUTIVE_ENGINEER_IT" && statusChange === "APPROVE") {
+      endpoint = "RESOLVED"; // Directly resolve the complaint
+    } else {
+      endpoint = "ae-acknowledged/ee-acknowledged";
+    }
     switch (statusChange) {
       case "JE_ACKNOWLEDGED":
         endpoint = "raised/je-acknowledged";
