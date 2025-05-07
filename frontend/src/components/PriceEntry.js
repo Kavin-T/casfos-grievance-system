@@ -166,7 +166,7 @@ const PriceEntry = () => {
                         className={`${rowBg} hover:bg-green-100`}
                       >
                         <td className="p-3 border-b">
-                          {complaint.complainantID}
+                          {complaint.complaintID}
                         </td>
                         <td className="p-3 border-b">
                           {complaint.complainantName}
