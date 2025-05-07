@@ -21,7 +21,12 @@ export default function Login() {
       navigate("/home");
       toast.success(`Welcome, ${data.username}!`);
     } catch (error) {
-      setError(error);
+      if (!error.response) {
+        // Redirect to maintenance page if backend is unreachable
+        navigate("/maintenance");
+      } else {
+        setError(error.response.data.message || "Login failed.");
+      }
     }
   };
 
@@ -35,9 +40,7 @@ export default function Login() {
               alt="CASFOS Logo"
               className="h-12 w-auto mr-4"
             />
-            <h1 className="text-2xl font-bold">
-              CASFOS Grievance Redressal System
-            </h1>
+            <h1 className="text-2xl font-bold">CASFOS Grievance Redressal System</h1>
           </div>
         </div>
       </header>
