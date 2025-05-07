@@ -21,11 +21,11 @@ export default function Login() {
       navigate("/home");
       toast.success(`Welcome, ${data.username}!`);
     } catch (error) {
-      if (!error.response) {
+      if (error==="Login failed.") {
         // Redirect to maintenance page if backend is unreachable
         navigate("/maintenance");
       } else {
-        setError(error.response.data.message || "Login failed.");
+        setError(error);
       }
     }
   };
