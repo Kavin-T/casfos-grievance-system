@@ -28,7 +28,7 @@ export default function Home() {
   const [notificationUpdate, setNotificationUpdate] = useState(false);
   const [activeTab, setActiveTab] = useState("complaint_statistics");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies([]);
+  const [cookies, removeCookie] = useCookies([]);
 
   const navigate = useNavigate();
 
