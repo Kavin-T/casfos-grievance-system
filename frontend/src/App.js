@@ -1,8 +1,9 @@
-import { React } from "react";
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import MainPage from "./components/MainPage";
 import Home from "./components/Home";
+import UnderMaintenance from "./components/UnderMaintenance";
 
 function App() {
   return (
@@ -11,6 +12,8 @@ function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/under-maintenance" element={<UnderMaintenance />} />
+        <Route path="*" element={<UnderMaintenance />} />
       </Routes>
 
       <footer className="bg-green-800 text-white text-center py-6 sm:py-8 lg:py-12">
