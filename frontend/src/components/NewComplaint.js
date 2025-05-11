@@ -60,103 +60,137 @@ export default function NewComplaint() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const isConfirmed = await confirmAction(
       `Are you sure you want to submit the form?`
     );
     if (!isConfirmed) {
       return;
     }
+  
     // Collect reasons for errors
     const reasons = [];
-
-    // Check for required fields
+  
+    // Complainant Name Validation (No special symbols)
     if (!formData.complainantName || formData.complainantName.trim() === "") {
       reasons.push("Complainant name is required.");
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.complainantName)) {
+      reasons.push("Complainant name must contain only alphabets and spaces.");
     }
-
+  
+    // Subject Validation
     if (!formData.subject || formData.subject.trim() === "") {
       reasons.push("Subject is required.");
+    } else if (formData.subject === "Other" && (!otherSubject || otherSubject.trim() === "")) {
+      reasons.push("Custom subject is required when 'Other' is selected.");
+    } else if (formData.subject === "Other" && /[^a-zA-Z0-9\s]/.test(otherSubject)) {
+      reasons.push("Custom subject must not contain special symbols.");
     }
-
+  
+    // Date of Incident Validation
     if (!formData.date || formData.date.trim() === "") {
-      reasons.push("Date is required.");
+      reasons.push("Date of incident is required.");
+    } else if (new Date(formData.date) > new Date()) {
+      reasons.push("Date of incident cannot be in the future.");
     }
-
+  
+    // Details Validation (No special symbols)
     if (!formData.details || formData.details.trim() === "") {
       reasons.push("Details are required.");
+    } else if (formData.details.length < 20) {
+      reasons.push("Details must be at least 20 characters long.");
+    } else if (/[^a-zA-Z0-9\s.,]/.test(formData.details)) {
+      reasons.push("Details must not contain special symbols (except periods and commas).");
     }
-
+  
+    // Department Validation
     if (!formData.department || formData.department.trim() === "") {
       reasons.push("Department is required.");
     }
-
+  
+    // Premises Validation
     if (!formData.premises || formData.premises.trim() === "") {
       reasons.push("Premises are required.");
+    } else if (formData.premises === "Other" && (!otherPremises || otherPremises.trim() === "")) {
+      reasons.push("Custom premises are required when 'Other' is selected.");
+    } else if (formData.premises === "Other" && /[^a-zA-Z0-9\s]/.test(otherPremises)) {
+      reasons.push("Custom premises must not contain special symbols.");
     }
-
+  
+    // Location Validation
     if (!formData.location || formData.location.trim() === "") {
       reasons.push("Location is required.");
+    } else if (formData.location === "Other" && (!otherLocation || otherLocation.trim() === "")) {
+      reasons.push("Custom location is required when 'Other' is selected.");
+    } else if (formData.location === "Other" && /[^a-zA-Z0-9\s]/.test(otherLocation)) {
+      reasons.push("Custom location must not contain special symbols.");
     }
-
-    // Check if required files are uploaded
+  
+    // Specific Location Validation (Optional, but no special symbols)
+    if (formData.specificLocation && /[^a-zA-Z0-9\s]/.test(formData.specificLocation)) {
+      reasons.push("Specific location must not contain special symbols.");
+    }
+  
+    // File Upload Validation
     if (!files.imgBefore_1 || !files.vidBefore) {
       reasons.push("At least one image and one video must be uploaded.");
     }
-
-    // Check file types if necessary
+  
     if (files.imgBefore_1 && !["image/jpeg", "image/png"].includes(files.imgBefore_1.type)) {
       reasons.push("Image must be in .jpg or .png format.");
     }
-
+  
     if (files.vidBefore && !["video/mp4", "video/quicktime"].includes(files.vidBefore.type)) {
       reasons.push("Video must be in .mp4 or .mov format.");
     }
-
+  
+    if (files.imgBefore_1 && files.imgBefore_1.size > 5 * 1024 * 1024) {
+      reasons.push("Image size must not exceed 5MB.");
+    }
+  
+    if (files.vidBefore && files.vidBefore.size > 100 * 1024 * 1024) {
+      reasons.push("Video size must not exceed 100MB.");
+    }
+  
+  
     // If there are any errors, show the collective reason and prevent submission
     if (reasons.length > 0) {
       toast.error(`Unable to submit complaint: ${reasons.join(" ")}`);
-      return;  // Exit function if there are validation errors
+      return; // Exit function if there are validation errors
     }
-
-
-    // if(!files.imgBefore_1 || !files.vidBefore){
-    //   toast.error("Please upload at least one image and one video before submitting the form.");
-    //   return;
-    // }
-
+  
     setIsSubmitting(true);
-
+  
     const data = new FormData();
-
+  
     for (const key in formData) {
       data.append(key, formData[key]);
     }
-
+  
     if (formData["subject"] === "Other") {
       data.set("subject", otherSubject);
     }
-
+  
     if (formData["premises"] === "Other") {
       data.set("premises", otherPremises);
     }
-
+  
     if (formData["location"] === "Other") {
       data.set("location", otherLocation);
     }
-
+  
     data.append("emergency", isEmergency);
-
+  
     if (files.imgBefore_1) data.append("imgBefore_1", files.imgBefore_1);
     if (files.imgBefore_2) data.append("imgBefore_2", files.imgBefore_2);
     if (files.imgBefore_3) data.append("imgBefore_3", files.imgBefore_3);
     if (files.vidBefore) data.append("vidBefore", files.vidBefore);
-
+  
     try {
       const response = await addComplaint(data);
-
+  
       toast.success(response.message);
-
+  
       setFormData({
         complainantName: getUser().username,
         subject: "",
@@ -167,12 +201,12 @@ export default function NewComplaint() {
         location: "",
         specificLocation: "",
       });
-
+  
       setOtherPremises("");
       setOtherLocation("");
       setOtherSubject("");
       setIsEmergency(false);
-
+  
       setFiles({
         imgBefore_1: null,
         imgBefore_2: null,
@@ -288,7 +322,7 @@ export default function NewComplaint() {
               className="focus:ring-green-500 focus:border-green-500 block w-50 pl-10 sm:text-sm border-gray-300 rounded-md"
               value={formData.date}
               onChange={handleInputChange}
-              max={new Date().toISOString().split("T")[0]}
+              max={new Date().toISOString().split("T")[0]} // Disable future dates
             />
           </div>
         </div>
