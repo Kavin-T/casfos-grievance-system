@@ -288,6 +288,7 @@ export default function NewComplaint() {
               className="focus:ring-green-500 focus:border-green-500 block w-50 pl-10 sm:text-sm border-gray-300 rounded-md"
               value={formData.date}
               onChange={handleInputChange}
+              max={new Date().toISOString().split("T")[0]}
             />
           </div>
         </div>
