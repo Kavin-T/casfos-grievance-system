@@ -22,7 +22,7 @@ const generateCSVReport = (complaints) => {
     { label: "Specific Location", value: "specificLocation" },
     { label: "Emergency", value: (row) => (row.emergency ? "Yes" : "No") },
     { label: "Re-Raised", value: (row) => (row.reRaised ? "Yes" : "No") },
-    { label: "Status", value: (row) => statusFormat(row.status) },
+    { label: "Status", value: (row) => statusFormat(row.status, row.department) },
     {
       label: "Reported On",
       value: (row) => (row.createdAt ? dateFormat(row.createdAt) : "N/A"),

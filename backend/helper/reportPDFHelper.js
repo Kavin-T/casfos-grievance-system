@@ -110,7 +110,7 @@ const generateReport = async (complaints) => {
         ? dateFormat(complaint.resolvedAt)
         : "In Progress";
 
-      const status = statusFormat(complaint.status);
+      const status = statusFormat(complaint.status, complaint.department);
 
       let duration = "N/A";
       if (complaint.createdAt && complaint.resolvedAt) {

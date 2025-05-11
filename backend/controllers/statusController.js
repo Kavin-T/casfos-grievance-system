@@ -56,7 +56,7 @@ const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint acknowledged successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -133,7 +133,7 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
 
 
   res.status(200).json({
-    message: "Media files uploaded and status updated successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -211,7 +211,7 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
 
 
   res.status(200).json({
-    message: "Media files uploaded and status updated successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -259,7 +259,7 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
 
 
   res.status(200).json({
-    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -350,7 +350,7 @@ const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
 
 
   res.status(200).json({
-    message: "Complaint status updated to CR_NOT_SATISFIED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -392,7 +392,7 @@ const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
 
 
   res.status(200).json({
-    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -430,7 +430,7 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to AE ACKNOWLEDGED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -628,7 +628,7 @@ const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to AE NOT TERMINATED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -676,7 +676,7 @@ const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to AE TERMINATED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -724,7 +724,7 @@ const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to EE NOT TERMINATED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -772,7 +772,7 @@ const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to AE TERMINATED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -820,7 +820,7 @@ const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to EE TERMINATED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -868,7 +868,7 @@ const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to AE NOT TERMINATED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -917,7 +917,7 @@ const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to AE NOT SATISFIED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -966,7 +966,7 @@ const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to EE NOT SATISFIED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -1014,7 +1014,7 @@ const raisedToResourceRequired = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to RESOURCE REQUIRED successfully.",
+    message: msg,
     complaint,
   });
 });
@@ -1154,7 +1154,7 @@ const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({
-    message: "Complaint status updated to CR NOT SATISFIED successfully.",
+    message: msg,
     complaint,
   });
 });
