@@ -410,6 +410,11 @@ const ComplaintsHistory = () => {
                   }`}
                 >
                   <ComplaintBasicDetails complaint={complaint} />
+                  {complaint.status === "RESOLVED" && (
+                    <div className="mt-2 text-green-700 font-medium">
+                      Resolved by: {complaint.resolvedName || "N/A"}
+                    </div>
+                  )}
                   <div className="flex justify-between gap-2 mt-4">
                     {complaint.status !== "RESOLVED" &&
                       complaint.status !== "TERMINATED" && (
@@ -444,6 +449,7 @@ const ComplaintsHistory = () => {
                     <th className="p-3 text-left text-green-700">Status</th>
                     <th className="p-3 text-left text-green-700">Reported On</th>
                     <th className="p-3 text-left text-green-700">Timer</th>
+                    <th className="p-3 text-left text-green-700">Resolved By</th>
                     <th className="p-3 text-left text-green-700">Action</th>
                   </tr>
                 </thead>
@@ -491,6 +497,9 @@ const ComplaintsHistory = () => {
                                 isEmergency={complaint.emergency}
                               />
                             )}
+                        </td>
+                         <td className="p-3 border-b">
+                          {complaint.status === "RESOLVED" ? complaint.resolvedName || "N/A" : ""}
                         </td>
                         <td className="p-3 border-b">
                           <button
