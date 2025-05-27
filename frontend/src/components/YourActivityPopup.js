@@ -244,7 +244,7 @@ const YourActivityPopup = ({
             "resourceRequiredToAeNotTerminated",
             "resourceRequiredToAeTerminated",
             "aeNotTerminatedToResourceRequired",
-            "eeNotTerminatedToAeNotTerminated",
+            "eeNotTerminatedToAeTerminated",
             "eeNotTerminatedToAeNotTerminated",
             "aeTerminatedToEeNotTerminated",
             "aeTerminatedToEeTerminated",
