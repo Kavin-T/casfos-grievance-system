@@ -154,6 +154,14 @@ const YourActivityPopup = ({
               />
             )}
 
+          {selectedComplaint.status === "CR_NOT_TERMINATED" &&
+            selectedComplaint.remark_CR && (
+              <RemarkDisplay
+                remark={selectedComplaint.remark_CR}
+                label="CR Remark :"
+              />
+            )}
+
           {selectedComplaint.status === "EE_TERMINATED" &&
             selectedComplaint.remark_EE && (
               <RemarkDisplay
@@ -165,7 +173,7 @@ const YourActivityPopup = ({
           {selectedComplaint.status === "EE_NOT_TERMINATED" &&
             selectedComplaint.remark_EE && (
               <RemarkDisplay
-                remark={selectedComplaint.remark_AE}
+                remark={selectedComplaint.remark_EE}
                 label="EE Remark :"
               />
             )}
@@ -250,6 +258,7 @@ const YourActivityPopup = ({
             "aeTerminatedToEeTerminated",
             "jeWorkDoneToCrNotSatisfied",
             "eeAcknowledgedToCrNotSatisfied",
+            "eeTerminatedToCrNotTerminated",
           ].includes(statusChange) ||
             (selectedComplaint.status === "RESOURCE_REQUIRED" &&
               statusChange === "RAISED") ||

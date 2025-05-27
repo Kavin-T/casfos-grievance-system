@@ -82,6 +82,7 @@ const complaintSchema = new mongoose.Schema({
       "EE_NOT_SATISFIED",
       "CR_NOT_SATISFIED",
       "AE_NOT_TERMINATED",
+      "CR_NOT_TERMINATED",
       "AE_TERMINATED",
       "EE_TERMINATED",
       "EE_NOT_TERMINATED",

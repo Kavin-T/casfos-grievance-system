@@ -97,6 +97,8 @@ export const statusFormat = (status, department) => {
   }
   else if (status === "TERMINATED") {
     return "Terminated";
+  } else if(status === "CR_NOT_TERMINATED"){
+    return "CR Not Terminated";
   } else {
     return "Unknown Status";
   }

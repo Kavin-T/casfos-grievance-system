@@ -71,8 +71,13 @@ export const statusOptions = {
     { value: "aeTerminatedToEeNotTerminated", label: "Not Terminate" },
     { value: "aeTerminatedToEeTerminated", label: "Terminate" },
   ],
+  CR_NOT_TERMINATED: [
+    { value: "aeTerminatedToEeNotTerminated", label: "Not Terminate" },
+    { value: "aeTerminatedToEeTerminated", label: "Terminate" },
+  ],
   EE_TERMINATED: [
-    { value: "eeTerminatedToTerminated", label: "Terminate" }
+    { value: "eeTerminatedToCrNotTerminated", label: "Not Terminate" },
+    { value: "eeTerminatedToTerminated", label: "Terminate" },
   ],
 };
 

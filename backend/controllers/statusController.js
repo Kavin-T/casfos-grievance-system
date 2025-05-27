@@ -411,7 +411,7 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
-  if (complaint.status === "TERMINATED") {
+  if (complaint.status === "TERMINATED" || complaint.status === "CR_NOT_TERMINATED") {
     return res.status(200).json({
       message: "Complaint already updated.",
     });
@@ -728,6 +728,56 @@ const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
     complaint,
   });
 });
+
+
+const eeTerminatedToCrNotTerminated = asyncHandler(async (req, res) => {
+  const { id, remark_CR } = req.body;
+
+  if (!id || !remark_CR) {
+    res.status(400);
+    throw new Error("Complaint ID and CR remark are required.");
+  }
+
+  const complaint = await Complaint.findById(id);
+  if (!complaint) {
+    res.status(404);
+    throw new Error("Complaint not found.");
+  }
+
+  if (
+    complaint.status === "TERMINATED" ||
+    complaint.status === "CR_NOT_TERMINATED"
+  ) {
+    return res.status(200).json({
+      message: "Complaint already updated.",
+    });
+  }
+
+  let msg = "";
+  let sts="CR_NOT_TERMINATED";
+  complaint.status = "CR_NOT_TERMINATED";
+  complaint.remark_CR = remark_CR;
+  await complaint.save();
+
+  if(complaint.department === "IT"){
+    msg="HEAD of OFFICE cancels the complaint TERMINATED request";
+  }
+  else{
+    msg="Complaint Raiser cancels the complaint TERMINATED request";
+  }
+  updateNotification(
+    complaint.complaintID,
+    complaint.subject,
+    sts,
+    msg,
+  );
+
+  res.status(200).json({
+    message: "Complaint status updated to CR NOT TERMINATED successfully.",
+    complaint,
+  });
+});
+
 
 const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
   const { id, remark_AE } = req.body;
@@ -1247,4 +1297,5 @@ module.exports = {
   crNotSatisfiedToJeWorkdone,
   eeAcknowledgedToCrNotSatisfied,
   updateComplaintPrice,
+  eeTerminatedToCrNotTerminated,
 };

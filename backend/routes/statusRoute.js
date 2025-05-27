@@ -25,6 +25,7 @@ const {
   eeRemarkWhenCrNotSatisfied,
   crNotSatisfiedToJeWorkdone,
   updateComplaintPrice,
+  eeTerminatedToCrNotTerminated,
   eeAcknowledgedToCrNotSatisfied,
 } = require("../controllers/statusController");
 const { upload, ensureTempDirectory } = require("../middleware/fileHandler");
@@ -188,6 +189,16 @@ router.put(
     "EXECUTIVE_ENGINEER_IT",
   ]),
   aeTerminatedToEeNotTerminated
+);
+router.put(
+  "/ee-terminated/cr-not-terminated",
+  validateDesignation([
+    "COMPLAINANT",
+    "ESTATE_OFFICER",
+    "PRINCIPAL",
+    "ASSISTANT_TO_ESTATE_OFFICER",
+  ]),
+  eeTerminatedToCrNotTerminated
 );
 router.put(
   "/ee-not-terminated/ae-terminated",

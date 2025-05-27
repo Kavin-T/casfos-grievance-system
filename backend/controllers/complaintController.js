@@ -129,12 +129,12 @@ const yourActivity = asyncHandler(async (req, res) => {
       break;
 
     case "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL":
-      statuses = ["AE_ACKNOWLEDGED","AE_TERMINATED","CR_NOT_SATISFIED"];
+      statuses = ["AE_ACKNOWLEDGED","AE_TERMINATED","CR_NOT_SATISFIED","CR_NOT_TERMINATED"];
       departmentQuery = { $in: ["CIVIL", "ELECTRICAL"] };
       break;
 
     case "EXECUTIVE_ENGINEER_IT":
-      statuses = ["AE_ACKNOWLEDGED","AE_TERMINATED","CR_NOT_SATISFIED"];
+      statuses = ["AE_ACKNOWLEDGED","AE_TERMINATED","CR_NOT_SATISFIED","CR_NOT_TERMINATED"];
       departmentQuery = "IT";
       break;
 

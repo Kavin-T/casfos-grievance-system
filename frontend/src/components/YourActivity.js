@@ -233,6 +233,10 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
             body["remark"] = remark;
             endpoint = "ee-remark/cr-not-satisfied";
             break;
+      case "eeTerminatedToCrNotTerminated":
+            body["remark_CR"] = remark;
+            endpoint = "ee-terminated/cr-not-terminated";
+            break;
       default:
           break;
     }
