@@ -53,6 +53,7 @@ const YourActivityPopup = ({
     "JUNIOR_ENGINEER_ELECTRICAL",
     "JUNIOR_ENGINEER_IT",
   ];
+  const isIT = selectedComplaint.department === "IT";
   return (
     <>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -65,7 +66,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_JE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_JE}
-                label="JE Remark :"
+                label={isIT ? "SA Remark :" : "JE Remark :"}
               />
             )}
 
@@ -73,7 +74,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_AE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_AE}
-                label="AE Remark :"
+                label={isIT ? "OC Remark :" : "AE Remark :"}
               />
             )}
 
@@ -81,7 +82,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_EE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_EE}
-                label="EE Remark :"
+                label={isIT ? "HO Remark :" : "EE Remark :"}
               />
             )}
 
@@ -142,7 +143,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_AE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_AE}
-                label="AE Remark :"
+                label={isIT ? "OC Remark :" : "AE Remark :"}
               />
             )}
 
@@ -150,7 +151,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_AE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_AE}
-                label="AE Remark :"
+                label={isIT ? "OC Remark :" : "AE Remark :"}
               />
             )}
 
@@ -166,7 +167,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_EE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_EE}
-                label="EE Remark :"
+                label={isIT ? "HO Remark :" : "EE Remark :"}
               />
             )}
 
@@ -174,7 +175,7 @@ const YourActivityPopup = ({
             selectedComplaint.remark_EE && (
               <RemarkDisplay
                 remark={selectedComplaint.remark_EE}
-                label="EE Remark :"
+                label={isIT ? "HO Remark :" : "EE Remark :"}
               />
             )}
 
