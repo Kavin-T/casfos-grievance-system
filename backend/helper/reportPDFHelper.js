@@ -1,6 +1,40 @@
+/*
+ * reportPDFHelper.js
+ *
+ * Purpose:
+ * This script provides a utility function to generate an HTML content string for a PDF report of complaint data
+ * in an Express.js application. The generated HTML is used to create a PDF report with formatted complaint details.
+ *
+ * Features:
+ * - generateReport: Creates an HTML string for a complaint report, including a table of complaints, a logo, a header,
+ *   and a total expenditure footer. Supports empty complaint lists with a "no complaints" message.
+ * - Formats complaint data using helper functions for dates, statuses, and durations.
+ * - Includes CSS styling for a clean, professional table layout in the PDF.
+ * - Calculates the total expenditure across all complaints.
+ * - Dynamically includes the application port from environment variables for the logo URL.
+ *
+ * Usage:
+ * Import this module in your application (e.g., `const { generateReport } = require('./reportPDFHelper');`) and
+ * pass an array of complaint objects to the `generateReport` function to produce an HTML content object suitable
+ * for PDF generation (e.g., with html-pdf-node). The output can be used in a controller to generate and send a PDF.
+ *
+ * Dependencies:
+ * - formatting.js: Provides helper functions for formatting status, date, and duration.
+ * - dotenv: Environment variables (e.g., PORT) must be configured in a .env file.
+ *
+ * Notes:
+ * - The complaint objects must include fields like complaintID, complainantName, subject, department, createdAt,
+ *   resolvedAt, status, and price.
+ * - The logo URL assumes a local server with a PORT environment variable and an accessible image at /assets/images/casfos_logo.jpg.
+ * - The generated HTML is styled for PDF rendering with a table layout and Arial font.
+ * - The function returns an object with a `content` property containing the HTML string, compatible with PDF generation libraries.
+ */
+
 const { dateFormat, calculateDuration, statusFormat } = require("./formatting");
 
+// Function to generate HTML content for PDF report
 const generateReport = async (complaints) => {
+  // Initialize HTML content with styles and header
   let htmlContent = `
     <html>
         <head>
@@ -102,6 +136,7 @@ const generateReport = async (complaints) => {
                 <tbody>
       `;
 
+    // Iterate through complaints to populate table rows
     complaints.forEach((complaint, index) => {
       const formattedCreatedAt = complaint.createdAt
         ? dateFormat(complaint.createdAt)
@@ -115,8 +150,7 @@ const generateReport = async (complaints) => {
       let duration = "N/A";
       if (complaint.createdAt && complaint.resolvedAt) {
         duration = calculateDuration(complaint.createdAt, complaint.resolvedAt);
-      }
-      else{
+      } else {
         duration = calculateDuration(complaint.createdAt, new Date());
       }
 

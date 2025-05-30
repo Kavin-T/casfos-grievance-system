@@ -1,3 +1,33 @@
+/*
+ * complaintModel.js
+ *
+ * Purpose:
+ * This script defines the Mongoose schema and model for complaints in an Express.js application.
+ * It structures complaint data stored in a MongoDB database and includes logic for generating unique complaint IDs.
+ *
+ * Features:
+ * - Defines a comprehensive schema for complaints with fields for complainant details, status, media, timestamps, and remarks.
+ * - Enforces data validation with required fields, enumerated values, and default settings.
+ * - Automatically generates a unique complaintID in the format `COMP_<departmentCode>_<number>` before saving new complaints.
+ * - Supports arrays for multiple media files (images and videos) and remarks.
+ * - Includes timestamps for creation, acknowledgment, resolution, and termination.
+ * - Trims string fields to remove unnecessary whitespace.
+ *
+ * Usage:
+ * Import this module in your application (e.g., `const Complaint = require('./complaintModel');`) to interact with the Complaint
+ * collection in MongoDB. Use the model for CRUD operations in controllers or other modules. Ensure Mongoose is connected to the
+ * database before using the model.
+ *
+ * Dependencies:
+ * - mongoose: MongoDB object modeling tool for Node.js.
+ *
+ * Notes:
+ * - The complaintID is generated using a department code (e.g., IT, EL, CI) and a sequential number based on existing complaints.
+ * - The schema enforces valid department values (CIVIL, ELECTRICAL, IT) and status values (e.g., RAISED, RESOLVED).
+ * - The price field uses Decimal128 for precise financial calculations.
+ * - The pre-save middleware ensures unique complaint IDs for new documents only.
+ */
+
 const mongoose = require("mongoose");
 
 const complaintSchema = new mongoose.Schema({
