@@ -1,3 +1,28 @@
+/*
+ * complaintApi.js
+ *
+ * Purpose:
+ * This file provides API functions for complaint-related operations in the CASFOS Grievance Redressal System frontend.
+ * It handles adding complaints, fetching complaints, statistics, and complaints requiring price entry.
+ *
+ * Features:
+ * - addComplaint: Submits a new complaint with form data (including file uploads).
+ * - fetchComplaint: Retrieves complaints with filters and pagination.
+ * - fetchComplaintStatistics: Gets statistics for complaints in a date range.
+ * - fetchComplaintsWithPriceLater: Fetches complaints that require price entry later.
+ *
+ * Usage:
+ * Import these functions wherever complaint data needs to be managed or displayed in the frontend.
+ * Example: import { addComplaint, fetchComplaint } from '../services/complaintApi';
+ *
+ * Dependencies:
+ * - axios.js: Configured Axios instance for API requests.
+ *
+ * Notes:
+ * - Handles both frontend and backend errors gracefully.
+ * - Update endpoints as needed to match backend API changes.
+ */
+
 import axios from "./axios";
 
 // Add complaint
