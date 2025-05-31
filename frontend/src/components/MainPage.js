@@ -1,3 +1,31 @@
+/*
+ * MainPage.js
+ *
+ * Purpose:
+ * This React component serves as the public landing page for the CASFOS Grievance Redressal System.
+ * It provides navigation, institutional information, and contact details for users before login.
+ *
+ * Features:
+ * - Responsive navigation bar with institutional branding and login button.
+ * - Sectioned layout for About Us, History, How to Reach, and Contact Us.
+ * - Mobile-friendly menu and smooth scrolling navigation.
+ * - Displays images and accreditation links.
+ *
+ * Usage:
+ * Used as the main entry point for unauthenticated users. Should be rendered at the root or landing route.
+ * Example: <MainPage />
+ *
+ * Dependencies:
+ * - react-scroll for smooth section navigation.
+ * - react-router-dom for navigation to login.
+ * - react-icons for menu icons.
+ * - Various institutional images from assets.
+ *
+ * Notes:
+ * - All content and images are static except for navigation.
+ * - Designed for accessibility and responsiveness.
+ */
+
 import React, { useState } from "react";
 import { Link } from "react-scroll";
 import { useNavigate } from "react-router-dom";
@@ -11,13 +39,15 @@ import casfos_coimbatore_img4 from "../assets/images/casfos-coimbatore-img4.jpg"
 import casfos_coimbatore_img5 from "../assets/images/casfos-coimbatore-img5.jpg";
 import casfos_coimbatore_img3 from "../assets/images/casfos-coimbatore-img3.jpg";
 
+// MainPage component for public landing and institutional info
 const MainPage = () => {
+  // State for mobile menu open/close
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div>
-      {/* Navigation Bar */}
+      {/* Navigation Bar with branding, images, and login */}
       <nav className="bg-green-700 text-white py-3 fixed w-full top-0 shadow-lg z-10">
         <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-xl px-4 md:px-6 text-green-700">
           {/* Left: Emblem + Title */}
@@ -116,6 +146,7 @@ const MainPage = () => {
 
       {/* Sections */}
       <div className="pt-[5rem]">
+        {/* Section: About Us */}
         <section
           id="about"
           className="min-h-screen bg-white flex justify-center items-center px-4"
@@ -155,6 +186,7 @@ const MainPage = () => {
       </div>
 
       <div className="pt-[5rem]">
+        {/* Section: History of the Academy */}
         <section
           id="history"
           className="min-h-screen bg-gray-200 flex justify-center items-center px-4"
@@ -280,6 +312,7 @@ const MainPage = () => {
       </div>
 
       <div className="pt-[3rem]">
+        {/* Section: How To Reach */}
         <section
           id="reach"
           className="min-h-fit bg-white flex justify-center items-center px-4"
@@ -306,6 +339,7 @@ const MainPage = () => {
       </div>
 
       <div className="pt-[1rem]">
+        {/* Section: Contact Us */}
         <section
           id="contact"
           className="min-h-fit bg-gray-200 flex justify-center items-center px-4"
