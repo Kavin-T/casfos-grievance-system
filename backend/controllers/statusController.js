@@ -32,6 +32,8 @@ const Complaint = require("../models/complaintModel");
 const { updateNotification } = require("./notificationController");
 const { sendComplaintRaisedMail } = require("../middleware/emailHandler");
 
+// raisedToJeAcknowledged: Acknowledges a complaint by a Junior Engineer (JE) or System Analyst (SA).
+// Updates complaint status to JE_ACKNOWLEDGED, sets acknowledgment date, and sends notification.
 const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
   const { id } = req.body;
   const username = req.user.username;
@@ -88,6 +90,8 @@ const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
   });
 });
 
+// jeAcknowledgedToJeWorkdone: Marks a complaint as work completed by JE or SA with file uploads.
+// Saves uploaded images/videos, updates status to JE_WORKDONE, and notifies stakeholders.
 const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -165,6 +169,8 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
   });
 });
 
+// crNotSatisfiedToJeWorkdone: Reprocesses a complaint marked as CR_NOT_SATISFIED by JE or SA.
+// Uploads new evidence, resets remarks, updates status to JE_WORKDONE, and sends notification.
 const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -243,6 +249,8 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
   });
 });
 
+// jeWorkDoneToAeAcknowledged: Approves a complaint's work by Assistant Engineer (AE) or Officer in Charge (OC).
+// Updates status to AE_ACKNOWLEDGED and notifies relevant parties.
 const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -291,6 +299,8 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
   });
 });
 
+// jeWorkDoneToResolved: Marks a complaint as fully resolved after JE or SA work completion.
+// Updates status to RESOLVED and sends a final notification.
 const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -333,6 +343,8 @@ const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
   });
 });
 
+// jeWorkDoneToCrNotSatisfied: Marks a complaint as unsatisfactory by the complainant (CR).
+// Updates status to CR_NOT_SATISFIED, adds remark, and sends notification.
 const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark_CR } = req.body;
 
@@ -382,6 +394,8 @@ const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
   });
 });
 
+// aeNotTerminatedToRaised: Reverts a non-terminated complaint to RAISED status.
+// Updates status to RAISED and notifies relevant parties.
 const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -424,6 +438,8 @@ const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
   });
 });
 
+// eeTerminatedToTerminated: Finalizes a complaint as TERMINATED by Executive Engineer (EE).
+// Updates status to TERMINATED and sends notification.
 const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -462,6 +478,8 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
   });
 });
 
+// aeAcknowledgedToEeAcknowledged: Approves a complaint by Executive Engineer (EE) or resolves it for IT department.
+// Updates status to EE_ACKNOWLEDGED or RESOLVED based on designation and notifies stakeholders.
 const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
   const { id, price, priceLater } = req.body;
   const designation = req.user.designation;
@@ -525,6 +543,8 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
   });
 });
 
+// eeAcknowledgedToResolved: Marks a complaint as fully resolved after EE acknowledgment.
+// Updates status to RESOLVED, sets resolution date, and sends notification.
 const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
   const { id } = req.body;
 
@@ -564,6 +584,8 @@ const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
   });
 });
 
+// aeNotTerminatedToResourceRequired: Requests resources for a non-terminated complaint by JE or SA.
+// Updates status to RESOURCE_REQUIRED, adds JE remark, and notifies stakeholders.
 const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
   const { id, remark_JE } = req.body;
 
@@ -612,6 +634,8 @@ const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
   });
 });
 
+// resourceRequiredToAeNotTerminated: Cancels a resource request by Assistant Engineer (AE) or Officer in Charge.
+// Updates status to AE_NOT_TERMINATED, adds AE remark, and sends notification.
 const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
   const { id, remark_AE } = req.body;
 
@@ -660,6 +684,8 @@ const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
   });
 });
 
+// resourceRequiredToAeTerminated: Approves a resource request by Assistant Engineer (AE) or Officer in Charge.
+// Updates status to AE_TERMINATED, adds AE remark, and notifies stakeholders.
 const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
   const { id, remark_AE } = req.body;
 
@@ -708,6 +734,8 @@ const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
   });
 });
 
+// aeTerminatedToEeNotTerminated: Rejects a termination request by Executive Engineer (EE) or Head of Office.
+// Updates status to EE_NOT_TERMINATED, adds EE remark, and sends notification.
 const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
   const { id, remark_EE } = req.body;
 
@@ -756,7 +784,8 @@ const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
   });
 });
 
-
+// eeTerminatedToCrNotTerminated: Allows complainant to reject a termination request.
+// Updates status to CR_NOT_TERMINATED, adds CR remark, and notifies stakeholders.
 const eeTerminatedToCrNotTerminated = asyncHandler(async (req, res) => {
   const { id, remark_CR } = req.body;
 
@@ -805,7 +834,8 @@ const eeTerminatedToCrNotTerminated = asyncHandler(async (req, res) => {
   });
 });
 
-
+// eeNotTerminatedToAeTerminated: Approves a previously rejected termination request by Assistant Engineer (AE) or Officer in Charge.
+// Updates status to AE_TERMINATED, adds AE remark, and notifies stakeholders.
 const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
   const { id, remark_AE } = req.body;
 
@@ -854,6 +884,8 @@ const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
   });
 });
 
+// aeTerminatedToEeTerminated: Finalizes a termination request by Executive Engineer (EE) or Head of Office.
+// Updates status to EE_TERMINATED, adds EE remark, and sends notification.
 const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
   const { id, remark_EE } = req.body;
 
@@ -902,6 +934,8 @@ const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
   });
 });
 
+// eeNotTerminatedToAeNotTerminated: Rejects a termination request by Assistant Engineer (AE) or Officer in Charge after EE rejection.
+// Updates status to AE_NOT_TERMINATED, adds AE remark, and notifies stakeholders.
 const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
   const { id, remark_AE } = req.body;
 
@@ -950,6 +984,8 @@ const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
   });
 });
 
+// jeWorkdoneToAeNotSatisfied: Marks a complaint as unsatisfactory by Assistant Engineer (AE) or Officer in Charge.
+// Updates status to AE_NOT_SATISFIED, adds AE remark, sets reRaised flag, and sends notification.
 const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark_AE } = req.body;
 
@@ -999,6 +1035,8 @@ const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
   });
 });
 
+// aeAcknowledgedToEeNotSatisfied: Marks a complaint as unsatisfactory by Executive Engineer (EE) or Head of Office.
+// Updates status to EE_NOT_SATISFIED, adds EE remark, sets reRaised flag, and notifies stakeholders.
 const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark_EE } = req.body;
 
@@ -1048,6 +1086,8 @@ const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
   });
 });
 
+// raisedToResourceRequired: Requests resources for a newly raised complaint by Junior Engineer (JE) or System Analyst (SA).
+// Updates status to RESOURCE_REQUIRED, adds JE remark, and sends notification.
 const raisedToResourceRequired = asyncHandler(async (req, res) => {
   const { id, remark_JE } = req.body;
 
@@ -1096,6 +1136,8 @@ const raisedToResourceRequired = asyncHandler(async (req, res) => {
   });
 });
 
+// resourceRequiredToRaised: Cancels a resource request by the complainant (CR), reverting to RAISED status.
+// Updates status to RAISED, adds CR remark, and notifies stakeholders.
 const resourceRequiredToRaised = asyncHandler(async (req, res) => {
   const { id, remark_CR } = req.body;
 
@@ -1141,6 +1183,8 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
   });
 });
 
+// aeRemarkWhenCrNotSatisfied: Adds an additional remark by Assistant Engineer (AE) to a CR_NOT_SATISFIED complaint.
+// Appends remark to multiple_remark_ae array and saves the updated complaint.
 const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark } = req.body;
 
@@ -1164,6 +1208,8 @@ const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   });
 });
 
+// eeRemarkWhenCrNotSatisfied: Adds an additional remark by Executive Engineer (EE) to a CR_NOT_SATISFIED complaint.
+// Appends remark to multiple_remark_ee array and saves the updated complaint.
 const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark } = req.body;
 
@@ -1187,6 +1233,8 @@ const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   });
 });
 
+// eeAcknowledgedToCrNotSatisfied: Marks a complaint as unsatisfactory by the complainant after EE acknowledgment.
+// Updates status to CR_NOT_SATISFIED, adds CR remark, sets reRaised flag, and sends notification.
 const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark_CR } = req.body;
 
@@ -1236,6 +1284,8 @@ const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
   });
 });
 
+// changeComplaintDepartment: Updates the department of a complaint and triggers an email notification.
+// Changes department, saves previous department for reference, and sends notification.
 const changeComplaintDepartment = asyncHandler(async (req, res) => {
   const { id, newDepartment } = req.body;
 
@@ -1273,6 +1323,8 @@ const changeComplaintDepartment = asyncHandler(async (req, res) => {
   });
 });
 
+// updateComplaintPrice: Updates the price of a complaint and marks it as price entered.
+// Sets the price field, updates isPriceEntered flag, and saves the complaint.
 const updateComplaintPrice = asyncHandler(async (req, res) => {
   const { id, price } = req.body;
 
