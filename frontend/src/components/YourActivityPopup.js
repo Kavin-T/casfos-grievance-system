@@ -1,3 +1,32 @@
+/*
+ * YourActivityPopup.js
+ *
+ * Purpose:
+ * This React component renders a modal popup for updating the status, remarks, department, and files for a selected complaint.
+ * It is used as part of the complaint workflow for staff and engineers to take actions on complaints.
+ *
+ * Features:
+ * - Displays complaint basic and additional details.
+ * - Allows status change, department change, and entering remarks or price.
+ * - Handles file uploads for after-resolution images/videos.
+ * - Shows dynamic form fields based on complaint status and user designation.
+ * - Provides validation and feedback for user actions.
+ *
+ * Usage:
+ * Used as a modal in the YourActivity component for complaint actions.
+ * Example: <YourActivityPopup ...props />
+ *
+ * Dependencies:
+ * - ComplaintBasicDetails, ComplaintAdditionalDetails: Components for displaying complaint info.
+ * - FileUpload: Component for file uploads.
+ * - statusOptions: Constants for status dropdowns.
+ * - react-toastify for notifications.
+ *
+ * Notes:
+ * - Expects props for selected complaint, status, remarks, price, files, and handlers.
+ * - Handles both frontend and backend errors gracefully.
+ */
+
 import React from "react";
 import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
@@ -5,11 +34,13 @@ import { statusOptions } from "../constants/options";
 import { FileUpload } from "./FileUpload";
 import { toast } from "react-toastify";
 
+// Helper to get user designation from localStorage
 const getUser = () => {
   const designation = localStorage.getItem("designation");
   return { designation };
 };
 
+// Main YourActivityPopup component for complaint actions modal
 const YourActivityPopup = ({
   selectedComplaint,
   statusChange,
@@ -28,6 +59,7 @@ const YourActivityPopup = ({
   priceLater,
   setPriceLater
 }) => {
+  // Compute status change options based on user and complaint status
   const statusChangeOptions =
     [
       "COMPLAINANT",
@@ -48,12 +80,14 @@ const YourActivityPopup = ({
       ? []
       : statusOptions[selectedComplaint.status] || [];
 
+  // Allowed designations for certain actions
   const allowedDesignations = [
     "JUNIOR_ENGINEER_CIVIL",
     "JUNIOR_ENGINEER_ELECTRICAL",
     "JUNIOR_ENGINEER_IT",
   ];
   const isIT = selectedComplaint.department === "IT";
+  // Render modal with complaint details, status/remark/price/file fields, and action buttons
   return (
     <>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -423,6 +457,7 @@ const YourActivityPopup = ({
   );
 };
 
+// Remark display subcomponent
 const RemarkDisplay = ({ label, remark }) => {
   return (
     <div className="text-red-600 font-bold mt-5 mb-5">
