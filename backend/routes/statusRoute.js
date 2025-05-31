@@ -1,3 +1,20 @@
+/**
+ * statusRoute.js
+ *
+ * Purpose:
+ * This file defines all routes related to the complaint lifecycle transitions and status updates.
+ * It handles the various status flows between roles like JE, AE, EE, CR, and Complainants.
+ *
+ * Features:
+ * - Validates user role/designation before processing.
+ * - Handles file uploads for work done images and videos.
+ * - Supports complaint status transitions like acknowledged, work done, not satisfied, resolved, terminated, etc.
+ *
+ * Middleware Used:
+ * - validateDesignation: Ensures only authorized roles can access specific routes.
+ * - ensureTempDirectory: Prepares temporary directory for file storage.
+ * - upload: Handles image/video uploads using Multer.
+ */
 const express = require("express");
 const {
   raisedToJeAcknowledged,
