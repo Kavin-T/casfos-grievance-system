@@ -1,3 +1,26 @@
+/*
+ * reportApi.js
+ *
+ * Purpose:
+ * This file provides API functions for generating and downloading complaint reports in the CASFOS Grievance Redressal System frontend.
+ * It handles requesting reports from the backend and triggering file downloads in the browser.
+ *
+ * Features:
+ * - getReport: Fetches a report (PDF or CSV) based on filters and downloads it using a generated filename.
+ *
+ * Usage:
+ * Import and use getReport wherever report generation or download is needed in the frontend.
+ * Example: import { getReport } from '../services/reportApi';
+ *
+ * Dependencies:
+ * - axios.js: Configured Axios instance for API requests.
+ * - dateFormat: Utility for formatting dates in filenames.
+ *
+ * Notes:
+ * - Handles both frontend and backend errors gracefully.
+ * - Update endpoints as needed to match backend API changes.
+ */
+
 import axios from "./axios";
 import { dateFormat } from "../utils/formatting";
 
