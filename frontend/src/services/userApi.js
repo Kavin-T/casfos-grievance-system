@@ -1,3 +1,28 @@
+/*
+ * userApi.js
+ *
+ * Purpose:
+ * This file provides API functions for user management operations in the CASFOS Grievance Redressal System frontend.
+ * It handles fetching, adding, updating, and deleting users via the backend API.
+ *
+ * Features:
+ * - fetchUsers: Retrieves all users from the backend.
+ * - addUser: Adds a new user with provided form data.
+ * - updateUser: Updates an existing user's information.
+ * - deleteUser: Deletes a user by ID.
+ *
+ * Usage:
+ * Import these functions wherever user management is required in the frontend.
+ * Example: import { fetchUsers, addUser } from '../services/userApi';
+ *
+ * Dependencies:
+ * - axios.js: Configured Axios instance for API requests.
+ *
+ * Notes:
+ * - Handles both frontend and backend errors gracefully.
+ * - Update endpoints as needed to match backend API changes.
+ */
+
 import axios from "./axios";
 
 // Fetch all users
