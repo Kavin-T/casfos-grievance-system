@@ -1,3 +1,26 @@
+/*
+ * formatting.js
+ *
+ * Purpose:
+ * This utility file provides formatting and helper functions for displaying data in the CASFOS Grievance Redressal System frontend.
+ * It includes functions for formatting designations, statuses, departments, dates, prices, and durations.
+ *
+ * Features:
+ * - designationFormat: Converts designation codes to human-readable labels.
+ * - statusFormat: Converts status codes and department to readable status strings.
+ * - departmentFormat: Converts department codes to readable names.
+ * - dateFormat: Formats dates for display.
+ * - priceFormat: Formats price values for display.
+ * - calculateDuration: Calculates and formats the duration between two timestamps.
+ *
+ * Usage:
+ * Import and use these functions wherever data needs to be formatted for display in the UI.
+ * Example: import { dateFormat, priceFormat } from '../utils/formatting';
+ *
+ * Notes:
+ * - Designed for use in React components and services for consistent formatting.
+ */
+
 export const designationFormat = (designation) => {
   switch (designation) {
     case "PRINCIPAL":
