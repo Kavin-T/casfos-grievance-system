@@ -1,3 +1,33 @@
+/*
+ * ComplaintsHistory.js
+ *
+ * Purpose:
+ * This React component provides a comprehensive interface for viewing, filtering, and managing the history of complaints.
+ * It allows users to filter complaints, view them in card or list mode, generate reports, and see detailed information in a modal.
+ *
+ * Features:
+ * - Fetches and displays complaints with pagination and filters.
+ * - Supports card (modal) and list (table) view modes.
+ * - Allows filtering by multiple fields and date ranges.
+ * - Generates PDF and CSV reports for filtered complaints.
+ * - Shows detailed complaint info in a modal, including additional details and media.
+ * - Displays loading spinner and toast notifications for user feedback.
+ *
+ * Usage:
+ * Import and use this component in a parent page or dashboard.
+ * Example: <ComplaintsHistory />
+ *
+ * Dependencies:
+ * - ComplaintBasicDetails, ComplaintAdditionalDetails: Components for displaying complaint info.
+ * - complaintApi.js, reportApi.js: API service functions for fetching complaints and reports.
+ * - Spinner, Timer: UI components for loading and timers.
+ * - react-toastify: For toast notifications.
+ *
+ * Notes:
+ * - Expects backend APIs to support filtering and pagination.
+ * - Handles both card and table views for flexible display.
+ */
+
 import React, {useCallback, useState, useEffect } from "react";
 import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
@@ -7,8 +37,11 @@ import Spinner from "./Spinner";
 import { toast } from "react-toastify";
 import { Timer } from "./Timer";
 
+// Main component for complaints history and filtering
 const ComplaintsHistory = () => {
+  // State for complaints data
   const [complaints, setComplaints] = useState([]);
+  // State for filter fields
   const [filters, setFilters] = useState({
     complaintID: "",
     complainantName: "",
@@ -29,6 +62,7 @@ const ComplaintsHistory = () => {
     resolvedStartDate: "",
     resolvedEndDate: "",
   });
+  // State for pagination, loading, modal, and view mode
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -37,12 +71,12 @@ const ComplaintsHistory = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState("modal");
 
+  // Handler for closing the modal
   const handleCloseModal = () => {
     setSelectedComplaint(null);
   };
 
-  
-
+  // Handler for fetching complaints from API
   const handleFetchComplaints = useCallback(async () => {
     setLoading(true);
     try {
@@ -56,24 +90,29 @@ const ComplaintsHistory = () => {
     }
   }, [filters, page]);
 
+  // useEffect to fetch complaints on filter/page/toggle change
   useEffect(() => {
     handleFetchComplaints();
   }, [toggle, page, handleFetchComplaints]);
 
+  // Handler for filter input changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
   };
 
+  // Handler for page change
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
 
+  // Handler for applying filters
   const handleApplyFilters = async () => {
     setPage(1);
     await handleFetchComplaints();
   };
 
+  // Handler for clearing filters
   const handleClearFilters = () => {
     setFilters({
       complaintID: "",
@@ -99,6 +138,7 @@ const ComplaintsHistory = () => {
     setToggle(!toggle);
   };
 
+  // Handler for generating PDF/CSV reports
   const handleGenerateReport = async (type) => {
     setLoading(true);
     try {
@@ -111,15 +151,18 @@ const ComplaintsHistory = () => {
     }
   };
 
+  // Handler for changing view mode (card/list)
   const handleViewModeChange = (mode) => {
     setViewMode(mode);
   };
 
   return (
     <div className="p-4 bg-green-50 min-h-screen">
+      {/* Filter section header */}
       <h2 className="text-2xl font-bold text-green-700 mb-4">
         Filter Complaints
       </h2>
+      {/* Mobile filter toggle button */}
       <div className="sm:hidden mb-4">
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -128,6 +171,7 @@ const ComplaintsHistory = () => {
           {showFilters ? "Hide Filters" : "View Filters"}
         </button>
       </div>
+      {/* Filter form grid (inputs, selects, date pickers, action buttons) */}
       <div
         className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 ${
           showFilters ? "" : "hidden sm:grid"
@@ -391,7 +435,9 @@ const ComplaintsHistory = () => {
         </button>
       </div>
 
+      {/* Complaints section header */}
       <h2 className="text-2xl font-bold text-green-700 mb-4">Complaints</h2>
+      {/* Loading spinner or complaints display */}
       {loading ? (
         <Spinner />
       ) : (
@@ -519,6 +565,7 @@ const ComplaintsHistory = () => {
         </>
       )}
 
+      {/* Modal for selected complaint details */}
       {selectedComplaint && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg max-w-lg w-full max-h-[80vh] overflow-y-auto">
@@ -537,6 +584,7 @@ const ComplaintsHistory = () => {
         </div>
       )}
 
+      {/* Pagination controls */}
       <div className="flex justify-center items-center mt-6 space-x-4">
         {page !== 1 && (
           <button
