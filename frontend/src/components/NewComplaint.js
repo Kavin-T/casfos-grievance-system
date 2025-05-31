@@ -1,3 +1,33 @@
+/*
+ * NewComplaint.js
+ *
+ * Purpose:
+ * This React component provides a form for users to submit new complaints in the CASFOS Grievance Redressal System.
+ * It handles form state, validation, file uploads, and submission to the backend API.
+ *
+ * Features:
+ * - Form fields for complainant name, subject, date, details, department, premises, location, and specific location.
+ * - Custom subject, premises, and location fields when 'Other' is selected.
+ * - Emergency checkbox and file uploads for images/videos before incident.
+ * - Comprehensive validation for all fields and file uploads.
+ * - Displays error messages and toast notifications.
+ * - Shows a spinner during submission.
+ *
+ * Usage:
+ * Used as the main form for submitting new complaints. Should be rendered in a protected route or dashboard.
+ * Example: <NewComplaint />
+ *
+ * Dependencies:
+ * - addComplaint: API service for submitting complaints (../services/complaintApi).
+ * - FileUpload: Component for file uploads.
+ * - react-toastify for notifications.
+ * - @heroicons/react for icons.
+ *
+ * Notes:
+ * - Expects user info in localStorage.
+ * - Handles both frontend and backend errors gracefully.
+ */
+
 import React, { useState } from "react";
 import {
   ClipboardIcon,
@@ -13,12 +43,15 @@ import { locationOptions, subjectOptions } from "../constants/options";
 import Spinner from "./Spinner";
 import { FileUpload } from "./FileUpload";
 
+// Helper to get user info from localStorage
 const getUser = () => {
   const user = localStorage.getItem("username");
   return { username: user };
 };
 
+// Main NewComplaint component for complaint submission
 export default function NewComplaint() {
+  // State for form fields, custom fields, emergency, submission, and files
   const [formData, setFormData] = useState({
     complainantName: getUser().username,
     subject: "",
@@ -44,6 +77,7 @@ export default function NewComplaint() {
     vidBefore: null,
   });
 
+  // Handler for premises change
   const handlePremisesChange = (e) => {
     const selectedPremises = e.target.value;
     setFormData((prev) => ({
@@ -53,11 +87,13 @@ export default function NewComplaint() {
     }));
   };
 
+  // Generic handler for input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -222,6 +258,7 @@ export default function NewComplaint() {
 
   return (
     <>
+      {/* Complaint submission form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name input */}
         <div>
@@ -523,6 +560,7 @@ export default function NewComplaint() {
           </label>
         </div>
 
+        {/* Warning about file size restrictions */}
         <div className="text-red-500 mt-2 text-wrap">
           <strong>Warning:</strong> The file must meet the following size
           restrictions:
@@ -532,6 +570,7 @@ export default function NewComplaint() {
           </ul>
         </div>
 
+        {/* File upload components for images and video */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-100 rounded-md shadow-lg">
           {/* Image Before 1 */}
           <FileUpload
