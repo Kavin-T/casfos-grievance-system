@@ -1,3 +1,31 @@
+/*
+ * ComplaintStatistics.js
+ *
+ * Purpose:
+ * This React component displays statistics and analytics for complaints, including totals, department-wise breakdowns, and expenditure.
+ * It allows users to filter statistics by date range and view summary and department-level data.
+ *
+ * Features:
+ * - Fetches and displays total, pending, resolved complaints, and total expenditure.
+ * - Shows department-wise statistics with icons and breakdowns.
+ * - Allows filtering by date range (from and to dates).
+ * - Displays loading spinner and error notifications.
+ *
+ * Usage:
+ * Import and use this component in a dashboard or analytics page.
+ * Example: <ComplaintStatistics />
+ *
+ * Dependencies:
+ * - fetchComplaintStatistics: API service for fetching statistics (../services/complaintApi).
+ * - Spinner: UI component for loading state.
+ * - @heroicons/react: For department and summary icons.
+ * - react-toastify: For toast notifications.
+ *
+ * Notes:
+ * - Expects backend API to support statistics queries by date range.
+ * - Handles empty or missing data gracefully.
+ */
+
 import React, {useCallback, useState, useEffect } from "react";
 import {
   ChartBarIcon,
@@ -12,13 +40,16 @@ import { fetchComplaintStatistics } from "../services/complaintApi";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
 
+// Main component for complaint statistics and analytics
 export default function ComplaintStatistics() {
+  // State for statistics data
   const [statistics, setStatistics] = useState({});
+  // State for date filters and loading
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Memoizing the fetchStatistics function to prevent unnecessary re-renders
+  // Memoized function to fetch statistics from API
   const fetchStatistics = useCallback(async () => {
     if (!fromDate) {
       toast.error("Please specify the start date.");
@@ -50,6 +81,7 @@ export default function ComplaintStatistics() {
     }
   }, [fromDate, toDate]); // Adding fromDate and toDate as dependencies
 
+  // useEffect to set default dates and fetch statistics
   useEffect(() => {
     const currentDate = new Date();
     const defaultToDate = currentDate.toISOString().split("T")[0];
@@ -67,6 +99,7 @@ export default function ComplaintStatistics() {
     }
   }, [fromDate, toDate, fetchStatistics]); // Adding fetchStatistics to the dependency array
 
+  // Handlers for date input changes
   const handleFromDateChange = (e) => setFromDate(e.target.value);
   const handleToDateChange = (e) => setToDate(e.target.value);
 
@@ -79,11 +112,12 @@ export default function ComplaintStatistics() {
 
   return (
     <div className="bg-white shadow rounded-lg p-6 mb-8">
+      {/* Section header */}
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">
         Complaint Statistics
       </h2>
 
-      {/* Filters */}
+      {/* Filters for date range */}
       <div className="filters flex flex-col sm:flex-row sm:space-x-4 sm:items-center space-y-4 sm:space-y-0 mb-6">
         <label>
           From Date:
@@ -115,6 +149,7 @@ export default function ComplaintStatistics() {
         </button>
       </div>
 
+      {/* Loading spinner or statistics display */}
       {loading ? (
         <Spinner />
       ) : (
@@ -175,7 +210,7 @@ export default function ComplaintStatistics() {
             </p>
           )}
 
-          {/* Department-Wise Statistics */}
+          {/* Department-wise statistics section */}
           {statistics.departmentWise &&
             statistics.departmentWise.length > 0 && (
               <>
