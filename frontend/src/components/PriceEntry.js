@@ -1,3 +1,33 @@
+/*
+ * PriceEntry.js
+ *
+ * Purpose:
+ * This React component allows authorized users to enter or update the price/expenditure for complaints that require price entry.
+ * It fetches complaints needing price entry, provides UI for updating prices, and supports both card and list views.
+ *
+ * Features:
+ * - Fetches complaints with pending price entry from the backend.
+ * - Allows inline price entry and update for each complaint.
+ * - Supports card (modal) and table (list) view modes.
+ * - Shows complaint details and additional details in a modal.
+ * - Displays loading spinner and toast notifications for user feedback.
+ *
+ * Usage:
+ * Used by authorized users to update complaint prices. Should be rendered in a protected route or dashboard.
+ * Example: <PriceEntry />
+ *
+ * Dependencies:
+ * - fetchComplaintsWithPriceLater: API service for fetching complaints (../services/complaintApi).
+ * - updateComplaintPrice: API service for updating price (../services/yourActivity).
+ * - ComplaintBasicDetails, ComplaintAdditionalDetails: Components for displaying complaint info.
+ * - Spinner: UI component for loading state.
+ * - react-toastify for notifications.
+ *
+ * Notes:
+ * - Expects backend to support fetching and updating complaint prices.
+ * - Handles both frontend and backend errors gracefully.
+ */
+
 import React, { useState, useEffect } from "react";
 import { fetchComplaintsWithPriceLater } from "../services/complaintApi";
 import { updateComplaintPrice } from "../services/yourActivity";
@@ -6,17 +36,21 @@ import ComplaintAdditionalDetails from "./ComplaintAdditionalDeatils";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
 
+// Main PriceEntry component for entering/updating complaint prices
 const PriceEntry = () => {
+  // State for complaints, price updates, loading, view mode, and selected complaint
   const [complaints, setComplaints] = useState([]);
   const [priceUpdates, setPriceUpdates] = useState({});
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState("modal");
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
+  // Fetch complaints needing price entry on mount
   useEffect(() => {
     fetchComplaints();
   }, []);
 
+  // Function to fetch complaints from API
   const fetchComplaints = async () => {
     setLoading(true);
     try {
@@ -29,6 +63,7 @@ const PriceEntry = () => {
     }
   };
 
+  // Handler for price input changes
   const handlePriceChange = (id, price) => {
     setPriceUpdates((prevState) => ({
       ...prevState,
@@ -36,6 +71,7 @@ const PriceEntry = () => {
     }));
   };
 
+  // Function to update price for a complaint
   const updatePrice = async (id) => {
     const price = priceUpdates[id];
     if (!price || price <= 0) {
@@ -58,8 +94,10 @@ const PriceEntry = () => {
 
   return (
     <div className="p-4 bg-green-50 min-h-screen">
+      {/* Section header */}
       <h2 className="text-2xl font-bold text-green-700 mb-4">Price Entry</h2>
 
+      {/* View mode toggle buttons */}
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setViewMode("modal")}
@@ -83,6 +121,7 @@ const PriceEntry = () => {
         </button>
       </div>
 
+      {/* Loading spinner or complaints display */}
       {loading ? (
         <Spinner />
       ) : (
@@ -224,6 +263,7 @@ const PriceEntry = () => {
         </>
       )}
 
+      {/* Modal for selected complaint details and price entry */}
       {selectedComplaint && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg max-w-lg w-full max-h-[80vh] overflow-y-auto">
