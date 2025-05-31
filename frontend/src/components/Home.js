@@ -1,3 +1,33 @@
+/*
+ * Home.js
+ *
+ * Purpose:
+ * This React component serves as the main dashboard and entry point for authenticated users in the CASFOS Grievance Redressal System.
+ * It manages navigation, authentication, session handling, and tab-based access to all major features.
+ *
+ * Features:
+ * - Tabbed navigation for statistics, complaints, user management, notifications, and more.
+ * - Handles authentication, session expiry, and auto-logout.
+ * - Fetches and displays counts for complaints and notifications.
+ * - Responsive design for mobile and desktop tab navigation.
+ * - Integrates all major components (statistics, new complaint, history, users, etc.).
+ *
+ * Usage:
+ * Used as the main page after login. Renders all core features and manages user session state.
+ * Example: <Home />
+ *
+ * Dependencies:
+ * - All major feature components (ComplaintStatistics, NewComplaint, ComplaintsHistory, etc.).
+ * - react-toastify for notifications.
+ * - react-cookie for session management.
+ * - react-router-dom for navigation.
+ * - jwt-decode for token expiry handling.
+ *
+ * Notes:
+ * - Expects user info in localStorage and cookies for authentication.
+ * - Handles both mobile and desktop navigation patterns.
+ */
+
 import React, { useState, useEffect } from "react";
 import Notifications from "./Notifications";
 import NewComplaint from "./NewComplaint";
@@ -16,16 +46,20 @@ import { fetchComplaintsByDesignation } from "../services/yourActivity";
 import { fetchNotifications } from "../services/notificationApi";
 import { jwtDecode } from "jwt-decode";
 
+// Helper to get user info from localStorage
 const getUser = () => {
   const username = localStorage.getItem("username");
   const designation = localStorage.getItem("designation");
   return { username, designation };
 };
 
+// Main Home component for dashboard and navigation
 export default function Home() {
+  // State for complaint and notification counts
   const [complaintCount, setComplaintCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
   const [notificationUpdate, setNotificationUpdate] = useState(false);
+  // State for tab navigation, menu, and session
   const [activeTab, setActiveTab] = useState("complaint_statistics");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cookies, removeCookie] = useCookies([]);
@@ -34,6 +68,7 @@ export default function Home() {
 
   const userInfo = getUser();
 
+  // Effect: Verify user authentication on mount
   useEffect(() => {
     const verifyUser = async () => {
       const response = await checkAuthentication();
@@ -46,6 +81,7 @@ export default function Home() {
     verifyUser();
   }, [cookies, navigate, removeCookie]);
 
+  // Effect: Handle auto-logout on token expiry
   useEffect(() => {
     const handleAutoLogout = () => {
       toast.error("Session expired. Please login again.");
@@ -76,6 +112,7 @@ export default function Home() {
     }
   }, [cookies.token, navigate, removeCookie]);
 
+  // Effect: Fetch complaint count for user
   useEffect(() => {
     const fetchComplaintCount = async () => {
       try {
@@ -91,6 +128,7 @@ export default function Home() {
     fetchComplaintCount();
   }, []);
 
+  // Effect: Fetch notification count
   useEffect(() => {
     const fetchNotificationsData = async () => {
       try {
@@ -105,6 +143,7 @@ export default function Home() {
     fetchNotificationsData();
   }, [notificationUpdate]); // Re-fetch when notificationUpdate changes
 
+  // Tab configuration for navigation
   const tabs = [
     { id: "complaint_statistics", label: "Complaint Statistics", show: true },
     {
@@ -143,6 +182,7 @@ export default function Home() {
     },
   ];
 
+  // Handler for logout
   const handleLogout = async () => {
     removeCookie("token");
     localStorage.removeItem("username");
@@ -150,6 +190,7 @@ export default function Home() {
     navigate("/");
   };
 
+  // Handler for complaint status change (to update notifications)
   const handleComplaintStatusChange = (complaintID, newStatus) => {
     if (newStatus === "RESOLVED" || newStatus === "TERMINATED") {
       setNotificationUpdate((prev) => !prev); // Toggle state to trigger re-fetch
@@ -158,7 +199,9 @@ export default function Home() {
 
   return (
     <>
+      {/* Toast notifications container */}
       <ToastContainer position="top-center" autoClose={3000} theme="colored" />
+      {/* Header with logo, title, user info, and logout */}
       <header className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
@@ -296,7 +339,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tab content */}
+        {/* Tab content for each feature */}
         {activeTab === "complaint_statistics" && <ComplaintStatistics />}
 
         {activeTab === "new_complaint" && <NewComplaint />}
