@@ -1,3 +1,22 @@
+/*
+ * options.js
+ *
+ * Purpose:
+ * This file contains constants for dropdown options and mappings used throughout the CASFOS Grievance Redressal System frontend.
+ * It provides lists for designations, status transitions, locations, and complaint subjects.
+ *
+ * Features:
+ * - Exports arrays and objects for designations, status options, location options, and subject options.
+ * - Used for form dropdowns, status workflows, and validation in the UI.
+ *
+ * Usage:
+ * Import these constants wherever dropdowns or status mappings are needed in forms or logic.
+ * Example: import { designations, statusOptions } from '../constants/options';
+ *
+ * Notes:
+ * - Update these lists as needed to reflect changes in organization structure or workflow.
+ */
+
 export const designations = [
   { value: "PRINCIPAL", label: "Principal" },
   { value: "ESTATE_OFFICER", label: "Estate Officer" },
