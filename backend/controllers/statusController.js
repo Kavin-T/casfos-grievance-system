@@ -1,3 +1,30 @@
+/*
+ * complaintController.js
+ *
+ * Purpose:
+ * This script defines controller functions for managing complaint workflows in an Express.js application.
+ * It handles state transitions for complaints, including acknowledgment, work completion, resolution, termination, and department changes.
+ *
+ * Features:
+ * - Manages complaint status transitions (e.g., RAISED to JE_ACKNOWLEDGED, JE_WORKDONE to RESOLVED).
+ * - Supports file uploads for images and videos to document work done.
+ * - Updates notifications for each state change.
+ * - Sends email notifications when complaints are raised or departments are changed.
+ * - Handles role-based complaint management for Junior Engineers (JE), Assistant Engineers (AE), Executive Engineers (EE), and Complainants (CR).
+ * - Supports IT and non-IT department-specific messaging.
+ *
+ * Usage:
+ * Import and use these functions in your route definitions (e.g., `router.post('/raised-to-je-acknowledged', raisedToJeAcknowledged);`).
+ * Ensure middleware like `express-async-handler` is configured for error handling.
+ *
+ * Dependencies:
+ * - express-async-handler: Wraps async route handlers to catch errors.
+ * - path: Node.js module for handling file paths.
+ * - fs: Node.js module for file system operations.
+ * - Complaint: Mongoose model for complaint data.
+ * - notificationController: Updates notifications for complaint status changes.
+ * - emailHandler: Sends emails for complaint-related events.
+ */
 const asyncHandler = require("express-async-handler");
 const path = require("path");
 const fs = require("fs");
