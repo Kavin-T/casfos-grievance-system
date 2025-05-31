@@ -1,3 +1,30 @@
+/*
+ * Users.js
+ *
+ * Purpose:
+ * This React component provides a user management interface for the CASFOS Grievance Redressal System.
+ * It allows authorized users to create, update, and delete user accounts, and view all users in the system.
+ *
+ * Features:
+ * - Fetches and displays a list of users from the backend.
+ * - Modal form for creating and updating users with validation.
+ * - Supports deleting users with confirmation.
+ * - Displays toast notifications for success and error states.
+ *
+ * Usage:
+ * Used by admin or privileged users to manage user accounts. Should be rendered in a protected route or dashboard.
+ * Example: <Users />
+ *
+ * Dependencies:
+ * - userApi.js: API services for user CRUD operations.
+ * - react-toastify for notifications.
+ * - confirmAction utility for confirmation dialogs.
+ *
+ * Notes:
+ * - Expects backend to support user CRUD operations.
+ * - Handles both frontend and backend errors gracefully.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   addUser,
@@ -11,6 +38,7 @@ import { designations } from "../constants/options";
 import confirmAction from "../utils/confirmAction ";
 
 const Users = () => {
+  // State for users, modal, form data, and editing mode
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,6 +52,7 @@ const Users = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Fetch users from API on mount
   const getUsers = async () => {
     try {
       const response = await fetchUsers();
@@ -37,11 +66,13 @@ const Users = () => {
     getUsers();
   }, []);
 
+  // Handler for form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handler for form submission (add/update user)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -72,6 +103,7 @@ const Users = () => {
     }
   };
 
+  // Handler for deleting a user
   const handleDelete = async (id) => {
     const isConfirmed = await confirmAction(
       "Are you sure you want to delete the user?"
@@ -89,6 +121,7 @@ const Users = () => {
     }
   };
 
+  // Handler to open modal for create or update
   const openModal = (user = null) => {
     if (user) {
       setFormData({
@@ -116,12 +149,14 @@ const Users = () => {
     setIsModalOpen(true);
   };
 
+  // Handler to close modal
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
   return (
     <div className="p-4 bg-green-50 min-h-screen" data-testid="user-management">
+      {/* Section header and create user button */}
       <div className="flex justify-between items-center mb-6">
         <h1
           className="text-2xl font-bold text-green-700"
@@ -138,6 +173,7 @@ const Users = () => {
         </button>
       </div>
 
+      {/* User list grid */}
       <div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         data-testid="user-list"
@@ -178,6 +214,7 @@ const Users = () => {
         ))}
       </div>
 
+      {/* Modal for create/update user */}
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
