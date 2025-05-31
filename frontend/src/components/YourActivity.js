@@ -1,3 +1,33 @@
+/*
+ * YourActivity.js
+ *
+ * Purpose:
+ * This React component displays and manages the complaints assigned to the current user based on their designation.
+ * It allows users to update complaint status, upload resolution files, change departments, and view complaint details.
+ *
+ * Features:
+ * - Fetches complaints for the logged-in user's designation.
+ * - Allows status updates, remarks, price entry, and department changes.
+ * - Handles file uploads for after-resolution images/videos.
+ * - Displays a modal popup for detailed complaint actions.
+ * - Shows a timer for each complaint and loading spinner during operations.
+ * - Provides confirmation dialogs and toast notifications for user actions.
+ *
+ * Usage:
+ * Used by staff and engineers to manage their assigned complaints. Should be rendered in a protected route or dashboard.
+ * Example: <YourActivity setComplaintCount={setComplaintCount} handleComplaintStatusChange={handleComplaintStatusChange} />
+ *
+ * Dependencies:
+ * - yourActivity.js: API services for complaint actions.
+ * - ComplaintBasicDetails, YourActivityPopup, Spinner, Timer: UI components.
+ * - react-toastify for notifications.
+ * - confirmAction utility for confirmation dialogs.
+ *
+ * Notes:
+ * - Expects backend to support complaint status updates and file uploads.
+ * - Handles both frontend and backend errors gracefully.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   fetchComplaintsByDesignation,
@@ -12,12 +42,15 @@ import confirmAction from "../utils/confirmAction ";
 import Spinner from "./Spinner";
 import { Timer } from "./Timer";
 
+// Helper to get user designation from localStorage
 const getUser = () => {
   const designation = localStorage.getItem("designation");
   return { designation };
 };
 
+// Main YourActivity component for managing assigned complaints
 const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
+  // State for complaints, selected complaint, status, remarks, price, files, loading, etc.
   const [complaints, setComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [statusChange, setStatusChange] = useState("");
@@ -33,6 +66,7 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
   });
   const [loading, setLoading] = useState(true);
 
+  // Fetch complaints for user on mount
   const fetchComplaints = async () => {
     setLoading(true);
     try {
@@ -50,6 +84,7 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     fetchComplaints();
   }, []);
 
+  // Handlers for opening/closing modal and resetting state
   const openModal = (complaint) => {
     setSelectedComplaint(complaint);
     setStatusChange("");
@@ -68,6 +103,7 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     setStatusChange("");
   };
 
+  // Handler for changing department
   const handleDepartmentChange = async () => {
     if (!newDepartment) {
       toast.error("Please select a new department.");
@@ -99,6 +135,7 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     await fetchComplaints();
   };
 
+  // Handler for updating complaint status and uploading files
   const handleStatusChange = async () => {
     const isConfirmed = await confirmAction(
       `Are you sure you want to update the complaint?`
