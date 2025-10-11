@@ -70,7 +70,7 @@ export const statusOptions = {
     { value: "resourceRequiredToAeTerminated", label: "Terminate" }
   ],
   EE_NOT_SATISFIED: [
-    { value: "AE_NOT_SATISFIED", label: "Not Satisfy" },
+    { value: "AE_NOT_SATISFIED", label: "Not Satisfied" },
     { value: "AE_ACKNOWLEDGED", label: "Approve" },
   ],
   JE_ACKNOWLEDGED: [{ value: "JE_WORKDONE", label: "Work Done" }],
