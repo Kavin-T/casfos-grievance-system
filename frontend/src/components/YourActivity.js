@@ -90,6 +90,7 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     setStatusChange("");
     setRemark("");
     setPrice("");
+    setPriceLater(false);
   };
 
   const closeModal = () => {
@@ -101,6 +102,7 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     setPrice("");
     setRemark("");
     setStatusChange("");
+    setPriceLater(false);
   };
 
   // Handler for changing department
@@ -164,9 +166,9 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
     body["id"] = selectedComplaint._id;
     let endpoint = "";
     if (getUser().designation === "EXECUTIVE_ENGINEER_IT" && statusChange === "APPROVE") {
-      endpoint = "RESOLVED"; // Directly resolve the complaint
-    } else {
       endpoint = "ae-acknowledged/ee-acknowledged";
+      body["price"] = price;
+      body["priceLater"] = priceLater;
     }
     switch (statusChange) {
       case "JE_ACKNOWLEDGED":

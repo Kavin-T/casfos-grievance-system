@@ -31,7 +31,7 @@
  * Notes:
  * - File uploads require a middleware (e.g., multer) to populate `req.files`.
  * - The `sendComplaintRaisedMail` function must be implemented in the emailHandler middleware.
- * - The Complaint model should include fields like complaintID, status, price, and isPriceEntered.
+ * - The Complaint model should include fields like complaintID, status, price, and priceLater.
  */
 
 const asyncHandler = require("express-async-handler");
@@ -363,8 +363,19 @@ const getComplaintStatistics = asyncHandler(async (req, res) => {
 
 // Handler to fetch complaints without price entered
 const fetchComplaintsWithPriceLater = asyncHandler(async (req, res) => {
+  let departments = [];
+
+  if (req.user) {
+    if (req.user.designation === "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL") {
+      departments = ["CIVIL", "ELECTRICAL"];
+    } else if (req.user.designation === "EXECUTIVE_ENGINEER_IT") {
+      departments = ["IT"];
+    }
+  }
+
   const complaints = await Complaint.find({
-    isPriceEntered: false,
+    priceLater: true,
+    department: { $in: departments }
   }).sort({
     createdAt: -1,
   });

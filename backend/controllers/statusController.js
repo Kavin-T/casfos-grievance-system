@@ -500,6 +500,13 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
+  if(!priceLater){
+    complaint.price = price;
+  }
+  else{
+    complaint.priceLater = true;
+  }
+
   if (designation === "EXECUTIVE_ENGINEER_IT") {
     complaint.status = "RESOLVED";
     complaint.resolvedAt = new Date();
@@ -1323,8 +1330,7 @@ const changeComplaintDepartment = asyncHandler(async (req, res) => {
   });
 });
 
-// updateComplaintPrice: Updates the price of a complaint and marks it as price entered.
-// Sets the price field, updates isPriceEntered flag, and saves the complaint.
+// updateComplaintPrice: Updates the price of a complaint and saves the complaint.
 const updateComplaintPrice = asyncHandler(async (req, res) => {
   const { id, price } = req.body;
 
@@ -1340,7 +1346,7 @@ const updateComplaintPrice = asyncHandler(async (req, res) => {
   }
 
   complaint.price = price;
-  complaint.isPriceEntered = true;
+  complaint.priceLater = false;
   await complaint.save();
 
   res.status(200).json({

@@ -119,7 +119,7 @@ const complaintSchema = new mongoose.Schema({
       "TERMINATED",
     ],
   },
-  isPriceEntered: {
+  priceLater: {
     type: Boolean,
     default: false,
   },
