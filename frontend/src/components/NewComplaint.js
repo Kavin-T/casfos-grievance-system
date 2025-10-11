@@ -168,8 +168,8 @@ export default function NewComplaint() {
     }
   
     // File Upload Validation
-    if (!files.imgBefore_1 || !files.vidBefore) {
-      reasons.push("At least one image and one video must be uploaded.");
+    if (!files.imgBefore_1) {
+      reasons.push("At least one image must be uploaded.");
     }
   
     if (files.imgBefore_1 && !["image/jpeg", "image/png"].includes(files.imgBefore_1.type)) {
@@ -187,7 +187,6 @@ export default function NewComplaint() {
     if (files.vidBefore && files.vidBefore.size > 100 * 1024 * 1024) {
       reasons.push("Video size must not exceed 100MB.");
     }
-  
   
     // If there are any errors, show the collective reason and prevent submission
     if (reasons.length > 0) {
