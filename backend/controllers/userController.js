@@ -35,7 +35,9 @@ const bcrypt = require("bcryptjs");
 
 // Handler to add a new user
 const addUser = asyncHandler(async (req, res) => {
-  const { username, designation, email, phoneNumber, password } = req.body;
+  let { username, designation, email, phoneNumber, password } = req.body;
+
+  username = username.toUpperCase();
 
   if (!password) {
     res.status(400);
