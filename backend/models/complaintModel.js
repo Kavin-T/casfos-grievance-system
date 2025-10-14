@@ -143,39 +143,13 @@ const complaintSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
-  remark_AE: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  remark_EE: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  remark_JE: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  remark_CR: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  multiple_remark_ae: {
-    type: [{ type: String, trim: true }],
-    default: [],
-  },
-  multiple_remark_ee: {
-    type: [{ type: String, trim: true }],
-    default: [],
-  },
-  resolvedName: {
-    type: String,
-    trim: true,
-    default: null,
-  },
+  remarks: [
+    {
+      timestamp: Date,
+      designation: String,
+      remark: String
+    }
+  ],
 });
 
 // Pre-save middleware to generate complaintID

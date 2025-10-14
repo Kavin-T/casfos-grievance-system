@@ -40,6 +40,39 @@ const getUser = () => {
   return { designation };
 };
 
+// Helper to check if remark is mandatory for current status/designation
+const isRemarkMandatory = (statusChange, selectedComplaint) => {
+  const designation = getUser().designation;
+  // List of conditions where remark is mandatory (from original code)
+  return (
+    [
+      "RESOURCE_REQUIRED",
+      "AE_NOT_SATISFIED",
+      "EE_NOT_SATISFIED",
+      "resourceRequiredToAeNotTerminated",
+      "resourceRequiredToAeTerminated",
+      "aeNotTerminatedToResourceRequired",
+      "eeNotTerminatedToAeTerminated",
+      "eeNotTerminatedToAeNotTerminated",
+      "aeTerminatedToEeNotTerminated",
+      "aeTerminatedToEeTerminated",
+      "jeWorkDoneToCrNotSatisfied",
+      "eeAcknowledgedToCrNotSatisfied",
+      "eeTerminatedToCrNotTerminated",
+    ].includes(statusChange) ||
+    (selectedComplaint.status === "RESOURCE_REQUIRED" &&
+      statusChange === "RAISED") ||
+    (selectedComplaint.status === "CR_NOT_SATISFIED" &&
+      [
+        "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+        "EXECUTIVE_ENGINEER_IT",
+        "ASSISTANT_ENGINEER_CIVIL",
+        "ASSISTANT_ENGINEER_ELECTRICAL",
+        "ASSISTANT_ENGINEER_IT",
+      ].includes(designation))
+  );
+};
+
 // Main YourActivityPopup component for complaint actions modal
 const YourActivityPopup = ({
   selectedComplaint,
@@ -87,6 +120,37 @@ const YourActivityPopup = ({
     "JUNIOR_ENGINEER_IT",
   ];
   const isIT = selectedComplaint.department === "IT";
+
+  // --- REMARKS DISPLAY LOGIC (Unified) ---
+  // Display all remarks as a timeline/list
+  const renderRemarks = () => {
+    if (!selectedComplaint.remarks || selectedComplaint.remarks.length === 0) {
+      return (
+        <div className="text-gray-500 font-semibold mt-4 mb-4">
+          No remarks yet.
+        </div>
+      );
+    }
+    return (
+      <div className="mt-4 mb-4">
+        <div className="font-bold text-lg mb-2 text-green-700">Remarks Timeline:</div>
+        <div className="max-h-[200px] overflow-y-auto border border-green-400 p-2 bg-gray-50 rounded">
+          {selectedComplaint.remarks.map((r, idx) => (
+            <div key={idx} className="mb-2">
+              <div className="text-sm text-gray-700">
+                <span className="font-semibold">{r.designation || "User"}</span>
+                <span className="mx-2 text-gray-400">|</span>
+                <span className="text-gray-500">{r.timestamp ? new Date(r.timestamp).toLocaleString() : ""}</span>
+              </div>
+              <div className="whitespace-pre-wrap break-words text-gray-900"><strong>Remark:</strong> {r.remark}</div>
+              {idx !== selectedComplaint.remarks.length - 1 && <hr className="my-2 border-green-200" />}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // Render modal with complaint details, status/remark/price/file fields, and action buttons
   return (
     <>
@@ -96,130 +160,8 @@ const YourActivityPopup = ({
 
           <ComplaintAdditionalDetails complaint={selectedComplaint} />
 
-          {selectedComplaint.status === "RESOURCE_REQUIRED" &&
-            selectedComplaint.remark_JE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_JE}
-                label={isIT ? "SA Remark :" : "JE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "AE_NOT_SATISFIED" &&
-            selectedComplaint.remark_AE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_AE}
-                label={isIT ? "OC Remark :" : "AE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "EE_NOT_SATISFIED" &&
-            selectedComplaint.remark_EE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_EE}
-                label={isIT ? "HO Remark :" : "EE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
-            [
-              "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
-              "EXECUTIVE_ENGINEER_IT",
-              "ASSISTANT_ENGINEER_CIVIL",
-              "ASSISTANT_ENGINEER_ELECTRICAL",
-              "ASSISTANT_ENGINEER_IT",
-              "JUNIOR_ENGINEER_CIVIL",
-              "JUNIOR_ENGINEER_ELECTRICAL",
-              "JUNIOR_ENGINEER_IT",
-            ].includes(getUser().designation) && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_CR}
-                label="CR Remark :"
-              />
-            )}
-
-          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
-            allowedDesignations.includes(getUser().designation) &&
-            selectedComplaint.multiple_remark_ae?.length > 0 && (
-              <div className="text-red-600 font-bold mt-5 mb-5">
-                <div className="mb-2">Assistant Engineer Remarks:</div>
-                <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
-                  {selectedComplaint.multiple_remark_ae.map((remark, index) => (
-                    <p
-                      key={index}
-                      className="m-0 whitespace-pre-wrap break-words"
-                    >
-                      {remark}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
-
-          {selectedComplaint.status === "CR_NOT_SATISFIED" &&
-            allowedDesignations.includes(getUser().designation) &&
-            selectedComplaint.multiple_remark_ee?.length > 0 && (
-              <div className="text-red-600 font-bold mt-5 mb-5">
-                <div className="mb-2">Executive Engineer Remarks:</div>
-                <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
-                  {selectedComplaint.multiple_remark_ee.map((remark, index) => (
-                    <p
-                      key={index}
-                      className="m-0 whitespace-pre-wrap break-words"
-                    >
-                      {remark}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
-
-          {selectedComplaint.status === "AE_NOT_TERMINATED" &&
-            selectedComplaint.remark_AE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_AE}
-                label={isIT ? "OC Remark :" : "AE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "AE_TERMINATED" &&
-            selectedComplaint.remark_AE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_AE}
-                label={isIT ? "OC Remark :" : "AE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "CR_NOT_TERMINATED" &&
-            selectedComplaint.remark_CR && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_CR}
-                label="CR Remark :"
-              />
-            )}
-
-          {selectedComplaint.status === "EE_TERMINATED" &&
-            selectedComplaint.remark_EE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_EE}
-                label={isIT ? "HO Remark :" : "EE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "EE_NOT_TERMINATED" &&
-            selectedComplaint.remark_EE && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_EE}
-                label={isIT ? "HO Remark :" : "EE Remark :"}
-              />
-            )}
-
-          {selectedComplaint.status === "RAISED" &&
-            selectedComplaint.remark_CR && (
-              <RemarkDisplay
-                remark={selectedComplaint.remark_CR}
-                label="CR Remark :"
-              />
-            )}
+          {/* Unified remarks display */}
+          {renderRemarks()}
 
           {selectedComplaint.status === "RAISED" && (
             <div className="mt-3">
@@ -280,44 +222,30 @@ const YourActivityPopup = ({
             setStatusChange("aeRemarkWhenCrNotSatisfied")
           ) : null}
 
-          {([
-            "RESOURCE_REQUIRED",
-            "AE_NOT_SATISFIED",
-            "EE_NOT_SATISFIED",
-            "resourceRequiredToAeNotTerminated",
-            "resourceRequiredToAeTerminated",
-            "aeNotTerminatedToResourceRequired",
-            "eeNotTerminatedToAeTerminated",
-            "eeNotTerminatedToAeNotTerminated",
-            "aeTerminatedToEeNotTerminated",
-            "aeTerminatedToEeTerminated",
-            "jeWorkDoneToCrNotSatisfied",
-            "eeAcknowledgedToCrNotSatisfied",
-            "eeTerminatedToCrNotTerminated",
-          ].includes(statusChange) ||
-            (selectedComplaint.status === "RESOURCE_REQUIRED" &&
-              statusChange === "RAISED") ||
-            (selectedComplaint.status === "CR_NOT_SATISFIED" &&
-              [
-                "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
-                "EXECUTIVE_ENGINEER_IT",
-                "ASSISTANT_ENGINEER_CIVIL",
-                "ASSISTANT_ENGINEER_ELECTRICAL",
-                "ASSISTANT_ENGINEER_IT",
-              ].includes(getUser().designation))) && (
-            <div className="mt-4">
-              <label htmlFor="remark">Enter Remark:</label>
-              <div className="mt-2">
-                <textarea
-                  id="remark-text"
-                  className="block mt-2 p-2 border rounded w-full"
-                  placeholder="Enter remark"
-                  value={remark}
-                  onChange={(e) => setRemark(e.target.value)}
-                />
-              </div>
+          {/* --- REMARK FIELD: Always show, mandatory for some, optional for others --- */}
+          <div className="mt-4">
+            <label htmlFor="remark" className="font-bold">
+              Enter Remark:{" "}
+              {isRemarkMandatory(statusChange, selectedComplaint) && (
+                <span className="text-red-600">*</span>
+              )}
+            </label>
+            <div className="mt-2">
+              <textarea
+                id="remark-text"
+                className="block mt-2 p-2 border rounded w-full"
+                placeholder={
+                  isRemarkMandatory(statusChange, selectedComplaint)
+                    ? "Enter remark (required)"
+                    : "Enter remark (optional)"
+                }
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                required={isRemarkMandatory(statusChange, selectedComplaint)}
+              />
             </div>
-          )}
+          </div>
+          {/* --- END REMARK FIELD --- */}
 
           {(statusChange === "EE_ACKNOWLEDGED" ||
             statusChange === "crNotSatisfiedToEeAcknowledged") && (
@@ -447,6 +375,7 @@ const YourActivityPopup = ({
               id="popup-submit"
               onClick={handleStatusChange}
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              disabled={isRemarkMandatory(statusChange, selectedComplaint) && !remark}
             >
               Submit
             </button>
@@ -454,18 +383,6 @@ const YourActivityPopup = ({
         </div>
       </div>
     </>
-  );
-};
-
-// Remark display subcomponent
-const RemarkDisplay = ({ label, remark }) => {
-  return (
-    <div className="text-red-600 font-bold mt-5 mb-5">
-      <div className="mb-2">{label}</div>
-      <div className="max-h-[150px] overflow-y-auto border border-red-600 p-2 bg-gray-100 rounded">
-        <p className="m-0 whitespace-pre-wrap break-words">{remark}</p>
-      </div>
-    </div>
   );
 };
 

@@ -32,16 +32,30 @@ const Complaint = require("../models/complaintModel");
 const { updateNotification } = require("./notificationController");
 const { sendComplaintRaisedMail } = require("../middleware/emailHandler");
 
+// Helper to add remarks to the complaint's remarks array
+function addRemarkToComplaint(complaint, remark) {
+  if (remark) {
+    if (!Array.isArray(complaint.remarks)) complaint.remarks = [];
+    if (Array.isArray(remark)) {
+      complaint.remarks.push(...remark);
+    } else {
+      complaint.remarks.push(remark);
+    }
+  }
+}
+
 // raisedToJeAcknowledged: Acknowledges a complaint by a Junior Engineer (JE) or System Analyst (SA).
-// Updates complaint status to JE_ACKNOWLEDGED, sets acknowledgment date, and sends notification.
 const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
+
   const username = req.user.username;
 
   if (!username) {
     res.status(400);
     throw new Error("Username required.");
-  }
+    const { id, remark } = req.body;
+}
+
 
   if (!id) {
     res.status(400);
@@ -63,19 +77,20 @@ const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
       message: "Complaint already acknowledged.",
     });
   }
-  
-  let msg="";
-  let sts="JE_ACKNOWLEDGED";
+
+  addRemarkToComplaint(complaint, remark);
+
+  let msg = "";
+  let sts = "JE_ACKNOWLEDGED";
   complaint.status = "JE_ACKNOWLEDGED";
   complaint.acknowledgeAt = new Date();
   complaint.resolvedName = username;
 
   await complaint.save();
-  if(complaint.department === "IT"){
-    msg="Complaint is ACKNOWLEDGED by SYSTEM ANALYST(SA)";
-  }
-  else{
-    msg="Complaint is ACKNOWLEDGED by JUNIOR ENGINEER(JE)";
+  if (complaint.department === "IT") {
+    msg = "Complaint is ACKNOWLEDGED by SYSTEM ANALYST(SA)";
+  } else {
+    msg = "Complaint is ACKNOWLEDGED by JUNIOR ENGINEER(JE)";
   }
   updateNotification(
     complaint.complaintID,
@@ -91,9 +106,16 @@ const raisedToJeAcknowledged = asyncHandler(async (req, res) => {
 });
 
 // jeAcknowledgedToJeWorkdone: Marks a complaint as work completed by JE or SA with file uploads.
-// Saves uploaded images/videos, updates status to JE_WORKDONE, and notifies stakeholders.
 const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const id = req.body.id;
+  let remark = req.body.remark;
+  if (typeof remark === "string") {
+    try {
+      remark = JSON.parse(remark);
+    } catch (e) {
+      remark = [];
+    }
+  }
 
   if (!id) {
     res.status(400);
@@ -111,6 +133,8 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
       message: "Complaint already updated.",
     });
   }
+
+  addRemarkToComplaint(complaint, remark);
 
   const complaintID = complaint.complaintID;
 
@@ -144,16 +168,15 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
   complaint.imgAfter = imgAfterPaths;
   complaint.vidAfter = vidAfterPaths;
   let msg = "";
-  let sts="JE_WORKDONE";
+  let sts = "JE_WORKDONE";
   complaint.status = "JE_WORKDONE";
 
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Work Done by SYSTEM ANALYST(SA)";
-  }
-  else{
-    msg="Work Done by JUNIOR ENGINEER(JE)";
+  if (complaint.department === "IT") {
+    msg = "Work Done by SYSTEM ANALYST(SA)";
+  } else {
+    msg = "Work Done by JUNIOR ENGINEER(JE)";
   }
   updateNotification(
     complaint.complaintID,
@@ -161,7 +184,6 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
     sts,
     msg,
   );
-
 
   res.status(200).json({
     message: msg,
@@ -170,9 +192,8 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
 });
 
 // crNotSatisfiedToJeWorkdone: Reprocesses a complaint marked as CR_NOT_SATISFIED by JE or SA.
-// Uploads new evidence, resets remarks, updates status to JE_WORKDONE, and sends notification.
 const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
 
   if (!id) {
     res.status(400);
@@ -190,6 +211,8 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
       message: "Complaint already updated.",
     });
   }
+
+  addRemarkToComplaint(complaint, remark);
 
   const complaintID = complaint.complaintID;
 
@@ -223,17 +246,16 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
   complaint.imgAfter = imgAfterPaths;
   complaint.vidAfter = vidAfterPaths;
   let msg = "";
-  let sts="JE_WORKDONE";
+  let sts = "JE_WORKDONE";
   complaint.status = "JE_WORKDONE";
   complaint.multiple_remark_ee = [];
   complaint.multiple_remark_ae = [];
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Re-Work done by SYSTEM ANALYST(SA)";
-  }
-  else{
-    msg="Re-Work done by JUNIOR ENGINEER(JE)";
+  if (complaint.department === "IT") {
+    msg = "Re-Work done by SYSTEM ANALYST(SA)";
+  } else {
+    msg = "Re-Work done by JUNIOR ENGINEER(JE)";
   }
   updateNotification(
     complaint.complaintID,
@@ -242,7 +264,6 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
     msg,
   );
 
-
   res.status(200).json({
     message: msg,
     complaint,
@@ -250,9 +271,8 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
 });
 
 // jeWorkDoneToAeAcknowledged: Approves a complaint's work by Assistant Engineer (AE) or Officer in Charge (OC).
-// Updates status to AE_ACKNOWLEDGED and notifies relevant parties.
 const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
 
   if (!id) {
     res.status(400);
@@ -274,16 +294,17 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="AE_ACKNOWLEDGED";
+  let sts = "AE_ACKNOWLEDGED";
   complaint.status = "AE_ACKNOWLEDGED";
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Complaint is APPROVED by OFFICER in CHARGE(OC)";
-  }
-  else{
-    msg="Complaint is APPROVED by ASSISTANT ENGINEER(AE)";
+  if (complaint.department === "IT") {
+    msg = "Complaint is APPROVED by OFFICER in CHARGE(OC)";
+  } else {
+    msg = "Complaint is APPROVED by ASSISTANT ENGINEER(AE)";
   }
   updateNotification(
     complaint.complaintID,
@@ -292,7 +313,6 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
     msg,
   );
 
-
   res.status(200).json({
     message: msg,
     complaint,
@@ -300,9 +320,8 @@ const jeWorkDoneToAeAcknowledged = asyncHandler(async (req, res) => {
 });
 
 // jeWorkDoneToResolved: Marks a complaint as fully resolved after JE or SA work completion.
-// Updates status to RESOLVED and sends a final notification.
 const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
 
   if (!id) {
     res.status(400);
@@ -324,8 +343,10 @@ const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "Complaint is RESOLVED";
-  let sts="RESOLVED";
+  let sts = "RESOLVED";
   complaint.status = "RESOLVED";
   await complaint.save();
 
@@ -336,7 +357,6 @@ const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
     msg,
   );
 
-
   res.status(200).json({
     message: "Complaint status updated to RESOLVED successfully.",
     complaint,
@@ -344,11 +364,10 @@ const jeWorkDoneToResolved = asyncHandler(async (req, res) => {
 });
 
 // jeWorkDoneToCrNotSatisfied: Marks a complaint as unsatisfactory by the complainant (CR).
-// Updates status to CR_NOT_SATISFIED, adds remark, and sends notification.
 const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
-  const { id, remark_CR } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_CR) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and CR remark are required.");
   }
@@ -368,17 +387,17 @@ const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
   complaint.reRaised = true;
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="CR_NOT_SATISFIED";
+  let sts = "CR_NOT_SATISFIED";
   complaint.status = "CR_NOT_SATISFIED";
-  complaint.remark_CR = remark_CR;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Complainant is not Satisfied with the work done by SYSTEM ANALYST(SA)";
-  }
-  else{
-    msg="Complainant is not satisfied with the word done by JUNIOR ENGINEER(JE)";
+  if (complaint.department === "IT") {
+    msg = "Complainant is not Satisfied with the work done by SYSTEM ANALYST(SA)";
+  } else {
+    msg = "Complainant is not satisfied with the word done by JUNIOR ENGINEER(JE)";
   }
   updateNotification(
     complaint.complaintID,
@@ -387,7 +406,6 @@ const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
     msg,
   );
 
-
   res.status(200).json({
     message: msg,
     complaint,
@@ -395,9 +413,8 @@ const jeWorkDoneToCrNotSatisfied = asyncHandler(async (req, res) => {
 });
 
 // aeNotTerminatedToRaised: Reverts a non-terminated complaint to RAISED status.
-// Updates status to RAISED and notifies relevant parties.
 const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
 
   if (!id) {
     res.status(400);
@@ -419,8 +436,10 @@ const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "Complaint is RAISED again";
-  let sts="RAISED";
+  let sts = "RAISED";
   complaint.status = "RAISED";
   await complaint.save();
 
@@ -431,7 +450,6 @@ const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
     msg,
   );
 
-
   res.status(200).json({
     message: msg,
     complaint,
@@ -439,9 +457,8 @@ const aeNotTerminatedToRaised = asyncHandler(async (req, res) => {
 });
 
 // eeTerminatedToTerminated: Finalizes a complaint as TERMINATED by Executive Engineer (EE).
-// Updates status to TERMINATED and sends notification.
 const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
 
   if (!id) {
     res.status(400);
@@ -460,8 +477,10 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "Complaint is TERMINATED";
-  let sts="TERMINATED";
+  let sts = "TERMINATED";
   complaint.status = "TERMINATED";
   await complaint.save();
 
@@ -479,9 +498,8 @@ const eeTerminatedToTerminated = asyncHandler(async (req, res) => {
 });
 
 // aeAcknowledgedToEeAcknowledged: Approves a complaint by Executive Engineer (EE) or resolves it for IT department.
-// Updates status to EE_ACKNOWLEDGED or RESOLVED based on designation and notifies stakeholders.
 const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
-  const { id, price, priceLater } = req.body;
+  const { id, price, priceLater, remark } = req.body;
   const designation = req.user.designation;
 
   if (!id) {
@@ -500,10 +518,12 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
-  if(!priceLater){
+  addRemarkToComplaint(complaint, remark);
+
+  if (!priceLater) {
     complaint.price = price;
   }
-  else{
+  else {
     complaint.priceLater = true;
   }
 
@@ -551,9 +571,8 @@ const aeAcknowledgedToEeAcknowledged = asyncHandler(async (req, res) => {
 });
 
 // eeAcknowledgedToResolved: Marks a complaint as fully resolved after EE acknowledgment.
-// Updates status to RESOLVED, sets resolution date, and sends notification.
 const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id, remark } = req.body;
 
   if (!id) {
     res.status(400);
@@ -572,8 +591,10 @@ const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "Complaint is RESOLVED";
-  let sts="RESOLVED";
+  let sts = "RESOLVED";
   complaint.status = "RESOLVED";
   complaint.resolvedAt = new Date();
   await complaint.save();
@@ -592,11 +613,10 @@ const eeAcknowledgedToResolved = asyncHandler(async (req, res) => {
 });
 
 // aeNotTerminatedToResourceRequired: Requests resources for a non-terminated complaint by JE or SA.
-// Updates status to RESOURCE_REQUIRED, adds JE remark, and notifies stakeholders.
 const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
-  const { id, remark_JE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_JE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and JE remark are required.");
   }
@@ -616,17 +636,17 @@ const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="RESOURCE_REQUIRED";
+  let sts = "RESOURCE_REQUIRED";
   complaint.status = "RESOURCE_REQUIRED";
-  complaint.remark_JE = remark_JE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="SYSTEM ANALYST(SA) is requesting for RESOURCES";
-  }
-  else{
-    msg="JUNIOR ENGINEER(JE) is requesting for RESOURCES";
+  if (complaint.department === "IT") {
+    msg = "SYSTEM ANALYST(SA) is requesting for RESOURCES";
+  } else {
+    msg = "JUNIOR ENGINEER(JE) is requesting for RESOURCES";
   }
   updateNotification(
     complaint.complaintID,
@@ -642,11 +662,10 @@ const aeNotTerminatedToResourceRequired = asyncHandler(async (req, res) => {
 });
 
 // resourceRequiredToAeNotTerminated: Cancels a resource request by Assistant Engineer (AE) or Officer in Charge.
-// Updates status to AE_NOT_TERMINATED, adds AE remark, and sends notification.
 const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_AE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_AE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and AE remark are required.");
   }
@@ -666,17 +685,17 @@ const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="AE_NOT_TERMINATED";
+  let sts = "AE_NOT_TERMINATED";
   complaint.status = "AE_NOT_TERMINATED";
-  complaint.remark_AE = remark_AE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="OFFICER in CHARGE cancels the RESOURCE REQUIRED request";
-  }
-  else{
-    msg="ASSISTANT ENGINEER cancels the RESOURCE REQUIRED request";
+  if (complaint.department === "IT") {
+    msg = "OFFICER in CHARGE cancels the RESOURCE REQUIRED request";
+  } else {
+    msg = "ASSISTANT ENGINEER cancels the RESOURCE REQUIRED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -692,11 +711,10 @@ const resourceRequiredToAeNotTerminated = asyncHandler(async (req, res) => {
 });
 
 // resourceRequiredToAeTerminated: Approves a resource request by Assistant Engineer (AE) or Officer in Charge.
-// Updates status to AE_TERMINATED, adds AE remark, and notifies stakeholders.
 const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_AE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_AE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and AE remark are required.");
   }
@@ -716,17 +734,17 @@ const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="AE_TERMINATED";
+  let sts = "AE_TERMINATED";
   complaint.status = "AE_TERMINATED";
-  complaint.remark_AE = remark_AE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="OFFICER in CHARGE accepts the RESOURCE REQUIRED request";
-  }
-  else{
-    msg="ASSISTANT ENGINEER accepts the RESOURCE REQUIRED request";
+  if (complaint.department === "IT") {
+    msg = "OFFICER in CHARGE accepts the RESOURCE REQUIRED request";
+  } else {
+    msg = "ASSISTANT ENGINEER accepts the RESOURCE REQUIRED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -742,11 +760,10 @@ const resourceRequiredToAeTerminated = asyncHandler(async (req, res) => {
 });
 
 // aeTerminatedToEeNotTerminated: Rejects a termination request by Executive Engineer (EE) or Head of Office.
-// Updates status to EE_NOT_TERMINATED, adds EE remark, and sends notification.
 const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_EE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_EE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and EE remark are required.");
   }
@@ -766,17 +783,17 @@ const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="EE_NOT_TERMINATED";
+  let sts = "EE_NOT_TERMINATED";
   complaint.status = "EE_NOT_TERMINATED";
-  complaint.remark_EE = remark_EE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="HEAD of OFFICE cancels the complaint TERMINATED request";
-  }
-  else{
-    msg="EXECUTIVE ENGINEER cancels the complaint TERMINATED request";
+  if (complaint.department === "IT") {
+    msg = "HEAD of OFFICE cancels the complaint TERMINATED request";
+  } else {
+    msg = "EXECUTIVE ENGINEER cancels the complaint TERMINATED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -792,11 +809,10 @@ const aeTerminatedToEeNotTerminated = asyncHandler(async (req, res) => {
 });
 
 // eeTerminatedToCrNotTerminated: Allows complainant to reject a termination request.
-// Updates status to CR_NOT_TERMINATED, adds CR remark, and notifies stakeholders.
 const eeTerminatedToCrNotTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_CR } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_CR) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and CR remark are required.");
   }
@@ -816,17 +832,17 @@ const eeTerminatedToCrNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="CR_NOT_TERMINATED";
+  let sts = "CR_NOT_TERMINATED";
   complaint.status = "CR_NOT_TERMINATED";
-  complaint.remark_CR = remark_CR;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="HEAD of OFFICE cancels the complaint TERMINATED request";
-  }
-  else{
-    msg="Complaint Raiser cancels the complaint TERMINATED request";
+  if (complaint.department === "IT") {
+    msg = "HEAD of OFFICE cancels the complaint TERMINATED request";
+  } else {
+    msg = "Complaint Raiser cancels the complaint TERMINATED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -842,11 +858,10 @@ const eeTerminatedToCrNotTerminated = asyncHandler(async (req, res) => {
 });
 
 // eeNotTerminatedToAeTerminated: Approves a previously rejected termination request by Assistant Engineer (AE) or Officer in Charge.
-// Updates status to AE_TERMINATED, adds AE remark, and notifies stakeholders.
 const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_AE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_AE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and AE remark are required.");
   }
@@ -866,17 +881,17 @@ const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="AE_TERMINATED";
+  let sts = "AE_TERMINATED";
   complaint.status = "AE_TERMINATED";
-  complaint.remark_AE = remark_AE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="OFFICER in CHARGE accepts the complaint TERMINATED request";
-  }
-  else{
-    msg="ASSISTANT ENGINEER accepts the complaint TERMINATED request";
+  if (complaint.department === "IT") {
+    msg = "OFFICER in CHARGE accepts the complaint TERMINATED request";
+  } else {
+    msg = "ASSISTANT ENGINEER accepts the complaint TERMINATED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -892,11 +907,10 @@ const eeNotTerminatedToAeTerminated = asyncHandler(async (req, res) => {
 });
 
 // aeTerminatedToEeTerminated: Finalizes a termination request by Executive Engineer (EE) or Head of Office.
-// Updates status to EE_TERMINATED, adds EE remark, and sends notification.
 const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_EE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_EE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and EE remark are required.");
   }
@@ -916,17 +930,17 @@ const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="EE_TERMINATED";
+  let sts = "EE_TERMINATED";
   complaint.status = "EE_TERMINATED";
-  complaint.remark_EE = remark_EE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="HEAD of OFFICE accepts the complaint TERMINATED request";
-  }
-  else{
-    msg="EXECUTIVE ENGINEER accepts the complaint TERMINATED request";
+  if (complaint.department === "IT") {
+    msg = "HEAD of OFFICE accepts the complaint TERMINATED request";
+  } else {
+    msg = "EXECUTIVE ENGINEER accepts the complaint TERMINATED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -942,11 +956,10 @@ const aeTerminatedToEeTerminated = asyncHandler(async (req, res) => {
 });
 
 // eeNotTerminatedToAeNotTerminated: Rejects a termination request by Assistant Engineer (AE) or Officer in Charge after EE rejection.
-// Updates status to AE_NOT_TERMINATED, adds AE remark, and notifies stakeholders.
 const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
-  const { id, remark_AE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_AE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and AE remark are required.");
   }
@@ -966,17 +979,17 @@ const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="AE_NOT_TERMINATED";
+  let sts = "AE_NOT_TERMINATED";
   complaint.status = "AE_NOT_TERMINATED";
-  complaint.remark_AE = remark_AE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="OFFICER in CHARGE cancels the complaint TERMINATED request";
-  }
-  else{
-    msg="ASSISTANT ENGINEER cancels the complaint TERMINATED request";
+  if (complaint.department === "IT") {
+    msg = "OFFICER in CHARGE cancels the complaint TERMINATED request";
+  } else {
+    msg = "ASSISTANT ENGINEER cancels the complaint TERMINATED request";
   }
   updateNotification(
     complaint.complaintID,
@@ -992,11 +1005,10 @@ const eeNotTerminatedToAeNotTerminated = asyncHandler(async (req, res) => {
 });
 
 // jeWorkdoneToAeNotSatisfied: Marks a complaint as unsatisfactory by Assistant Engineer (AE) or Officer in Charge.
-// Updates status to AE_NOT_SATISFIED, adds AE remark, sets reRaised flag, and sends notification.
 const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
-  const { id, remark_AE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_AE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and AE remark are required.");
   }
@@ -1016,18 +1028,18 @@ const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
 
-  let msg ="";
-  let sts="AE_NOT_SATISFIED";
+  addRemarkToComplaint(complaint, remark);
+
+  let msg = "";
+  let sts = "AE_NOT_SATISFIED";
   complaint.status = "AE_NOT_SATISFIED";
-  complaint.remark_AE = remark_AE;
   complaint.reRaised = true;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="OFFICER in CHARGE is not satisfied with the WORKDONE";
-  }
-  else{
-    msg="ASSISTANT ENGINEER is not satisfied with the WORKDONE";
+  if (complaint.department === "IT") {
+    msg = "OFFICER in CHARGE is not satisfied with the WORKDONE";
+  } else {
+    msg = "ASSISTANT ENGINEER is not satisfied with the WORKDONE";
   }
   updateNotification(
     complaint.complaintID,
@@ -1043,11 +1055,10 @@ const jeWorkdoneToAeNotSatisfied = asyncHandler(async (req, res) => {
 });
 
 // aeAcknowledgedToEeNotSatisfied: Marks a complaint as unsatisfactory by Executive Engineer (EE) or Head of Office.
-// Updates status to EE_NOT_SATISFIED, adds EE remark, sets reRaised flag, and notifies stakeholders.
 const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
-  const { id, remark_EE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_EE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and EE remark are required.");
   }
@@ -1067,18 +1078,18 @@ const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="EE_NOT_SATISFIED";
+  let sts = "EE_NOT_SATISFIED";
   complaint.status = "EE_NOT_SATISFIED";
-  complaint.remark_EE = remark_EE;
   complaint.reRaised = true;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="HEAD of OFFICE is not satisfied with the WORKDONE";
-  }
-  else{
-    msg="EXECUTIVE ENGINEER is not satisfied with the WORKDONE";
+  if (complaint.department === "IT") {
+    msg = "HEAD of OFFICE is not satisfied with the WORKDONE";
+  } else {
+    msg = "EXECUTIVE ENGINEER is not satisfied with the WORKDONE";
   }
   updateNotification(
     complaint.complaintID,
@@ -1094,11 +1105,10 @@ const aeAcknowledgedToEeNotSatisfied = asyncHandler(async (req, res) => {
 });
 
 // raisedToResourceRequired: Requests resources for a newly raised complaint by Junior Engineer (JE) or System Analyst (SA).
-// Updates status to RESOURCE_REQUIRED, adds JE remark, and sends notification.
 const raisedToResourceRequired = asyncHandler(async (req, res) => {
-  const { id, remark_JE } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_JE) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and JE remark are required.");
   }
@@ -1118,17 +1128,17 @@ const raisedToResourceRequired = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="RESOURCE_REQUIRED";
+  let sts = "RESOURCE_REQUIRED";
   complaint.status = "RESOURCE_REQUIRED";
-  complaint.remark_JE = remark_JE;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="RESOURCE REQUIRED by SYSTEM ANALYST";
-  }
-  else{
-    msg="RESOURCE REQUIRED by JUNIOR ENGINEER";
+  if (complaint.department === "IT") {
+    msg = "RESOURCE REQUIRED by SYSTEM ANALYST";
+  } else {
+    msg = "RESOURCE REQUIRED by JUNIOR ENGINEER";
   }
   updateNotification(
     complaint.complaintID,
@@ -1144,11 +1154,10 @@ const raisedToResourceRequired = asyncHandler(async (req, res) => {
 });
 
 // resourceRequiredToRaised: Cancels a resource request by the complainant (CR), reverting to RAISED status.
-// Updates status to RAISED, adds CR remark, and notifies stakeholders.
 const resourceRequiredToRaised = asyncHandler(async (req, res) => {
-  const { id, remark_CR } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_CR) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and CR remark are required.");
   }
@@ -1165,17 +1174,17 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="RAISED";
+  let sts = "RAISED";
   complaint.status = "RAISED";
-  complaint.remark_CR = remark_CR;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Request for RESOURCE is cancelled";
-  }
-  else{
-    msg="Request for RESOURCE is cancelled";
+  if (complaint.department === "IT") {
+    msg = "Request for RESOURCE is cancelled";
+  } else {
+    msg = "Request for RESOURCE is cancelled";
   }
   updateNotification(
     complaint.complaintID,
@@ -1191,7 +1200,6 @@ const resourceRequiredToRaised = asyncHandler(async (req, res) => {
 });
 
 // aeRemarkWhenCrNotSatisfied: Adds an additional remark by Assistant Engineer (AE) to a CR_NOT_SATISFIED complaint.
-// Appends remark to multiple_remark_ae array and saves the updated complaint.
 const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark } = req.body;
 
@@ -1206,8 +1214,7 @@ const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
-  complaint.multiple_remark_ae.push(remark);
-  await complaint.save();
+  addRemarkToComplaint(complaint, remark);
 
   res.status(200).json({
     message: "Complaint status updated successfully.",
@@ -1216,7 +1223,6 @@ const aeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
 });
 
 // eeRemarkWhenCrNotSatisfied: Adds an additional remark by Executive Engineer (EE) to a CR_NOT_SATISFIED complaint.
-// Appends remark to multiple_remark_ee array and saves the updated complaint.
 const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
   const { id, remark } = req.body;
 
@@ -1231,8 +1237,7 @@ const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
-  complaint.multiple_remark_ee.push(remark);
-  await complaint.save();
+  addRemarkToComplaint(complaint, remark);
 
   res.status(200).json({
     message: "Complaint status updated successfully.",
@@ -1241,11 +1246,10 @@ const eeRemarkWhenCrNotSatisfied = asyncHandler(async (req, res) => {
 });
 
 // eeAcknowledgedToCrNotSatisfied: Marks a complaint as unsatisfactory by the complainant after EE acknowledgment.
-// Updates status to CR_NOT_SATISFIED, adds CR remark, sets reRaised flag, and sends notification.
 const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
-  const { id, remark_CR } = req.body;
+  const { id, remark } = req.body;
 
-  if (!id || !remark_CR) {
+  if (!id || !remark) {
     res.status(400);
     throw new Error("Complaint ID and CR remark are required.");
   }
@@ -1265,18 +1269,18 @@ const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
     });
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   let msg = "";
-  let sts="CR_NOT_SATISFIED";
+  let sts = "CR_NOT_SATISFIED";
   complaint.status = "CR_NOT_SATISFIED";
-  complaint.remark_CR = remark_CR;
   complaint.reRaised = true;
   await complaint.save();
 
-  if(complaint.department === "IT"){
-    msg="Complainant is NOT SATISFIED with the work done";
-  }
-  else{
-    msg="Complainant is NOT SATISFIED with the work done";
+  if (complaint.department === "IT") {
+    msg = "Complainant is NOT SATISFIED with the work done";
+  } else {
+    msg = "Complainant is NOT SATISFIED with the work done";
   }
   updateNotification(
     complaint.complaintID,
@@ -1292,9 +1296,8 @@ const eeAcknowledgedToCrNotSatisfied = asyncHandler(async (req, res) => {
 });
 
 // changeComplaintDepartment: Updates the department of a complaint and triggers an email notification.
-// Changes department, saves previous department for reference, and sends notification.
 const changeComplaintDepartment = asyncHandler(async (req, res) => {
-  const { id, newDepartment } = req.body;
+  const { id, newDepartment, remark } = req.body;
 
   if (!id || !newDepartment) {
     res.status(400);
@@ -1308,15 +1311,17 @@ const changeComplaintDepartment = asyncHandler(async (req, res) => {
     throw new Error("Complaint not found.");
   }
 
+  addRemarkToComplaint(complaint, remark);
+
   const previousDepartment = complaint.department;
 
   complaint.department = newDepartment;
   await complaint.save();
 
   sendComplaintRaisedMail(complaint._id);
-  let msg="Department changed from "+previousDepartment+" to "+newDepartment;
-  let sts="DEPARTMENT_CHANGED";
- 
+  let msg = "Department changed from " + previousDepartment + " to " + newDepartment;
+  let sts = "DEPARTMENT_CHANGED";
+
   updateNotification(
     complaint.complaintID,
     complaint.subject,
@@ -1332,7 +1337,7 @@ const changeComplaintDepartment = asyncHandler(async (req, res) => {
 
 // updateComplaintPrice: Updates the price of a complaint and saves the complaint.
 const updateComplaintPrice = asyncHandler(async (req, res) => {
-  const { id, price } = req.body;
+  const { id, price, remark } = req.body;
 
   if (!id || price === undefined || (!price && price !== 0)) {
     res.status(400);
@@ -1344,6 +1349,8 @@ const updateComplaintPrice = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Complaint not found.");
   }
+
+  addRemarkToComplaint(complaint, remark);
 
   complaint.price = price;
   complaint.priceLater = false;

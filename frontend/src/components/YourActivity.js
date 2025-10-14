@@ -35,6 +35,7 @@ import {
   updateWorkDone,
   changeDepartment,
 } from "../services/yourActivity";
+import { designationFormat } from "../utils/formatting";
 import YourActivityPopup from "./YourActivityPopup";
 import ComplaintBasicDetails from "./ComplaintBasicDetails";
 import { toast } from "react-toastify";
@@ -146,7 +147,17 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
       return;
     }
 
-    if (!statusChange && (selectedComplaint.status !== "CR_NOT_SATISFIED" && !["EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL", "EXECUTIVE_ENGINEER_IT", "ASSISTANT_ENGINEER_CIVIL", "ASSISTANT_ENGINEER_ELECTRICAL", "ASSISTANT_ENGINEER_IT"].includes(getUser().designation))) {
+    if (
+      !statusChange &&
+      (selectedComplaint.status !== "CR_NOT_SATISFIED" &&
+        ![
+          "EXECUTIVE_ENGINEER_CIVIL_AND_ELECTRICAL",
+          "EXECUTIVE_ENGINEER_IT",
+          "ASSISTANT_ENGINEER_CIVIL",
+          "ASSISTANT_ENGINEER_ELECTRICAL",
+          "ASSISTANT_ENGINEER_IT",
+        ].includes(getUser().designation))
+    ) {
       toast.error("Choose the status to change");
       return;
     }
@@ -162,129 +173,139 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
       return;
     }
 
-    let body = {};
-    body["id"] = selectedComplaint._id;
-    let endpoint = "";
-    if (getUser().designation === "EXECUTIVE_ENGINEER_IT" && statusChange === "APPROVE") {
-      endpoint = "ae-acknowledged/ee-acknowledged";
-      body["price"] = price;
-      body["priceLater"] = priceLater;
+    // Always build remark array: empty if no text, else array with one object
+    let remarkArr = [];
+    if (remark && remark.trim() !== "") {
+      remarkArr = [
+        {
+          timestamp: new Date().toISOString(),
+          designation: designationFormat(getUser().designation),
+          remark: remark,
+        },
+      ];
     }
-    switch (statusChange) {
-      case "JE_ACKNOWLEDGED":
-        endpoint = "raised/je-acknowledged";
-        break;
-      case "RESOURCE_REQUIRED":
-        endpoint = "raised/resource-required";
-        body["remark_JE"] = remark;
-        break;
-      case "AE_ACKNOWLEDGED":
-        endpoint = "je-workdone/ae-acknowledged";
-        break;
-      case "AE_NOT_SATISFIED":
-        endpoint = "je-workdone/ae-not-satisfied";
-        body["remark_AE"] = remark;
-        break;
-      case "EE_ACKNOWLEDGED":
+
+
+    let body;
+    let endpoint = "";
+
+    // Handle file upload cases (FormData)
+    if (
+      statusChange === "JE_WORKDONE" ||
+      statusChange === "crNotSatisfiedToJeWorkdone"
+    ) {
+      body = new FormData();
+      body.append("id", selectedComplaint._id);
+      if (files.imgAfter_1) body.append("imgAfter_1", files.imgAfter_1);
+      if (files.imgAfter_2) body.append("imgAfter_2", files.imgAfter_2);
+      if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
+      if (files.vidAfter) body.append("vidAfter", files.vidAfter);
+      // Always attach remark array (empty or with one object)
+      body.append("remark", JSON.stringify(remarkArr));
+      endpoint =
+        statusChange === "JE_WORKDONE"
+          ? "je-acknowledged/je-workdone"
+          : "cr-not-satisfied/je-workdone";
+    } else {
+      // All other cases: always send remark array
+      body = {
+        id: selectedComplaint._id,
+        remark: remarkArr,
+      };
+      if (
+        getUser().designation === "EXECUTIVE_ENGINEER_IT" &&
+        statusChange === "APPROVE"
+      ) {
         endpoint = "ae-acknowledged/ee-acknowledged";
         body["price"] = price;
         body["priceLater"] = priceLater;
-        break;
-      case "EE_NOT_SATISFIED":
-        endpoint = "ae-acknowledged/ee-not-satisfied";
-        body["remark_EE"] = remark;
-        break;
-      case "RESOLVED":
-        endpoint = "ee-acknowledged/resolved";
-        break;
-      case "RAISED":
-        endpoint = "resource-required/raised";
-        body["remark_CR"] = remark;
-        break;
-      case "JE_WORKDONE":
-        endpoint = "je-acknowledged/je-workdone";
-        body = new FormData();
-        body.append("id", selectedComplaint._id);
-        if (files.imgAfter_1) body.append("imgAfter_1", files.imgAfter_1);
-        if (files.imgAfter_2) body.append("imgAfter_2", files.imgAfter_2);
-        if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
-        if (files.vidAfter) body.append("vidAfter", files.vidAfter);
-        break;
-      case "aeNotTerminatedToRaised":
+      }
+      switch (statusChange) {
+        case "JE_ACKNOWLEDGED":
+          endpoint = "raised/je-acknowledged";
+          break;
+        case "RESOURCE_REQUIRED":
+          endpoint = "raised/resource-required";
+          break;
+        case "AE_ACKNOWLEDGED":
+          endpoint = "je-workdone/ae-acknowledged";
+          break;
+        case "AE_NOT_SATISFIED":
+          endpoint = "je-workdone/ae-not-satisfied";
+          break;
+        case "EE_ACKNOWLEDGED":
+          endpoint = "ae-acknowledged/ee-acknowledged";
+          body["price"] = price;
+          body["priceLater"] = priceLater;
+          break;
+        case "EE_NOT_SATISFIED":
+          endpoint = "ae-acknowledged/ee-not-satisfied";
+          break;
+        case "RESOLVED":
+          endpoint = "ee-acknowledged/resolved";
+          break;
+        case "RAISED":
+          endpoint = "resource-required/raised";
+          break;
+        case "aeNotTerminatedToRaised":
           endpoint = "ae-not-terminated/raised";
           break;
-      case "eeAcknowledgedToCrNotSatisfied":
-          body["remark_CR"] = remark;
+        case "eeAcknowledgedToCrNotSatisfied":
           endpoint = "ee-acknowledged/cr-not-satisfied";
           break;
-      case "aeNotTerminatedToResourceRequired":
-          body["remark_JE"] = remark;
+        case "aeNotTerminatedToResourceRequired":
           endpoint = "ae-not-terminated/resource-required";
           break;
-      case "resourceRequiredToAeNotTerminated":
-          body["remark_AE"] = remark;
+        case "resourceRequiredToAeNotTerminated":
           endpoint = "resource-required/ae-not-terminated";
           break;
-      case "resourceRequiredToAeTerminated":
-          body["remark_AE"] = remark;
+        case "resourceRequiredToAeTerminated":
           endpoint = "resource-required/ae-terminated";
           break;
-      case "aeTerminatedToEeNotTerminated":
-          body["remark_EE"] = remark;
+        case "aeTerminatedToEeNotTerminated":
           endpoint = "ae-terminated/ee-not-terminated";
           break;
-      case "eeNotTerminatedToAeTerminated":
-          body["remark_AE"] = remark;
+        case "eeNotTerminatedToAeTerminated":
           endpoint = "ee-not-terminated/ae-terminated";
           break;
-      case "aeTerminatedToEeTerminated":
-          body["remark_EE"] = remark;
+        case "aeTerminatedToEeTerminated":
           endpoint = "ae-terminated/ee-terminated";
           break;
-      case "eeTerminatedToTerminated":
+        case "eeTerminatedToTerminated":
           endpoint = "ee-terminated/terminated";
           break;
-      case "eeNotTerminatedToAeNotTerminated":
-          body["remark_AE"] = remark;
+        case "eeNotTerminatedToAeNotTerminated":
           endpoint = "ee-not-terminated/ae-not-terminated";
           break;
-      case "jeWorkDoneToResolved":
-            endpoint = "je-workdone/resolved";
-            break;
-      case "jeWorkDoneToCrNotSatisfied":
-            body["remark_CR"] = remark;
-            endpoint = "je-workdone/cr-not-satisfied";
-            break;
-      case "crNotSatisfiedToJeWorkdone":
-            endpoint = "cr-not-satisfied/je-workdone";
-            body = new FormData();
-            body.append("id", selectedComplaint._id);
-            if (files.imgAfter_1) body.append("imgAfter_1", files.imgAfter_1);
-            if (files.imgAfter_2) body.append("imgAfter_2", files.imgAfter_2);
-            if (files.imgAfter_3) body.append("imgAfter_3", files.imgAfter_3);
-            if (files.vidAfter) body.append("vidAfter", files.vidAfter);
-            break;
-      case "aeRemarkWhenCrNotSatisfied":
-            body["remark"] = remark;
-            endpoint = "ae-remark/cr-not-satisfied";
-            break;
-      case "eeRemarkWhenCrNotSatisfied":
-            body["remark"] = remark;
-            endpoint = "ee-remark/cr-not-satisfied";
-            break;
-      case "eeTerminatedToCrNotTerminated":
-            body["remark_CR"] = remark;
-            endpoint = "ee-terminated/cr-not-terminated";
-            break;
-      default:
+        case "jeWorkDoneToResolved":
+          endpoint = "je-workdone/resolved";
           break;
+        case "jeWorkDoneToCrNotSatisfied":
+          endpoint = "je-workdone/cr-not-satisfied";
+          break;
+        case "aeRemarkWhenCrNotSatisfied":
+          endpoint = "ae-remark/cr-not-satisfied";
+          break;
+        case "eeRemarkWhenCrNotSatisfied":
+          endpoint = "ee-remark/cr-not-satisfied";
+          break;
+        case "eeTerminatedToCrNotTerminated":
+          endpoint = "ee-terminated/cr-not-terminated";
+          break;
+        default:
+          // For all other status changes, use generic endpoint if needed
+          break;
+      }
     }
 
     try {
       setLoading(true);
       let response;
-      if (statusChange === "JE_WORKDONE" || statusChange === "crNotSatisfiedToJeWorkdone") {
-        response = await updateWorkDone(body,endpoint);
+      if (
+        statusChange === "JE_WORKDONE" ||
+        statusChange === "crNotSatisfiedToJeWorkdone"
+      ) {
+        response = await updateWorkDone(body, endpoint);
       } else {
         response = await updateStatus(body, endpoint);
       }
@@ -294,7 +315,11 @@ const YourActivity = ({ setComplaintCount, handleComplaintStatusChange }) => {
       if (statusChange !== "JE_ACKNOWLEDGED") {
         setComplaintCount((prevCount) => prevCount - 1);
       }
-      if (["RESOLVED", "eeTerminatedToTerminated", "jeWorkDoneToResolved"].includes(statusChange)) {
+      if (
+        ["RESOLVED", "eeTerminatedToTerminated", "jeWorkDoneToResolved"].includes(
+          statusChange
+        )
+      ) {
         handleComplaintStatusChange(selectedComplaint._id, statusChange);
       }
     } catch (error) {
