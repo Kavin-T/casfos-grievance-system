@@ -154,12 +154,7 @@ const MainPage = () => {
           <div className="text-center max-w-4xl w-full pt-[10rem]">
             <h1 className="text-2xl md:text-3xl font-bold mb-4">About Us</h1>
             <p className="text-sm md:text-lg text-justify mb-6">
-              The Central Academy for State Forest Service, CASFOS, Coimbatore (erstwhile State Forest Service
-              college) is one of the premier institutions under the aegis of
-              Directorate of Forest Education, Ministry of Environment, Forests
-              and Climate Change, which imparts professional training to newly
-              recruited ACF’s and RFO’s and in-service training to the State Forest
-              Service Officers of ACF and DCF ranks.
+              The Central Academy for State Forest Service(CASFOS), Coimbatore is one of the premier institutions under the aegis of Directorate of Forest Education, Ministry of Environment, Forest and Climate Change, Dehradun which imparts Professional Induction Training to the newly recruited State Forest Officers (ACF) and Forest Range Officers (FRO) from various States and offers In-Service Training to the State Forest Service Officers of DCF, ACF, and FRO ranks.
             </p>
             <img
               src={casfos_vana_vigyan}
@@ -167,19 +162,9 @@ const MainPage = () => {
               className="h-auto w-auto object-cover mx-auto mb-6"
             />
             <p className="text-sm md:text-lg text-justify">
-              The Academy was set up in the year 1980. Earlier to this, the
-              State Forest Service Officers had been were trained at the
-              erstwhile Indian Forest College, Dehradun and State Forest Service
-              College, Burnihat . With the advent of developmental schemes in
-              Forestry sector during the IV and V Five year plans, and launching
-              of the Social Forestry Projects in many States, the Government of
-              India felt the urgency of starting two more institutions to train
-              the increasing number of officers specially from the State
-              Services, and as a sequel to this the college was established on
-              25th January, 1980, along with the State Forest Service College,
-              Burnihat.
-              <br />
-              <b>Last updated: 05 Mar, 2025</b>
+              It also conducts General Awareness & Capacity building courses/workshops for other stake holders on importance of Forests, Forest Policy and Law to enable smooth interface between Forest and other departments
+              <br /><br />
+              The Academy was set up in the year 1980. Prior to this, the State Forest Service Officers had been were trained at the erstwhile Indian Forest College, Dehradun and State Forest Service College, Burnihat.<br/>
             </p>
           </div>
         </section>
@@ -195,118 +180,48 @@ const MainPage = () => {
             <h1 className="text-2xl md:text-3xl font-bold mb-4">
               History of the Academy
             </h1>
-            <p className="text-sm md:text-lg text-justify mb-6">
-              The Central Academy for State Forest Service, Coimbatore is one of
-              the premier institutions under the aegis of Directorate of Forest
-              Education, Ministry of Environment, Forest and Climate Change,
-              Dehradun which imparts Professional Induction Training to the
-              newly recruited State Forest Officers (ACF) and Forest Range
-              Officers (FRO) from various States and offers In-Service Training
-              to the State Forest Service Officers of DCF, ACF, and FRO ranks.
-              It also conducts General Awareness & Capacity building
-              courses/workshops for other stake holders on importance of
-              Forests, Forest Policy and Law to enable smooth interface between
-              Forest and other departments
-            </p>
-            <img
-              src={casfos_coimbatore_img4}
-              alt="History"
-              className="h-auto w-auto object-cover mx-auto mb-6"
-            />
-            <h1 className="text-left text-xl md:text-xl font-bold mb-4">
-              Mandate
-            </h1>
-            <ul className="text-sm md:text-lg text-justify mb-6 list-disc list-inside">
-              <li>
-                To impart Professional training to the newly recruited State
-                Forest Service officers and to bring them up as capable of
-                meeting future challenges in the sphere of Forests, Wildlife &
-                Environment through Capacity building & Knowledge sharing
-              </li>
-              <li>
-                Strengthening existing management process and disseminating new
-                concepts through continued education, in the shape of In-service
-                Courses to augment their managerial skills with administrative &
-                technical acumen.
-              </li>
-              <li>
-                Conducting Special & Theme based Workshops and Refresher Courses
-                covering emerging issues in forestry research and technology.
-              </li>
-              <li>
-                Re-orienting forest education in tune with requisite parameters
-                of ecology and environment.
-              </li>
-            </ul>
+                        
             <h1 className="text-left text-xl md:text-xl font-bold mb-4">
               Genesis of Forest Training in The Coimbatore
             </h1>
             <p className="text-sm md:text-lg text-justify">
               It is interesting to note that CASFOS Coimbatore played a major
-              role in forestry education and training in South India. The
-              Forestry Education commenced in India in 1867, based on the
-              recommendation of Sir Dietrich Brandis, the First Inspector
-              General of Forests. A Forest school was set up to train Rangers
-              and Foresters at Dehradun in the year 1878 by the then North West
-              Province which was later taken over by the Government of India and
-              designated as the Imperial Forest College.
-              <br />
-              Next mile stone in Forestry Education in India was the
-              establishment of Madras Forest College at Coimbatore in the year
-              1912 by the then Madras Presidency with Mr. F. L. C. Cowley Brown,
-              I.F.S., as its first Principal. Mr. F. A. Lodge, then Conservator
-              of Forests in Coimbatore was instrumental in the establishment of
-              this College. It was the second Forest Rangers College in India,
-              after Dehra Dun. It was set up to meet the rising demand of
-              trained Foresters in the country, especially those from the South
-              India. <br />
-              During the Second World War, the Madras Forest College was closed
-              down and was revived in 1945 by C. R. Ranganathan as its first
-              Indian Principal. It was taken over by Government of India in 1948
-              to train more number of Forest Ranger Trainees as the demand was
-              going up after the Independence. <br /> <br />
-              <img
-                src={casfos_coimbatore_img5}
-                alt="History"
-                className="h-auto w-auto object-cover mx-auto mb-6"
-              />
-              <img
-                src={casfos_coimbatore_img3}
-                alt="History"
-                className="h-auto w-auto object-cover mx-auto mb-6"
-              />
-              The historic Forest Campus that housed the MFC which later became
-              the “Southern Forest Rangers College” (SFRC) in the year 1955.
-              Under the aegis of Government of India, 31 batches of Forest
-              Rangers passed out from the SFRC after completing rigorous
-              training of two years. SFRC has trained more than 4000 Forest
-              Ranger officers between 1912 and 1988. The trainees included not
-              only from India but also from Ceylon, Afghanistan, Uganda, Malaya,
-              Ghana, Fiji, Laos, Sierra Leone, British Guyana, etc. <br />
-              Due to policy decision of Government of India, that imparting of
-              Induction and In-service Training to the Forestry Personnel below
-              the rank of Assistant Conservator of Forests should rest with the
-              State Government, the training activities came to an end on
-              31.12.1987 in the Southern Forest Rangers College. <br />
-              State Forest Service Officers were trained at the College,
-              erstwhile Indian Forest College, Dehradun and State Forest Service
-              College, Burnihat. With the advent of various developmental
-              schemes in the Forestry sector during the IV and V Five year
-              plans, and launching of the Social Forestry Projects in many
-              States, the Government of India felt the urgency of starting two
-              more institutions to train the increasing number of officers
-              specially from the State Services, and as a sequel to this the
-              State Forest Service College, Coimbatore was established on 25th
-              January, 1980 under the aegis of Directorate of Forest Education,
-              Ministry of Environment & Forests. Later it was rechristened as
-              Central Academy for State Forest Service (CASFOS). <br />
-              CASFOS Coimbatore was brought under the single administrative
-              control of Director, IGNFA, Dehradun along with the other
-              Academies as integration of all Forest Training Academies under a
-              single command. (Vide order no. 15-15/2018-RT, dated 03-02-2022).{" "}
-              <br />
-              <b>Last updated: 05 Mar, 2025 </b>
+                role in forestry education and training in South India. The
+                Forestry Education commenced in India in 1867, based on the
+                recommendation of Sir Dietrich Brandis, the First Inspector
+                General of Forests. A Forest school was set up to train Rangers and Foresters at Dehradun in the year 1878 by the then North West Province which was later taken over by the Government of India and designated as the Imperial Forest College.
+              <br /><br />
+              Next mile stone in Forestry Education in India was the establishment of Madras Forest College at Coimbatore in the year 1912 by the then Madras Presidency with Mr. F. L. C. Cowley Brown, IFS, as its first Principal. Mr. F. A. Lodge, then Conservator of Forests in Coimbatore was instrumental in the establishment of this College. It was the second Forest Rangers College in India, after DehraDun. It was set up to meet the rising demand of trained Foresters in the country, especially those from South India. 
+              <br /><br />
+              During the Second World War, the Madras Forest College was closed down and was revived in 1945 by Mr. C. R. Ranganathan, IFS, as its first Indian Principal. It was taken over by the Government of India in 1948 to train more number of Forest Ranger Trainees as the demand was going up after Independence.
+               <br /> <br />
+              The historic Forest Campus that housed the MFC later became the “Southern Forest Rangers College” (SFRC) in the year 1955. Under the aegis of Government of India, 31 batches of Forest Rangers passed out from the SFRC after completing rigorous training of two years. SFRC has trained more than 4000 Forest Ranger officers between 1912 and 1988. The trainees included not only Indians but also from Ceylon, Afghanistan, Uganda, Malaya, Ghana, Fiji, Laos, Sierra Leone, British Guyana, etc.
+              <br /><br />
+              Due to policy decision of the Government of India, that imparting Induction and In-service Training to the Forestry Personnel below the rank of Assistant Conservator of Forests should rest with the State Government, the training activities came to an end on 31.12.1987 in the Southern Forest Rangers College.
+               <br /><br />
+              State Forest Service Officers were trained at the College, erstwhile Indian Forest College, Dehradun and State Forest Service College, Burnihat. With the advent of various developmental schemes in the Forestry sector during the IV and V Five year plans, and launching of the Social Forestry Projects in many States, the Government of India felt the urgency of starting two more institutions to train the increasing number of officers specially from the State Services, and as a sequel to this the State Forest Service College, Coimbatore was established on 25th January, 1980 under the aegis of Directorate of Forest Education, Ministry of Environment & Forests. Later it was rechristened as Central Academy for State Forest Service (CASFOS).
+              <br /><br />
+              CASFOS Coimbatore was brought under the single administrative control of Director, IGNFA, Dehradun along with the other Academies as integration of all Forest Training Academies under a single command. (Vide order no. 15-15/2018-RT, dated 03-02-2022){" "}
+              <br /><br />
             </p>
+            <br />
+            <h1 className="text-left text-xl md:text-xl font-bold mb-4">
+              Mandate
+            </h1>
+            <ul className="text-sm md:text-lg text-justify mb-6 list-disc list-inside">
+              <li>
+                To impart Professional training to the newly recruited State Forest Service officers and to bring them up as capable of meeting future challenges in the sphere of Forests, Wildlife & Environment through Capacity building & Knowledge sharing
+              </li>
+              <li>
+                Strengthening existing management process and disseminating new concepts through continued education, in the shape of In-service Courses to augment their managerial skills with administrative & technical acumen.
+              </li>
+              <li>
+                Conducting Special & Theme based Workshops and Refresher Courses covering emerging issues in forestry research and technology.
+              </li>
+              <li>
+                Re-orienting forest education in tune with requisite parameters of ecology and environment.
+              </li>
+            </ul>
           </div>
         </section>
       </div>
