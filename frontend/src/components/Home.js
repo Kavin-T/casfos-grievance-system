@@ -205,7 +205,7 @@ export default function Home() {
       <header className="bg-green-800 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <a href={process.env.REACT_APP_LANDING_PAGE_URL}>
+            <a href={`http://${window.location.hostname}:3000`}>
               <img
                 src={casfos_logo}
                 alt="CASFOS Logo"

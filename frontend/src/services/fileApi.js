@@ -19,7 +19,9 @@
  * - Designed for previewing uploaded complaint images and videos.
  */
 
-const BASE_URL = process.env.REACT_APP_BACKEND_API_URL;
+import { getBaseUrl } from "../utils/getBaseUrl";
+
+const BASE_URL = getBaseUrl();
 
 export const handleMediaOpen = (mediaPath) => {
     if (mediaPath) {
