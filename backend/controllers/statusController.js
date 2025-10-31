@@ -193,7 +193,15 @@ const jeAcknowledgedToJeWorkdone = asyncHandler(async (req, res) => {
 
 // crNotSatisfiedToJeWorkdone: Reprocesses a complaint marked as CR_NOT_SATISFIED by JE or SA.
 const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
-  const { id, remark } = req.body;
+  const id = req.body.id;
+  let remark = req.body.remark;
+  if (typeof remark === "string") {
+    try {
+      remark = JSON.parse(remark);
+    } catch (e) {
+      remark = [];
+    }
+  }
 
   if (!id) {
     res.status(400);
@@ -248,8 +256,6 @@ const crNotSatisfiedToJeWorkdone = asyncHandler(async (req, res) => {
   let msg = "";
   let sts = "JE_WORKDONE";
   complaint.status = "JE_WORKDONE";
-  complaint.multiple_remark_ee = [];
-  complaint.multiple_remark_ae = [];
   await complaint.save();
 
   if (complaint.department === "IT") {
