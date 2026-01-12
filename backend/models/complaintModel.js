@@ -153,18 +153,48 @@ const complaintSchema = new mongoose.Schema({
 });
 
 // Pre-save middleware to generate complaintID
+// complaintSchema.pre("save", async function (next) {
+//   if (!this.isNew) return next();
+
+//   const departmentCode = getDepartmentCode(this.department);
+//   const Complaint = mongoose.model("Complaint");
+
+//   // Count existing complaints for the department
+//   const count = await Complaint.countDocuments({ department: this.department });
+
+//   // Generate complaintID in the required format
+//   this.complaintID = `COMP_${departmentCode}_${String(count + 1)}`;
+//   next();
+// });
 complaintSchema.pre("save", async function (next) {
   if (!this.isNew) return next();
 
-  const departmentCode = getDepartmentCode(this.department);
-  const Complaint = mongoose.model("Complaint");
+  try {
+    const departmentCode = getDepartmentCode(this.department);
+    const Complaint = mongoose.model("Complaint");
 
-  // Count existing complaints for the department
-  const count = await Complaint.countDocuments({ department: this.department });
+    const result = await Complaint.aggregate([
+      { $match: { department: this.department } },
+      {
+        $addFields: {
+          num: {
+            $toInt: {
+              $arrayElemAt: [{ $split: ["$complaintID", "_"] }, 2]
+            }
+          }
+        }
+      },
+      { $sort: { num: -1 } },
+      { $limit: 1 }
+    ]);
 
-  // Generate complaintID in the required format
-  this.complaintID = `COMP_${departmentCode}_${String(count + 1)}`;
-  next();
+    const nextNumber = result.length ? result[0].num + 1 : 1;
+
+    this.complaintID = `COMP_${departmentCode}_${nextNumber}`;
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Helper function to get department code
