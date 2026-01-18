@@ -122,24 +122,24 @@ async function backupResolvedComplaintsWithMedia(backupName) {
       throw error;
     }
 
-    // Step 2: Back up only resolved complaints (additional backup)
-    const query = `{"status":"RESOLVED"}`; // MongoDB query to filter resolved complaints
-    const resolvedCommand = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=complaints --query="${query.replace(
-      /"/g,
-      '\\"'
-    )}" --archive="${resolvedBackupPath}" --gzip`;
+    // // Step 2: Back up only resolved complaints (additional backup)
+    // const query = `{"status":"RESOLVED"}`; // MongoDB query to filter resolved complaints
+    // const resolvedCommand = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=complaints --query="${query.replace(
+    //   /"/g,
+    //   '\\"'
+    // )}" --archive="${resolvedBackupPath}" --gzip`;
 
-    try {
-      console.log(`Backing up resolved complaints...`);
-      const { stdout, stderr } = await execAsync(resolvedCommand);
-      if (stderr && !stderr.includes("writing")) {
-        console.warn(`Warning for resolved complaints: ${stderr}`);
-      }
-      console.log(`Resolved complaints backup completed: ${resolvedBackupPath}`);
-    } catch (error) {
-      console.error(`Error backing up resolved complaints: ${error.message}`);
-      // Don't throw - continue even if resolved complaints backup fails
-    }
+    // try {
+    //   console.log(`Backing up resolved complaints...`);
+    //   const { stdout, stderr } = await execAsync(resolvedCommand);
+    //   if (stderr && !stderr.includes("writing")) {
+    //     console.warn(`Warning for resolved complaints: ${stderr}`);
+    //   }
+    //   console.log(`Resolved complaints backup completed: ${resolvedBackupPath}`);
+    // } catch (error) {
+    //   console.error(`Error backing up resolved complaints: ${error.message}`);
+    //   // Don't throw - continue even if resolved complaints backup fails
+    // }
 
     // Step 3: Back up media files (if uploads directory exists)
     if (fs.existsSync(UPLOADS_DIR)) {
