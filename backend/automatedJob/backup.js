@@ -53,6 +53,24 @@ if (!fs.existsSync(BACKUP_DIR)) {
   fs.mkdirSync(BACKUP_DIR, { recursive: true });
 }
 
+// Function to extract database name from MONGO_URI
+function getDatabaseName(uri) {
+  try {
+    // Try to extract database name from URI
+    // Format: mongodb://.../database or mongodb+srv://.../database
+    const match = uri.match(/\/([^/?]+)(\?|$)/);
+    if (match && match[1]) {
+      return match[1];
+    }
+    // If no database in URI, try to get from DB_NAME env var or use default
+    return process.env.DB_NAME || "test";
+  } catch (error) {
+    return process.env.DB_NAME || "test";
+  }
+}
+
+const DB_NAME = getDatabaseName(MONGO_URI);
+
 // Function to back up multiple collections for weekly backup
 async function backupWeeklyCollections(backupName) {
   const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_collections`);
@@ -65,7 +83,7 @@ async function backupWeeklyCollections(backupName) {
   // Use Promise.all to wait for all backups to complete
   const backupPromises = collections.map(async (collection) => {
     const backupPath = path.join(weeklyBackupDir, `${collection}.gz`);
-    const command = `mongodump --uri="${MONGO_URI}" --collection=${collection} --archive="${backupPath}" --gzip`;
+    const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=${collection} --archive="${backupPath}" --gzip`;
 
     try {
       const { stdout, stderr } = await execAsync(command);
@@ -98,7 +116,7 @@ async function backupResolvedComplaintsWithMedia(backupName) {
   try {
     // Step 1: Back up only resolved complaints
     const query = `{"status":"RESOLVED"}`; // MongoDB query to filter resolved complaints
-    const command = `mongodump --uri="${MONGO_URI}" --collection=complaints --query="${query.replace(
+    const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=complaints --query="${query.replace(
       /"/g,
       '\\"'
     )}" --archive="${resolvedBackupPath}" --gzip`;
@@ -136,7 +154,7 @@ async function backupResolvedComplaintsWithMedia(backupName) {
     const collections = ["complaints", "counters", "notifications", "users"];
     const collectionBackupPromises = collections.map(async (collection) => {
       const backupPath = path.join(quarterlyBackupDir, `${collection}.gz`);
-      const command = `mongodump --uri="${MONGO_URI}" --collection=${collection} --archive="${backupPath}" --gzip`;
+      const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=${collection} --archive="${backupPath}" --gzip`;
 
       try {
         const { stdout, stderr } = await execAsync(command);
