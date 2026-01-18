@@ -51,40 +51,33 @@ function getDatabaseName(uri) {
 const DB_NAME = getDatabaseName(MONGO_URI);
 console.log(`📊 Using database: ${DB_NAME}\n`);
 
-// Function to back up multiple collections for weekly backup (same as backup.js)
+// Function to back up entire database for weekly backup (same as backup.js)
 async function backupWeeklyCollections(backupName) {
-  const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_collections`);
+  const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_database`);
   if (!fs.existsSync(weeklyBackupDir)) {
     fs.mkdirSync(weeklyBackupDir, { recursive: true });
   }
 
-  const collections = ["complaints", "counters", "notifications", "users"];
+  const backupPath = path.join(weeklyBackupDir, `${DB_NAME}.gz`);
+  const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --archive="${backupPath}" --gzip`;
 
   console.log(`\n🚀 Starting test weekly backup...`);
   console.log(`📁 Backup directory: ${weeklyBackupDir}\n`);
+  console.log(`⏳ Backing up entire database: ${DB_NAME}...`);
 
-  // Use Promise.all to wait for all backups to complete
-  const backupPromises = collections.map(async (collection) => {
-    const backupPath = path.join(weeklyBackupDir, `${collection}.gz`);
-    const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=${collection} --archive="${backupPath}" --gzip`;
-
-    try {
-      console.log(`⏳ Backing up collection: ${collection}...`);
-      const { stdout, stderr } = await execAsync(command);
-      if (stderr && !stderr.includes("writing")) {
-        console.warn(`⚠️  Warning for ${collection}: ${stderr}`);
-      }
-      console.log(`✅ Backup completed for collection: ${collection}`);
-      console.log(`   Saved to: ${backupPath}\n`);
-    } catch (error) {
-      console.error(`❌ Error backing up ${collection}: ${error.message}`);
-      throw error;
+  try {
+    const { stdout, stderr } = await execAsync(command);
+    if (stderr && !stderr.includes("writing")) {
+      console.warn(`⚠️  Warning: ${stderr}`);
     }
-  });
-
-  await Promise.all(backupPromises);
-  console.log(`\n✨ Weekly backup completed successfully: ${backupName}`);
-  console.log(`📂 All backups saved in: ${weeklyBackupDir}\n`);
+    console.log(`✅ Backup completed for database: ${DB_NAME}`);
+    console.log(`   Saved to: ${backupPath}\n`);
+    console.log(`\n✨ Weekly backup completed successfully: ${backupName}`);
+    console.log(`📂 Backup saved in: ${weeklyBackupDir}\n`);
+  } catch (error) {
+    console.error(`❌ Error backing up database: ${error.message}`);
+    throw error;
+  }
 }
 
 // Function to calculate directory size recursively

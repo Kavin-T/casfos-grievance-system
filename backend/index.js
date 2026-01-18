@@ -12,7 +12,7 @@
  * - Defines public routes (auth, report) and protected routes (complaint, status, user, notification) with JWT validation.
  * - Includes a global error handler for consistent error responses.
  * - Schedules weekly (every Friday at 12:00 AM) and quarterly (April 1, August 1, December 1 at 12:00 AM) backups
- *   using node-cron and a separate backup script.
+ *   of the entire database using node-cron and a separate backup script.
  * - Connects to MongoDB and initializes the Nodemailer transporter.
  * - Starts the server on a specified port (default 5000).
  *

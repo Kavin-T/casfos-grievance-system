@@ -7,9 +7,9 @@
  * notifications if storage exceeds a defined threshold.
  *
  * Features:
- * - Weekly backups of specified MongoDB collections ('complaints', 'counters', 'notifications', 'users') every Friday.
- * - Quarterly backups of resolved complaints and related media files on the first day of April, August, and December.
- * - Creates compressed (.gz) backups of MongoDB collections using mongodump.
+ * - Weekly backups of the entire MongoDB database every Friday.
+ * - Quarterly backups of the entire database, resolved complaints, and related media files on the first day of April, August, and December.
+ * - Creates compressed (.gz) backups of the entire database using mongodump.
  * - Archives media files from the uploads directory into a .zip file for quarterly backups.
  * - Monitors storage usage of the backup directory and sends an email alert if usage exceeds 80%.
  * - Uses environment variables (MONGO_URI, GMAIL_USER, GMAIL_PASSWORD) for configuration.
@@ -71,72 +71,82 @@ function getDatabaseName(uri) {
 
 const DB_NAME = getDatabaseName(MONGO_URI);
 
-// Function to back up multiple collections for weekly backup
+// Function to back up entire database for weekly backup
 async function backupWeeklyCollections(backupName) {
-  const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_collections`);
+  const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_database`);
   if (!fs.existsSync(weeklyBackupDir)) {
     fs.mkdirSync(weeklyBackupDir, { recursive: true });
   }
 
-  const collections = ["complaints", "counters", "notifications", "users"];
+  const backupPath = path.join(weeklyBackupDir, `${DB_NAME}.gz`);
+  const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --archive="${backupPath}" --gzip`;
 
-  // Use Promise.all to wait for all backups to complete
-  const backupPromises = collections.map(async (collection) => {
-    const backupPath = path.join(weeklyBackupDir, `${collection}.gz`);
-    const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=${collection} --archive="${backupPath}" --gzip`;
-
-    try {
-      const { stdout, stderr } = await execAsync(command);
-      if (stderr && !stderr.includes("writing")) {
-        console.warn(`Warning for ${collection}: ${stderr}`);
-      }
-      console.log(
-        `Backup completed for collection: ${collection}, saved to: ${backupPath}`
-      );
-    } catch (error) {
-      console.error(`Error backing up ${collection}: ${error.message}`);
-      throw error;
+  try {
+    console.log(`Starting weekly backup of entire database: ${DB_NAME}...`);
+    const { stdout, stderr } = await execAsync(command);
+    if (stderr && !stderr.includes("writing")) {
+      console.warn(`Warning: ${stderr}`);
     }
-  });
-
-  await Promise.all(backupPromises);
-  console.log(`Weekly backup completed: ${backupName}`);
+    console.log(`Backup completed for database: ${DB_NAME}, saved to: ${backupPath}`);
+    console.log(`Weekly backup completed: ${backupName}`);
+  } catch (error) {
+    console.error(`Error backing up database: ${error.message}`);
+    throw error;
+  }
 }
 
-// Function to back up resolved complaints and related media files for quarterly backup
+// Function to back up entire database, resolved complaints and related media files for quarterly backup
 async function backupResolvedComplaintsWithMedia(backupName) {
-  const quarterlyBackupDir = path.join(BACKUP_DIR, `${backupName}_collections`);
+  const quarterlyBackupDir = path.join(BACKUP_DIR, `${backupName}_database`);
   if (!fs.existsSync(quarterlyBackupDir)) {
     fs.mkdirSync(quarterlyBackupDir, { recursive: true });
   }
 
+  const databaseBackupPath = path.join(quarterlyBackupDir, `${DB_NAME}.gz`);
   const resolvedBackupPath = path.join(quarterlyBackupDir, `resolved.gz`);
   const mediaBackupPath = path.join(quarterlyBackupDir, `uploads.tar.gz`);
 
   try {
-    // Step 1: Back up only resolved complaints
+    // Step 1: Back up entire database
+    const databaseCommand = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --archive="${databaseBackupPath}" --gzip`;
+
+    try {
+      console.log(`Starting quarterly backup of entire database: ${DB_NAME}...`);
+      const { stdout, stderr } = await execAsync(databaseCommand);
+      if (stderr && !stderr.includes("writing")) {
+        console.warn(`Warning for database backup: ${stderr}`);
+      }
+      console.log(`Database backup completed: ${databaseBackupPath}`);
+    } catch (error) {
+      console.error(`Error backing up database: ${error.message}`);
+      throw error;
+    }
+
+    // Step 2: Back up only resolved complaints (additional backup)
     const query = `{"status":"RESOLVED"}`; // MongoDB query to filter resolved complaints
-    const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=complaints --query="${query.replace(
+    const resolvedCommand = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=complaints --query="${query.replace(
       /"/g,
       '\\"'
     )}" --archive="${resolvedBackupPath}" --gzip`;
 
     try {
-      const { stdout, stderr } = await execAsync(command);
+      console.log(`Backing up resolved complaints...`);
+      const { stdout, stderr } = await execAsync(resolvedCommand);
       if (stderr && !stderr.includes("writing")) {
         console.warn(`Warning for resolved complaints: ${stderr}`);
       }
       console.log(`Resolved complaints backup completed: ${resolvedBackupPath}`);
     } catch (error) {
       console.error(`Error backing up resolved complaints: ${error.message}`);
-      throw error;
+      // Don't throw - continue even if resolved complaints backup fails
     }
 
-    // Step 2: Back up media files (if uploads directory exists)
+    // Step 3: Back up media files (if uploads directory exists)
     if (fs.existsSync(UPLOADS_DIR)) {
       const mediaCommand = `tar -czf "${mediaBackupPath}" -C "${UPLOADS_DIR}" .`;
 
       try {
+        console.log(`Backing up media files...`);
         const { stdout, stderr } = await execAsync(mediaCommand);
         if (stderr && !stderr.includes("Removing leading")) {
           console.warn(`Warning for media backup: ${stderr}`);
@@ -144,33 +154,12 @@ async function backupResolvedComplaintsWithMedia(backupName) {
         console.log(`Media files backup completed: ${mediaBackupPath}`);
       } catch (error) {
         console.error(`Error backing up media files: ${error.message}`);
-        // Don't throw - continue with collection backups even if media backup fails
+        // Don't throw - continue even if media backup fails
       }
     } else {
       console.warn(`Uploads directory not found: ${UPLOADS_DIR}`);
     }
 
-    // Step 3: Back up all collections
-    const collections = ["complaints", "counters", "notifications", "users"];
-    const collectionBackupPromises = collections.map(async (collection) => {
-      const backupPath = path.join(quarterlyBackupDir, `${collection}.gz`);
-      const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=${collection} --archive="${backupPath}" --gzip`;
-
-      try {
-        const { stdout, stderr } = await execAsync(command);
-        if (stderr && !stderr.includes("writing")) {
-          console.warn(`Warning for ${collection}: ${stderr}`);
-        }
-        console.log(
-          `Backup completed for collection: ${collection}, saved to: ${backupPath}`
-        );
-      } catch (error) {
-        console.error(`Error backing up ${collection}: ${error.message}`);
-        throw error;
-      }
-    });
-
-    await Promise.all(collectionBackupPromises);
     console.log(`Quarterly backup completed: ${backupName}`);
   } catch (error) {
     console.error(`Error in quarterly backup process: ${error.message}`);

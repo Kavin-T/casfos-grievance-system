@@ -3,7 +3,7 @@
  * 
  * Purpose:
  * Test script to verify that restore functionality works correctly.
- * This script restores a collection to a test collection name to avoid overwriting production data.
+ * This script restores the database to a test database name to avoid overwriting production data.
  * 
  * Usage:
  * Run: node backend/automatedJob/test-restore.js
@@ -85,26 +85,32 @@ async function testRestore() {
 
   console.log(`📦 Found latest backup: ${latestBackup.name}\n`);
 
-  // Check if backup files exist
-  const testCollection = "complaints";
-  const backupFile = path.join(latestBackup.path, `${testCollection}.gz`);
+  // Check if backup file exists (database backup)
+  const backupFile = path.join(latestBackup.path, `${DB_NAME}.gz`);
 
   if (!fs.existsSync(backupFile)) {
     console.error(`❌ Backup file not found: ${backupFile}`);
+    console.error(`   Looking for database backup: ${DB_NAME}.gz`);
     process.exit(1);
   }
 
   const fileSize = fs.statSync(backupFile).size;
-  console.log(`📄 Backup file: ${testCollection}.gz`);
-  console.log(`📏 File size: ${(fileSize / 1024).toFixed(2)} KB\n`);
+  const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+  const fileSizeGB = (fileSize / (1024 * 1024 * 1024)).toFixed(2);
+  console.log(`📄 Backup file: ${DB_NAME}.gz`);
+  if (fileSize / (1024 * 1024 * 1024) >= 1) {
+    console.log(`📏 File size: ${fileSizeGB} GB\n`);
+  } else {
+    console.log(`📏 File size: ${fileSizeMB} MB\n`);
+  }
 
-  // Test restore to a test collection name (to avoid overwriting production)
-  const testCollectionName = `${testCollection}_restore_test`;
-  console.log(`🔄 Testing restore to test collection: ${testCollectionName}`);
-  console.log(`⚠️  This will create/overwrite: ${testCollectionName} (not production data)\n`);
+  // Test restore to a test database name (to avoid overwriting production)
+  const testDatabaseName = `${DB_NAME}_restore_test`;
+  console.log(`🔄 Testing restore to test database: ${testDatabaseName}`);
+  console.log(`⚠️  This will create/overwrite database: ${testDatabaseName} (not production data)\n`);
 
-  // Use --nsInclude for newer MongoDB tools, fallback to --db and --collection for compatibility
-  const restoreCommand = `mongorestore --uri="${MONGO_URI}" --nsInclude=${DB_NAME}.${testCollectionName} --archive="${backupFile}" --gzip --drop`;
+  // Restore entire database to a test database
+  const restoreCommand = `mongorestore --uri="${MONGO_URI}" --nsFrom="${DB_NAME}.*" --nsTo="${testDatabaseName}.*" --archive="${backupFile}" --gzip --drop`;
 
   try {
     console.log("⏳ Restoring...");
@@ -115,26 +121,27 @@ async function testRestore() {
     }
 
     console.log(`✅ Restore completed successfully!`);
-    console.log(`📊 Restored to collection: ${testCollectionName}\n`);
+    console.log(`📊 Restored to database: ${testDatabaseName}\n`);
 
-    // Verify the restore by checking document count
+    // Verify the restore by checking collections in the test database
     console.log("🔍 Verifying restore...");
-    const verifyCommand = `mongosh "${MONGO_URI}" --quiet --eval "db.getSiblingDB('${DB_NAME}').${testCollectionName}.countDocuments()"`;
+    const verifyCommand = `mongosh "${MONGO_URI}" --quiet --eval "db.getSiblingDB('${testDatabaseName}').getCollectionNames()"`;
     
     try {
-      const { stdout: countOutput } = await execAsync(verifyCommand);
-      const count = parseInt(countOutput.trim());
-      console.log(`✅ Verified: ${count} documents restored to ${testCollectionName}`);
+      const { stdout: collectionsOutput } = await execAsync(verifyCommand);
+      const collections = collectionsOutput.trim();
+      console.log(`✅ Verified: Collections restored to ${testDatabaseName}`);
+      console.log(`📋 Collections: ${collections}`);
       
-      if (count > 0) {
+      if (collections && collections.length > 0 && !collections.includes("Error")) {
         console.log("\n✨ Restore test PASSED! The backup can be successfully restored.");
-        console.log(`\n💡 To clean up the test collection, run:`);
-        console.log(`   mongosh "${MONGO_URI}" --eval "db.getSiblingDB('${DB_NAME}').${testCollectionName}.drop()"`);
+        console.log(`\n💡 To clean up the test database, run:`);
+        console.log(`   mongosh "${MONGO_URI}" --eval "db.getSiblingDB('${testDatabaseName}').dropDatabase()"`);
       } else {
-        console.log("\n⚠️  Restore completed but collection is empty (backup may be empty)");
+        console.log("\n⚠️  Restore completed but database appears empty (backup may be empty)");
       }
     } catch (verifyError) {
-      console.log("⚠️  Could not verify document count (this is okay if mongosh is not available)");
+      console.log("⚠️  Could not verify collections (this is okay if mongosh is not available)");
       console.log("✅ Restore command executed successfully");
     }
 
