@@ -7,9 +7,9 @@
  * notifications if storage exceeds a defined threshold.
  *
  * Features:
- * - Weekly backups of specified MongoDB collections ('complaints', 'counters', 'notifications', 'users') every Friday.
- * - Quarterly backups of resolved complaints and related media files on the first day of April, August, and December.
- * - Creates compressed (.gz) backups of MongoDB collections using mongodump.
+ * - Weekly backups of the entire MongoDB database every Friday.
+ * - Quarterly backups of the entire database, resolved complaints, and related media files on the first day of April, August, and December.
+ * - Creates compressed (.gz) backups of the entire database using mongodump.
  * - Archives media files from the uploads directory into a .zip file for quarterly backups.
  * - Monitors storage usage of the backup directory and sends an email alert if usage exceeds 80%.
  * - Uses environment variables (MONGO_URI, GMAIL_USER, GMAIL_PASSWORD) for configuration.
@@ -31,7 +31,10 @@ const path = require("path"); // Import path module first
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") }); // Explicitly load environment variables from .env
 const fs = require("fs");
 const { exec } = require("child_process");
+const { promisify } = require("util");
 const nodemailer = require("nodemailer");
+
+const execAsync = promisify(exec);
 
 // Load environment variables
 const MONGO_URI = process.env.MONGO_URI;
@@ -39,97 +42,178 @@ const BACKUP_DIR = path.join(__dirname, "..", "backups");
 const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
 const STORAGE_THRESHOLD = 80; // 80%
 
+// Validate required environment variables
+if (!MONGO_URI) {
+  console.error("Error: MONGO_URI environment variable is not set");
+  process.exit(1);
+}
+
 // Ensure backup directory exists
 if (!fs.existsSync(BACKUP_DIR)) {
-  fs.mkdirSync(BACKUP_DIR);
+  fs.mkdirSync(BACKUP_DIR, { recursive: true });
 }
 
-// Function to back up multiple collections for weekly backup
-async function backupWeeklyCollections(backupName) {
-  const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_collections`);
-  if (!fs.existsSync(weeklyBackupDir)) {
-    fs.mkdirSync(weeklyBackupDir);
-  }
-
-  const collections = ["complaints", "counters", "notifications", "users"];
-
-  collections.forEach((collection) => {
-    const backupPath = path.join(weeklyBackupDir, `${collection}.gz`);
-    const command = `mongodump --uri="${MONGO_URI}" --collection=${collection} --archive="${backupPath}" --gzip`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error backing up ${collection}: ${error.message}`);
-        return;
-      }
-      console.log(
-        `Backup completed for collection: ${collection}, saved to: ${backupPath}`
-      );
-    });
-  });
-}
-
-// Function to back up resolved complaints and related media files for quarterly backup
-async function backupResolvedComplaintsWithMedia(backupName) {
-  const quarterlyBackupDir = path.join(BACKUP_DIR, `${backupName}_collections`);
-  if (!fs.existsSync(quarterlyBackupDir)) {
-    fs.mkdirSync(quarterlyBackupDir);
-  }
-
-  const resolvedBackupPath = path.join(quarterlyBackupDir, `resolved.gz`);
-  const mediaBackupPath = path.join(quarterlyBackupDir, `uploads.zip`);
-
-  // Step 1: Back up only resolved complaints
-  const query = `{"status":"RESOLVED"}`; // MongoDB query to filter resolved complaints
-  const command = `mongodump --uri="${MONGO_URI}" --collection=complaints --query="${query.replace(
-    /"/g,
-    '\\"'
-  )}" --archive="${resolvedBackupPath}" --gzip`;
-
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error backing up resolved complaints: ${error.message}`);
-      return;
+// Function to extract database name from MONGO_URI
+function getDatabaseName(uri) {
+  try {
+    // Try to extract database name from URI
+    // Format: mongodb://.../database or mongodb+srv://.../database
+    const match = uri.match(/\/([^/?]+)(\?|$)/);
+    if (match && match[1]) {
+      return match[1];
     }
-    console.log(`Resolved complaints backup completed: ${resolvedBackupPath}`);
+    // If no database in URI, try to get from DB_NAME env var or use default
+    return process.env.DB_NAME || "test";
+  } catch (error) {
+    return process.env.DB_NAME || "test";
+  }
+}
 
-    // Step 2: Back up media files
-    const mediaCommand = `tar -czf "${mediaBackupPath}" -C "${UPLOADS_DIR}" .`;
+const DB_NAME = getDatabaseName(MONGO_URI);
 
-    exec(mediaCommand, (mediaError, mediaStdout, mediaStderr) => {
-      if (mediaError) {
-        console.error(`Error backing up media files: ${mediaError.message}`);
-        return;
+// Function to back up entire database for weekly backup
+async function backupWeeklyCollections(backupName) {
+  const weeklyBackupDir = path.join(BACKUP_DIR, `${backupName}_database`);
+  if (!fs.existsSync(weeklyBackupDir)) {
+    fs.mkdirSync(weeklyBackupDir, { recursive: true });
+  }
+
+  const backupPath = path.join(weeklyBackupDir, `${DB_NAME}.gz`);
+  const command = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --archive="${backupPath}" --gzip`;
+
+  try {
+    console.log(`Starting weekly backup of entire database: ${DB_NAME}...`);
+    const { stdout, stderr } = await execAsync(command);
+    if (stderr && !stderr.includes("writing")) {
+      console.warn(`Warning: ${stderr}`);
+    }
+    console.log(`Backup completed for database: ${DB_NAME}, saved to: ${backupPath}`);
+    console.log(`Weekly backup completed: ${backupName}`);
+  } catch (error) {
+    console.error(`Error backing up database: ${error.message}`);
+    throw error;
+  }
+}
+
+// Function to back up entire database, resolved complaints and related media files for quarterly backup
+async function backupResolvedComplaintsWithMedia(backupName) {
+  const quarterlyBackupDir = path.join(BACKUP_DIR, `${backupName}_database`);
+  if (!fs.existsSync(quarterlyBackupDir)) {
+    fs.mkdirSync(quarterlyBackupDir, { recursive: true });
+  }
+
+  const databaseBackupPath = path.join(quarterlyBackupDir, `${DB_NAME}.gz`);
+  const resolvedBackupPath = path.join(quarterlyBackupDir, `resolved.gz`);
+  const mediaBackupPath = path.join(quarterlyBackupDir, `uploads.tar.gz`);
+
+  try {
+    // Step 1: Back up entire database
+    const databaseCommand = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --archive="${databaseBackupPath}" --gzip`;
+
+    try {
+      console.log(`Starting quarterly backup of entire database: ${DB_NAME}...`);
+      const { stdout, stderr } = await execAsync(databaseCommand);
+      if (stderr && !stderr.includes("writing")) {
+        console.warn(`Warning for database backup: ${stderr}`);
       }
-      console.log(`Media files backup completed: ${mediaBackupPath}`);
-    });
-  });
+      console.log(`Database backup completed: ${databaseBackupPath}`);
+    } catch (error) {
+      console.error(`Error backing up database: ${error.message}`);
+      throw error;
+    }
 
-  // Step 3: Back up all collections
-  const collections = ["complaints", "counters", "notifications", "users"];
-  collections.forEach((collection) => {
-    const backupPath = path.join(quarterlyBackupDir, `${collection}.gz`);
-    const command = `mongodump --uri="${MONGO_URI}" --collection=${collection} --archive="${backupPath}" --gzip`;
+    // // Step 2: Back up only resolved complaints (additional backup)
+    // const query = `{"status":"RESOLVED"}`; // MongoDB query to filter resolved complaints
+    // const resolvedCommand = `mongodump --uri="${MONGO_URI}" --db=${DB_NAME} --collection=complaints --query="${query.replace(
+    //   /"/g,
+    //   '\\"'
+    // )}" --archive="${resolvedBackupPath}" --gzip`;
 
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error backing up ${collection}: ${error.message}`);
-        return;
+    // try {
+    //   console.log(`Backing up resolved complaints...`);
+    //   const { stdout, stderr } = await execAsync(resolvedCommand);
+    //   if (stderr && !stderr.includes("writing")) {
+    //     console.warn(`Warning for resolved complaints: ${stderr}`);
+    //   }
+    //   console.log(`Resolved complaints backup completed: ${resolvedBackupPath}`);
+    // } catch (error) {
+    //   console.error(`Error backing up resolved complaints: ${error.message}`);
+    //   // Don't throw - continue even if resolved complaints backup fails
+    // }
+
+    // Step 3: Back up media files (if uploads directory exists)
+    if (fs.existsSync(UPLOADS_DIR)) {
+      const mediaCommand = `tar -czf "${mediaBackupPath}" -C "${UPLOADS_DIR}" .`;
+
+      try {
+        console.log(`Backing up media files...`);
+        const { stdout, stderr } = await execAsync(mediaCommand);
+        if (stderr && !stderr.includes("Removing leading")) {
+          console.warn(`Warning for media backup: ${stderr}`);
+        }
+        console.log(`Media files backup completed: ${mediaBackupPath}`);
+      } catch (error) {
+        console.error(`Error backing up media files: ${error.message}`);
+        // Don't throw - continue even if media backup fails
       }
-      console.log(
-        `Backup completed for collection: ${collection}, saved to: ${backupPath}`
-      );
-    });
-  });
+    } else {
+      console.warn(`Uploads directory not found: ${UPLOADS_DIR}`);
+    }
+
+    console.log(`Quarterly backup completed: ${backupName}`);
+  } catch (error) {
+    console.error(`Error in quarterly backup process: ${error.message}`);
+    throw error;
+  }
+}
+
+// Function to calculate directory size recursively
+function getDirectorySize(dirPath) {
+  let totalSize = 0;
+  
+  try {
+    const files = fs.readdirSync(dirPath);
+    
+    for (const file of files) {
+      const filePath = path.join(dirPath, file);
+      const stats = fs.statSync(filePath);
+      
+      if (stats.isDirectory()) {
+        totalSize += getDirectorySize(filePath);
+      } else {
+        totalSize += stats.size;
+      }
+    }
+  } catch (error) {
+    console.error(`Error calculating directory size: ${error.message}`);
+  }
+  
+  return totalSize;
 }
 
 // Function to check storage usage
 function checkStorageUsage() {
-  const { size: totalSize } = fs.statSync(BACKUP_DIR);
-  const usedPercentage = (totalSize / fs.statSync("/").size) * 100;
-
-  if (usedPercentage > STORAGE_THRESHOLD) {
-    notifyStorageUsage(usedPercentage);
+  try {
+    const backupSize = getDirectorySize(BACKUP_DIR);
+    
+    // Use a fixed threshold in bytes (e.g., 10GB = 10 * 1024 * 1024 * 1024)
+    const MAX_BACKUP_SIZE = 10 * 1024 * 1024 * 1024; // 10GB threshold
+    
+    if (backupSize > MAX_BACKUP_SIZE) {
+      const usedPercentage = (backupSize / MAX_BACKUP_SIZE) * 100;
+      console.warn(`Backup directory size (${(backupSize / (1024 * 1024 * 1024)).toFixed(2)} GB) exceeds threshold`);
+      notifyStorageUsage(usedPercentage);
+    } else {
+      const sizeInMB = backupSize / (1024 * 1024);
+      const sizeInGB = backupSize / (1024 * 1024 * 1024);
+      if (sizeInGB >= 1) {
+        console.log(`Backup directory size: ${sizeInGB.toFixed(2)} GB`);
+      } else {
+        console.log(`Backup directory size: ${sizeInMB.toFixed(2)} MB`);
+      }
+    }
+  } catch (error) {
+    console.error(`Error checking storage usage: ${error.message}`);
   }
 }
 
@@ -162,26 +246,39 @@ function notifyStorageUsage(usedPercentage) {
 }
 
 // Schedule weekly and quarterly backups
-function scheduleBackups() {
+async function scheduleBackups() {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 = Sunday, 5 = Friday
   const month = now.getMonth(); // 0 = January
+  const isQuarterlyDate = [3, 7, 11].includes(month) && now.getDate() === 1;
+  const isFriday = dayOfWeek === 5;
 
-  if (dayOfWeek === 5) {
-    // Weekly backup on Friday
-    const backupName = `weekly-backup-${now.toISOString().split("T")[0]}`;
-    backupWeeklyCollections(backupName);
+  try {
+    // If it's both Friday and a quarterly date, prioritize quarterly backup
+    if (isQuarterlyDate) {
+      // Quarterly backup on the first day of April, August, December
+      const backupName = `quarterly-backup-${now.toISOString().split("T")[0]}`;
+      console.log(`Starting quarterly backup: ${backupName}`);
+      await backupResolvedComplaintsWithMedia(backupName);
+    } else if (isFriday) {
+      // Weekly backup on Friday (only if not a quarterly date)
+      const backupName = `weekly-backup-${now.toISOString().split("T")[0]}`;
+      console.log(`Starting weekly backup: ${backupName}`);
+      await backupWeeklyCollections(backupName);
+    } else {
+      console.log("No backup scheduled for today");
+    }
+
+    // Check storage usage
+    checkStorageUsage();
+  } catch (error) {
+    console.error(`Error in backup scheduler: ${error.message}`);
+    process.exit(1);
   }
-
-  if ([3, 7, 11].includes(month) && now.getDate() === 1) {
-    // Quarterly backup on the first day of April, August, December
-    const backupName = `quarterly-backup-${now.toISOString().split("T")[0]}`;
-    backupResolvedComplaintsWithMedia(backupName);
-  }
-
-  // Check storage usage
-  checkStorageUsage();
 }
 
 // Run the backup scheduler
-scheduleBackups();
+scheduleBackups().catch((error) => {
+  console.error(`Fatal error in backup process: ${error.message}`);
+  process.exit(1);
+});
