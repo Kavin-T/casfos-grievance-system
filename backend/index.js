@@ -103,12 +103,15 @@ app.use(errorHandler);
 // Schedule Weekly Backup (Every Friday at 12:00 AM)
 cron.schedule("0 0 * * 5", () => {
   console.log("Running weekly backup...");
-  exec("node ./automatedJob/backup.js", (error, stdout, stderr) => {
+  const backupScriptPath = path.join(__dirname, "automatedJob", "backup.js");
+  exec(`node "${backupScriptPath}"`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing weekly backup: ${error.message}`);
       return;
     }
-    console.log(`Weekly backup output: ${stdout}`);
+    if (stdout) {
+      console.log(`Weekly backup output: ${stdout}`);
+    }
     if (stderr) {
       console.error(`Weekly backup error: ${stderr}`);
     }
@@ -118,12 +121,15 @@ cron.schedule("0 0 * * 5", () => {
 // Schedule Quarterly Backup (1st day of April, August, December at 12:00 AM)
 cron.schedule("0 0 1 4,8,12 *", () => {
   console.log("Running quarterly backup...");
-  exec("node ./automatedJob/backup.js", (error, stdout, stderr) => {
+  const backupScriptPath = path.join(__dirname, "automatedJob", "backup.js");
+  exec(`node "${backupScriptPath}"`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing quarterly backup: ${error.message}`);
       return;
     }
-    console.log(`Quarterly backup output: ${stdout}`);
+    if (stdout) {
+      console.log(`Quarterly backup output: ${stdout}`);
+    }
     if (stderr) {
       console.error(`Quarterly backup error: ${stderr}`);
     }

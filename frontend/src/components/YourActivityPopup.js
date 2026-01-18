@@ -114,11 +114,13 @@ const YourActivityPopup = ({
       : statusOptions[selectedComplaint.status] || [];
 
   // Allowed designations for certain actions
+  // eslint-disable-next-line no-unused-vars
   const allowedDesignations = [
     "JUNIOR_ENGINEER_CIVIL",
     "JUNIOR_ENGINEER_ELECTRICAL",
     "JUNIOR_ENGINEER_IT",
   ];
+  // eslint-disable-next-line no-unused-vars
   const isIT = selectedComplaint.department === "IT";
 
   // --- REMARKS DISPLAY LOGIC (Unified) ---

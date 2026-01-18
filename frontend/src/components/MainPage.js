@@ -35,9 +35,6 @@ import ministry from "../assets/images/ministry.png";
 import lifestyle_for_environment from "../assets/images/lifestyle_for_environment.png";
 import casfos_dehradun from "../assets/images/casfos_dehradun.png";
 import casfos_vana_vigyan from "../assets/images/casfos_vana_vigyan.png";
-import casfos_coimbatore_img4 from "../assets/images/casfos-coimbatore-img4.jpg";
-import casfos_coimbatore_img5 from "../assets/images/casfos-coimbatore-img5.jpg";
-import casfos_coimbatore_img3 from "../assets/images/casfos-coimbatore-img3.jpg";
 
 // MainPage component for public landing and institutional info
 const MainPage = () => {
